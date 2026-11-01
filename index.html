@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Professional Dental Care Center</title>
+<meta name="description" content="Dental clinic management: patients, appointments, invoices and records.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>body{font-family:'Roboto',sans-serif;-webkit-font-smoothing:antialiased}input,select,textarea{font-size:16px}
+::selection{background:color-mix(in srgb,var(--c) 30%,white)}
+.nv{display:flex;gap:14px;align-items:center;padding:12px 16px;margin:4px 8px;border-radius:10px;font-weight:500;cursor:pointer;transition:background .15s,color .15s,transform .1s}
+.nv:active{transform:scale(.98)}
+.nv.on{background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 70%,#000 8%));color:#fff;box-shadow:0 4px 10px color-mix(in srgb,var(--c) 35%,transparent)}
+.sb{background:#f3f4f6;box-shadow:0 2px 6px #0002;border-radius:12px;padding:14px 16px;text-align:left;width:100%;color:#4b5563;transition:transform .12s,box-shadow .12s}
+.sb:active{transform:scale(.98)}
+.sb.on{background:var(--cl);color:var(--cd);box-shadow:0 2px 10px color-mix(in srgb,var(--c) 20%,transparent)}
+.inp{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:9px 12px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.inp:focus{outline:none;border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent)}
+.lg{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#1d1d6b 25%));box-shadow:0 8px 20px -6px color-mix(in srgb,var(--c) 55%,transparent);transition:filter .15s,transform .1s}
+.lg:hover{filter:brightness(1.07)}.lg:active{transform:scale(.98)}
+:root{--c:#dc2626;--cd:#7f1d1d;--cl:#fef2f2}
+.bg-red-600,.bg-red-500,.hover\:bg-red-600:hover{background-color:var(--c)!important}
+.bg-red-100,.bg-red-50{background-color:color-mix(in srgb,var(--c) 12%,white)!important}
+.bg-red-200{background-color:color-mix(in srgb,var(--c) 25%,white)!important}
+.text-red-500,.text-red-600,.text-red-700{color:var(--c)!important}
+.text-red-800,.text-red-900{color:var(--cd)!important}
+.border-red-300,.border-red-600{border-color:var(--c)!important}
+.border-red-100{border-color:color-mix(in srgb,var(--c) 15%,white)!important}
+#login{background:radial-gradient(circle at 15% 15%,color-mix(in srgb,var(--c) 18%,white),var(--cl) 60%)}
+#login>div{box-shadow:0 20px 50px -16px color-mix(in srgb,var(--cd) 45%,transparent),0 2px 8px #0001}
+.card,.bg-white.rounded-xl,.bg-white.rounded-3xl{box-shadow:0 1px 3px #0000000d,0 1px 2px #0000000a}
+button,.btn{transition:transform .1s,filter .12s}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--c) 35%,#d1d5db);border-radius:6px}
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<div id="boot" style="position:fixed;inset:0;z-index:90;background:#fff;display:flex;align-items:center;justify-content:center;color:#555;font-size:15px">Loading...</div>
+<div id="login" class="min-h-screen flex items-center justify-center p-4" style="background:var(--cl)">
+ <div class="bg-white rounded-3xl shadow-2xl overflow-hidden flex w-full max-w-5xl">
+  <div class="w-full md:w-1/2 p-8 md:p-12">
+   <div class="text-center mb-8">
+    <div id="lb" class="mb-4"></div>
+    <h1 class="text-3xl font-bold" style="color:var(--cd)">Professional Dental Care Center</h1>
+    <p class="mt-2" style="color:var(--c)">Welcome back! Please sign in to your account.</p></div>
+   <label class="font-medium text-sm" style="color:var(--cd)">Clinic</label>
+    <select id="lc" onchange="selC()" class="inp mt-1 mb-2" style="background:#fff7f7;border-color:#fecaca"></select>
+    <div class="flex items-center justify-between text-xs mb-4" style="color:var(--cd)"><label class="flex items-center gap-1"><input type="checkbox" id="lr" checked> Remember this clinic</label><button onclick="newClinicLogin()" class="underline">+ Create clinic</button></div>
+    <label class="font-medium text-sm" style="color:var(--cd)">Username</label>
+   <input id="lp" class="inp mt-1 mb-4" style="background:#fff7f7;border-color:#fecaca" placeholder="Username or email" autocapitalize="none" autocorrect="off">
+   <label class="font-medium text-sm" style="color:var(--cd)">Password</label>
+   <div class="relative mt-1 mb-6"><input id="lw" type="password" class="inp" style="background:#fff7f7;border-color:#fecaca" placeholder="Enter your password" onkeydown="if(event.key=='Enter')login()">
+    <i class="fa fa-eye absolute right-3 top-3 text-red-500 cursor-pointer" onclick="lw.type=lw.type=='password'?'text':'password'"></i></div>
+   <button id="lbtn" onclick="login()" class="lg w-full text-white font-semibold py-3 rounded-xl shadow"><i class="fa fa-right-to-bracket mr-2"></i>Sign In</button>
+   <p class="text-xs text-center mt-3 text-gray-500">Forgot your password? Ask your clinic admin to reset it under Users.</p><p id="le" class="text-sm text-center mt-3 hidden" style="color:var(--c)">Invalid username or password.</p>
+   <p class="text-center text-sm mt-6 pt-4 border-t border-red-100" style="color:var(--c)">Powered by <b>SmartDent</b></p></div>
+  <div class="hidden md:flex w-1/2 items-center justify-center text-center p-10" style="background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,white))">
+   <div><div class="text-5xl font-bold" style="color:#ffffff">Professional Dental</div><div class="text-3xl font-light mt-1" style="color:#ffffff">Care Center</div></div></div>
+ </div></div>
+
+<div id="app" class="hidden h-screen flex overflow-hidden">
+ <div id="ov" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="tgl()"></div>
+ <aside id="sb" class="fixed lg:static z-40 inset-y-0 left-0 w-64 bg-white border-r flex flex-col -translate-x-full lg:translate-x-0 transition-transform">
+  <div class="p-4 border-b text-center relative"><i class="fa fa-angles-left absolute left-4 top-4 text-gray-500 cursor-pointer" onclick="tgl()"></i>
+   <div id="clh" class="flex items-center gap-3 mt-6 text-left"></div></div>
+  <nav id="nav" class="flex-1 overflow-auto py-3"></nav>
+  <div class="nv border-t" onclick="logout()"><i class="fa fa-right-from-bracket"></i>Logout</div>
+  <div class="text-center text-xs text-gray-500 py-3 border-t">Powered by <b class="text-red-700">SmartDent</b></div>
+ </aside>
+ <div class="flex-1 flex flex-col min-w-0">
+  <header class="flex items-center gap-3 p-3">
+   <button class="lg:hidden text-gray-600 px-2" onclick="tgl()"><i class="fa fa-bars"></i></button>
+   <div class="relative w-full max-w-xs"><i class="fa fa-search absolute left-3 top-3 text-gray-500"></i><input id="q" oninput="Q=this.value;go('recent')" placeholder="Search patients" class="w-full bg-white rounded-md shadow pl-9 pr-3 py-2"></div>
+   <div class="ml-auto flex items-center gap-3"><div id="av" class="w-9 h-9 rounded-full bg-white overflow-hidden"></div><button id="calbtn" onclick="cycleCal()" class="text-xs border rounded-md px-2 py-1 bg-white text-gray-700 whitespace-nowrap" title="Switch between Ethiopian and Gregorian dates"></button><span id="un" class="text-red-500 text-sm"></span></div>
+  </header>
+  <main id="v" class="flex-1 overflow-auto p-3 md:p-6"></main>
+ </div></div>
+
+<div id="md" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4"><div id="mb" class="bg-white rounded-xl p-6 w-full max-w-xl max-h-[90vh] overflow-auto"></div></div>
+
+<script>/* Ethiopian calendar: conversion, display mode (EC / GC / both) and date entry fields. */
+const EC_M=['መስከረም','ጥቅምት','ኅዳር','ታኅሣሥ','ጥር','የካቲት','መጋቢት','ሚያዝያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','ጳጉሜ'];
+const EC_L=['Meskerem','Tikimt','Hidar','Tahsas','Tir','Yekatit','Megabit','Miazia','Ginbot','Sene','Hamle','Nehase','Pagume'];
+const EC_OFF=1723856;
+const gJDN=d=>Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)+2440588;
+function toEC(d){const j=gJDN(d),r=(j-EC_OFF)%1461,n=r%365+365*Math.floor(r/1460);return {y:4*Math.floor((j-EC_OFF)/1461)+Math.floor(r/365)-Math.floor(r/1460),m:Math.floor(n/30)+1,d:n%30+1}}
+function fromEC(y,m,d){const j=EC_OFF+365+365*(y-1)+Math.floor(y/4)+30*m+d-31,u=(j-2440588)*864e5,x=new Date(u);return new Date(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate())}
+const ecLeap=y=>y%4==3,ecDays=(y,m)=>m<13?30:(ecLeap(y)?6:5);
+const pad2=n=>String(n).padStart(2,'0');
+const isoD=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())};
+const ISO_RE=/^\d{4}-\d{2}-\d{2}$/;
+function toDate(t){if(t==null||t==='')return null;if(t instanceof Date)return isNaN(t)?null:t;if(typeof t=='number')return new Date(t);const s=String(t);if(ISO_RE.test(s))return new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));const v=Date.parse(s);return isNaN(v)?null:new Date(v)}
+const toISO=t=>{const d=toDate(t);return d?isoD(d):''};
+const CAL_KEY='dental_calendar';
+let CALM_=(()=>{try{const v=localStorage.getItem(CAL_KEY);return ['ec','gc','both'].includes(v)?v:'ec'}catch(e){return 'ec'}})();
+const CALM=()=>CALM_;
+const gcStr=d=>d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+const ecStr=d=>{const e=toEC(d);return EC_M[e.m-1]+' '+e.d+', '+e.y};
+function fdate(t,mode){const d=toDate(t);if(!d)return (t==null||t==='')?'-':String(t);mode=mode||CALM_;return mode=='gc'?gcStr(d):mode=='ec'?ecStr(d):ecStr(d)+' ('+gcStr(d)+')'}
+function fshort(t){const d=toDate(t);if(!d)return '';if(CALM_=='gc')return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});const e=toEC(d);return EC_M[e.m-1]+' '+e.d}
+const dsp=x=>ISO_RE.test(x.date||'')?fdate(x.date):fdate(x.ts||x.date);
+const calLabel=()=>CALM_=='ec'?'EC':CALM_=='gc'?'GC':'EC + GC';
+function cycleCal(){CALM_=CALM_=='ec'?'gc':CALM_=='gc'?'both':'ec';try{localStorage.setItem(CAL_KEY,CALM_)}catch(e){}calBtn();if(typeof go=='function'&&typeof U!='undefined'&&U&&document.getElementById('md').classList.contains('hidden'))go(V)}
+function calBtn(){const b=document.getElementById('calbtn');if(b)b.textContent='Calendar: '+calLabel()}
+
+/* date entry: Ethiopian selects (EC mode) or a native date input (GC / both). The value is always an ISO yyyy-mm-dd string in #id. */
+function dateField(id,val,cb){cb=cb||'';const iso=toISO(val),mode=CALM_;
+ if(mode=='ec'){const base=iso?toDate(iso):new Date(),e=toEC(base),cy=toEC(new Date()).y,ys=[];for(let y=cy-100;y<=cy+5;y++)ys.push(y);
+  const v=iso||isoD(base);
+  return `<div class="grid grid-cols-3 gap-2 mb-3"><select id="${id}_d" onchange="ecSync('${id}');${cb}" class="inp" aria-label="Day">${Array.from({length:30},(_,i)=>`<option ${i+1==e.d?'selected':''}>${i+1}</option>`).join('')}</select><select id="${id}_m" onchange="ecSync('${id}');${cb}" class="inp" aria-label="Month">${EC_M.map((n,i)=>`<option value="${i+1}" ${i+1==e.m?'selected':''}>${n}</option>`).join('')}</select><select id="${id}_y" onchange="ecSync('${id}');${cb}" class="inp" aria-label="Year">${ys.map(y=>`<option ${y==e.y?'selected':''}>${y}</option>`).join('')}</select><input type="hidden" id="${id}" value="${v}"></div><div id="${id}_h" class="text-xs text-gray-500 -mt-2 mb-3">${gcStr(base)}</div>`}
+ return `<input id="${id}" type="date" value="${iso}" onchange="ecHint('${id}');${cb}" class="inp mb-3">`+(mode=='both'?`<div id="${id}_h" class="text-xs text-gray-500 -mt-2 mb-3">${iso?ecStr(toDate(iso)):''}</div>`:'')}
+function ecSync(id){const y=+document.getElementById(id+'_y').value,m=+document.getElementById(id+'_m').value;let d=+document.getElementById(id+'_d').value;const max=ecDays(y,m);if(d>max){d=max;document.getElementById(id+'_d').value=d}const g=fromEC(y,m,d);document.getElementById(id).value=isoD(g);const h=document.getElementById(id+'_h');if(h)h.textContent=gcStr(g)}
+function ecHint(id){const h=document.getElementById(id+'_h'),v=document.getElementById(id).value;if(h)h.textContent=v?ecStr(toDate(v)):''}
+
+/* payment platforms */
+const PAYM=['Cash','Telebirr','CBE Birr','CBE (bank)','eBirr','Other bank','Card'];
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>/* Data layer: Supabase auth + shared database. Everything the app stores goes through DB. */
+const SB_URL='https://qorufqosjdhefnafwfzh.supabase.co',SB_KEY='sb_publishable_2aGJ8SWeZBbWKtTJ8DdpeA_amjSfx39';
+const DB=(()=>{
+ let sb=null;
+ const email=u=>{u=String(u).trim().toLowerCase();return u.includes('@')?u:u+'@dental.app'};
+ const ck=r=>{if(r.error)throw new Error(r.error.message||'Request failed');return r.data};
+ const prof=r=>r&&({...r,clinic:r.clinic});
+ return {
+  async init(){if(!window.supabase)throw new Error('Could not load the sign-in library. Check your internet connection.');sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'dental_auth'},global:{fetch:(u,o)=>{o=o||{};if(o.headers&&typeof o.headers.entries=='function'&&!Array.isArray(o.headers))o={...o,headers:Object.fromEntries(o.headers.entries())};return fetch(u,o)}}})},
+  async clinics(){return ck(await sb.from('clinics').select('*').order('created_at'))},
+  async profile(){const {data}=await sb.auth.getSession();if(!data.session)return null;const r=await sb.from('profiles').select('*').eq('id',data.session.user.id).maybeSingle();if(r.error||!r.data){await sb.auth.signOut();return null}return prof(r.data)},
+  async signIn(username,password){const r=await sb.auth.signInWithPassword({email:email(username),password});if(r.error)throw new Error('Invalid username or password.');const p=await sb.from('profiles').select('*').eq('id',r.data.user.id).maybeSingle();if(p.error||!p.data){await sb.auth.signOut();throw new Error('This account has no profile. Ask your admin.')}return prof(p.data)},
+  async token(){const {data}=await sb.auth.getSession();return data.session?data.session.access_token:null},
+  async signOut(){try{await sb.auth.signOut()}catch(e){}},
+  async loadClinicData(cid){const [p,l]=await Promise.all([sb.from('patients').select('id,data').eq('clinic',cid).limit(5000),sb.from('clinic_lists').select('kind,data').eq('clinic',cid)]);const pr=ck(p),ls=ck(l),o={dis:null,proc:null};ls.forEach(x=>o[x.kind]=x.data);return {patients:pr.map(r=>r.data),dis:o.dis,proc:o.proc}},
+  async savePatients(cid,ins,upd,del){const now=new Date().toISOString();
+   if(ins.length)ck(await sb.from('patients').insert(ins.map(p=>({id:p.id,clinic:cid,data:p,updated_at:now}))));
+   await Promise.all(upd.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))));
+   if(del.length)ck(await sb.from('patients').delete().in('id',del.map(Number)))},
+  async saveList(cid,kind,data){ck(await sb.from('clinic_lists').upsert({clinic:cid,kind,data,updated_at:new Date().toISOString()}))},
+  async saveClinic(c){ck(await sb.from('clinics').upsert({id:c.id,name:c.name,type:c.type,color:c.color,icon:c.icon,logo:c.logo||null}))},
+  async deleteClinic(id){ck(await sb.from('clinics').delete().eq('id',id))},
+  async users(){return ck(await sb.from('profiles').select('*').order('created_at'))},
+  async fn(action,payload){const {data}=await sb.auth.getSession();if(!data.session)throw new Error('Please sign in again.');
+   let r;try{r=await fetch(SB_URL+'/functions/v1/manage-users',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token,apikey:SB_KEY},body:JSON.stringify({action,...payload})})}catch(e){throw new Error('Could not reach the server. Check your internet connection.')}
+   const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw new Error(j.error||'Request failed');return j},
+  async updateProfile(id,f){const allowed=['name','phone','email','title','exp','idcode','blood','expiry','avatar','branch'],o={};allowed.forEach(k=>{if(f[k]!==undefined)o[k]=f[k]});ck(await sb.from('profiles').update(o).eq('id',id))},
+  async changePassword(username,oldPw,newPw){const r=await sb.auth.signInWithPassword({email:email(username),password:oldPw});if(r.error)throw new Error('Current password is wrong.');const u=await sb.auth.updateUser({password:newPw});if(u.error)throw new Error(u.error.message)}
+ }})();
+</script>
+<!-- app code, in load order -->
+<script>const bad=m=>{alert(m);return false};
+const $=i=>document.getElementById(i),H=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NAV=[['dash','Dashboard','fa-table-columns'],['appt','Appointment','fa-calendar-check'],['recent','Recent Patient','fa-user-clock'],['card','New Patient Card','fa-id-card'],['ran','Analytics','fa-chart-line'],['rinv','Invoice Manager','fa-file-invoice-dollar'],['rpr','Print Center','fa-print'],['fin','Finance','fa-sack-dollar'],['lab','Finished Laboratory','fa-flask'],['proc','Procedure','fa-tooth'],['users','Users','fa-users'],['clinics','Clinics','fa-hospital'],['dis','Disease','fa-virus'],['profile','Profile','fa-user']];
+const DIS="Chronic Apical Periodontitis,Chronic Periodontitis,Pulpal Necrosis,Acute Apical Periodontitis (AAP),Dental Caries,Acute Apical Abscess (AAA),Acute Periodontal Abscess (APA),Caries Lesion,Acute Pulpitis,Chronic Pulpitis,Cellulitis,Ameloblastoma,Enamel Imperfecta,Gingivitis,Epulis,Cystic Lesion,Granuloma,Periodontitis,Halitosis,Hypersensitivity,Endo-Perio Lesion,Perio-Endo Lesion,Enamel Hypoplasia,Periapical Lesion,Reversible pulpitis,Retained primary teeth,Pericoronitis,Root fracture,Intrusion luxation,Extrusion luxation,Lateral luxation,Crown fracture".split(',');
+const PRO=[['Scaling & Polishing',1500],['Composite Filling',2000],['Extraction',1000],['Root Canal Treatment',5000],['Orthodontic (Tradition Brace) Lower',16000],['Crown',6000]];
+const MEDS=['Amoxicillin 500mg','Metronidazole 400mg','Ibuprofen 400mg','Paracetamol 500mg','Diclofenac 50mg','Chlorhexidine Mouthwash','Augmentin 625mg'];
+const CONS=['Allergies','Anemia','Epilepsy','Asthma','Diabetes Mellitus','Hypertension','Heart Disease','Immune Deficiency','Coagulopathy','Organopathy','Pregnancy','Medications Taken','Bleeding Disorder'];
+const VATO=['No VAT','Add 15% VAT'];
+const SEC={
+rec:{t:'Dental Record',b:'New Record',e:'No Dental findings available.',f:[['tooth','Tooth No','sel',["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "Full mouth"]],['finding','Diagnosis / Finding','sel',[]],['treat','Treatment','sel',[]],['note','Notes','area']]},
+appt:{t:'Appointments',b:'New Appointment',e:'No appointments available.',f:[['date','Date','date'],['time','Time','time'],['note','Note']]},
+lab:{t:'Labratory',b:'New labratory Request',e:'No Labratory Request available.',f:[['req','Request'],['lab','Laboratory'],['done','Finished','sel',['No','Yes']]]},
+prof:{t:'Proforma Records',b:'New Proforma',e:'No Proforma available for this patient.',f:[['item','Procedure / Item','sel',[]],['desc','Description'],['price','Price per unit (ETB)','number'],['qty','Quantity','number'],['disc','Discount (ETB)','number'],['vat','15% VAT','sel',VATO]]},
+note:{t:'Notes',b:'New Note',e:'No notes yet.',f:[['title','Title'],['note','Note','area']]},
+inv:{t:'Invoices',b:'New Invoice',e:'No invoices yet.',f:[['item','Procedure / Item','sel',[]],['desc','Description'],['price','Price per unit (ETB)','number'],['qty','Quantity','number'],['disc','Discount (ETB)','number'],['vat','15% VAT','sel',VATO],['paid','Amount paid (ETB)','number'],['method','Payment method (for amount paid)','sel',PAYM],['ref','Transaction / reference no. (not needed for cash)']]},
+img:{t:'Images & X-rays',b:'Upload Image',e:'No images found for this patient.',f:[['kind','Type','sel',['X-ray','Panoramic X-ray','Photo','Other']],['tooth','Tooth / Area'],['note','Note']]},
+cred:{t:'Credit',b:'New Credit',e:'No Credit available for this patient.',f:[['amt','Amount (ETB)','number'],['note','Note']]},
+ortho:{t:'Orthodontics',b:'New Ortho Record',e:'No orthodontic records.',f:[['type','Treatment'],['date','Start date','date'],['note','Note','area']]},
+cert:{t:'Medical Certificate',b:'New Certificate',e:'No certificates issued.',f:[['dx','Diagnosis'],['days','Rest days','number'],['date','Date','date']]},
+health:{t:'Health Information',b:'New Entry',e:'No health information.',f:[['bp','Blood pressure'],['allergy','Allergies'],['note','Notes','area']]},
+ref:{t:'Referral',b:'New Referral',e:'No referrals.',f:[['to','Refer to'],['why','Reason','area']]},
+fna:{t:'FNA or Biopsy Request',b:'New Request',e:'No requests.',f:[['site','Site'],['type','FNA / Biopsy','sel',['FNA','Biopsy']],['note','Notes','area']]}};
+const SIDE=[['appt','Appointments'],['lab','Labratory'],['prof','Proforma'],['note','Note'],['inv','Invoice'],['img','Images'],['cred','Credit']];
+const DR=[['rec','Dental Records'],['ortho','Orthodontics'],['presc','Prescriptions'],['consent','Consent'],['cert','Medical Certificate'],['health','Health Information'],['ref','Referral'],['fna','FNA or Biopsy Request']];
+let S,U,V='dash',Q='',PID,SK='rec',MENU=0,TAB='all';
+const ETB=n=>'ETB '+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const now=Date.now(),ds=t=>fdate(t);
+const K={s:'private_dental_selected_clinic',cc:'private_dental_currentClinic'};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const ICONS={tooth:'<path d="M50 14C38 8 22 16 24 36c1 12 6 20 8 34 1.5 11 5 18 9 18 5 0 4-16 9-16s4 16 9 16c4 0 7.5-7 9-18 2-14 7-22 8-34C78 16 62 8 50 14z"/>',cross:'<path d="M40 14h20v26h26v20H60v26H40V60H14V40h26z"/>',shield:'<path d="M50 10l34 12v26c0 20-14 36-34 42C30 84 16 68 16 48V22z"/>',heart:'<path d="M50 88C20 64 10 48 10 32 10 20 20 12 31 12c8 0 15 4 19 11 4-7 11-11 19-11 11 0 21 8 21 20 0 16-10 32-40 56z"/>',star:'<path d="M50 8l12 27 29 3-22 20 7 29-26-15-26 15 7-29L9 38l29-3z"/>',building:'<path d="M20 90V30l30-18 30 18v60H58V62H42v28z"/>',smile:'<path d="M50 12a38 38 0 100 76 38 38 0 000-76zm-16 30a6 6 0 1112 0 6 6 0 01-12 0zm32 0a6 6 0 1112 0 6 6 0 01-12 0zM30 58c4 12 15 20 20 20s16-8 20-20c-6 6-13 9-20 9s-14-3-20-9z"/>',gem:'<path d="M50 10L90 40 50 92 10 40z"/>',drop:'<path d="M50 10c18 26 30 42 30 58a30 30 0 01-60 0c0-16 12-32 30-58z"/>',bolt:'<path d="M55 8L25 55h23l-8 37 38-50H56l12-34z"/>',leaf:'<path d="M20 82C18 34 48 12 84 16c3 36-16 62-48 68-8 2-13 1-16-2zM24 78C40 62 54 48 68 30"/>'};
+const logoH=(c,sz)=>`<div class="${sz} rounded-full flex items-center justify-center overflow-hidden shrink-0" style="background:${c.color}">${c.logo?`<img src="${c.logo}" class="w-full h-full object-cover">`:`<svg viewBox="0 0 100 100" class="w-3/5 h-3/5" fill="#fff">${ICONS[c.icon]||ICONS.tooth}</svg>`}</div>`;
+const TYPE=t=>t=='government'?'Government Dental Clinic':'Private Dental Clinic Center';
+let CL=[],C=null;
+S={users:[],usersLoaded:0,patients:[],dis:[],proc:[]};
+let SNAP=new Map(),SNAPL={dis:'',proc:'',fin:''},SQ=Promise.resolve(),SERR=0;
+const stab=o=>JSON.stringify(o,(k,v)=>v&&typeof v=='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v);
+const clName=id=>id=='all'?'All clinics':(CL.find(c=>c.id==id)||{name:'-'}).name;
+function setTheme(c){const r=document.documentElement.style;r.setProperty('--c',c.color);r.setProperty('--cd',`color-mix(in srgb,${c.color} 60%,black)`);r.setProperty('--cl',`color-mix(in srgb,${c.color} 10%,white)`)}
+const migrate=(p,i)=>{p.card??=(p.cardNo&&p.cardNo!='N/A'?p.cardNo:i+1);p.doc??=p.doctor||'';p.doctor??=p.doc;p.date=typeof p.date=='number'?p.date:(Date.parse(p.date)||Date.now());p.arr??=p.date;p.st??='new';p.fin??=false;p.d??={}};
+function applyData(d){S.patients=d.patients||[];S.patients.forEach(migrate);S.dis=d.dis||DIS.map((n,i)=>({id:i+1,name:n,date:'12/3/2025'}));S.proc=d.proc||PRO.map((x,i)=>({id:i+1,n:x[0],p:x[1]}));S.fin=d.fin||{sal:[],exp:[]};S.fin.sal=S.fin.sal||[];S.fin.exp=S.fin.exp||[];
+ SNAP=new Map(S.patients.map(p=>[String(p.id),stab(p)]));SNAPL={dis:stab(S.dis),proc:stab(S.proc),fin:stab(S.fin)};ensureInvNos();if(S.patients.some(p=>SNAP.get(String(p.id))!==stab(p)))sv()}
+async function loadClinic(id){C=CL.find(c=>c.id==id)||CL[0];applyData(await DB.loadClinicData(C.id));setTheme(C);document.title=C.name}
+function toast(m,ok){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;max-width:92vw;padding:10px 16px;border-radius:10px;color:#fff;font-size:14px;box-shadow:0 4px 14px #0004';document.body.appendChild(t)}t.style.background=ok?'#15803d':'#b91c1c';t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',ok?1800:6000)}
+function sv(){SQ=SQ.then(syncNow).then(()=>{if(SERR){SERR=0;toast('Saved',1)}},e=>{SERR=1;toast('Could not save: '+(e.message||e)+'. Your changes will retry on the next save.')})}
+async function syncNow(){if(!C||!U)return;const cid=C.id,cur=new Map(S.patients.map(p=>[String(p.id),stab(p)])),ins=[],upd=[],del=[];
+ S.patients.forEach(p=>{const k=String(p.id),o=SNAP.get(k);if(o===undefined)ins.push(p);else if(o!==cur.get(k))upd.push(p)});SNAP.forEach((v,k)=>{if(!cur.has(k))del.push(k)});
+ if(ins.length||upd.length||del.length){await DB.savePatients(cid,ins,upd,del);ins.concat(upd).forEach(p=>SNAP.set(String(p.id),cur.get(String(p.id))));del.forEach(k=>SNAP.delete(k))}
+ for(const k of ['dis','proc','fin']){const j=stab(S[k]);if(j!==SNAPL[k]){await DB.saveList(cid,k,S[k]);SNAPL[k]=j}}}
+let RF=0;
+async function refresh(){if(RF||!C||!U)return;RF=1;try{await SQ;const cid=C.id,d=await DB.loadClinicData(cid);if(cid!=C.id)return;const mine_=new Map(S.patients.map(p=>[String(p.id),stab(p)]));
+ let pending=mine_.size!=SNAP.size;mine_.forEach((v,k)=>{if(SNAP.get(k)!==v)pending=true});if(pending)return;
+ const rem=new Map(d.patients.map(p=>[String(p.id),stab(p)]));let diff=rem.size!=SNAP.size||stab(d.dis||S.dis)!=SNAPL.dis||stab(d.proc||S.proc)!=SNAPL.proc||stab(d.fin||S.fin)!=SNAPL.fin;rem.forEach((v,k)=>{if(SNAP.get(k)!==v)diff=true});
+ if(diff&&md.classList.contains('hidden')){applyData(d);if(V!='card')go(V)}}catch(e){}finally{RF=0}}
+setInterval(()=>{if(U&&C&&!document.hidden&&md.classList.contains('hidden')&&V!='card')refresh()},45000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&U&&C&&md.classList.contains('hidden')&&V!='card')refresh()});
+function setCur(){if(C){lsSet(K.cc,C.id);try{sessionStorage.setItem(K.cc,C.id)}catch(e){}}}
+function hdr(){calBtn();un.textContent=U.name;av.innerHTML=U.avatar?`<img class="w-full h-full object-cover" src="${U.avatar}">`:'';$('clh').innerHTML=logoH(C,'w-12 h-12')+`<div class="min-w-0"><div class="font-bold text-sm leading-tight break-words">${H(C.name)}</div><div class="text-[11px] text-gray-500">${TYPE(C.type)}</div></div>`}
+function lcInit(){const sel=lsGet(K.s);lc.innerHTML=CL.map(c=>`<option value="${c.id}" ${c.id==sel?'selected':''}>${H(c.name)} (${c.type=='government'?'Government':'Private'})</option>`).join('');selC()}
+function selC(){const c=CL.find(x=>x.id==lc.value)||CL[0];setTheme(c);$('lb').innerHTML=logoH(c,'w-16 h-16 mx-auto')}
+async function login(){le.classList.add('hidden');const b=$('lbtn');if(b.disabled)return;b.disabled=true;
+ try{if(!lp.value.trim()||!lw.value)throw new Error('Enter your username and password.');const u=await DB.signIn(lp.value,lw.value),cid=lc.value;if(u.role!='admin'&&u.clinic!=cid){await DB.signOut();throw new Error('This account does not belong to the selected clinic.')}
+  if(lr.checked)lsSet(K.s,cid);else lsDel(K.s);U=u;await loadClinic(cid);setCur();boot()}catch(e){le.textContent=e.message||'Sign-in failed.';le.classList.remove('hidden')}finally{b.disabled=false}}
+async function logout(){try{await SQ}catch(e){}await DB.signOut();lsDel(K.cc);try{sessionStorage.removeItem(K.cc)}catch(e){}location.reload()}
+function boot(){if(!U||!C)return;login_.classList.add('hidden');app.classList.remove('hidden');hdr();go('dash')}
+async function start(){const ov=$('boot');try{await DB.init();CL=await DB.clinics();lcInit();const p=await DB.profile();if(p){U=p;let cid=sessionStorage.getItem(K.cc)||lsGet(K.cc)||'';if(!CL.some(c=>c.id==cid))cid=U.role=='admin'?(CL[0]||{}).id:U.clinic;await loadClinic(cid);boot()}}
+ catch(e){ov.innerHTML=`<div class="text-center p-6"><p class="mb-3">${H(e.message||'Could not start the app.')}</p><button onclick="location.reload()" class="lg text-white font-semibold px-5 py-2 rounded-xl">Try again</button></div>`;return}
+ ov.style.display='none'}
+/* clinic create / edit */
+let CT=null,CK=null,CA={u:'',p:''};
+function clinicModal(c,ok,auth){CT={...c};CK=ok;CA={u:'',p:''};cmr(auth?1:0);md.classList.replace('hidden','flex')}
+function cmr(auth){if(auth&&$('ca_u')&&$('ca_p')){CA.u=$('ca_u').value;CA.p=$('ca_p').value}const t=CT;$('mb').innerHTML=`<h3 class="font-bold text-xl mb-3">${t.id?'Edit Clinic':'Create Clinic'}</h3>
+ ${auth?`<p class="text-xs text-gray-500 mb-2">Admin sign-in is required to create a clinic.</p><input id="ca_u" value="${H(CA.u)}" class="inp mb-2" placeholder="Admin username" autocapitalize="none"><input id="ca_p" value="${H(CA.p)}" type="password" class="inp mb-3" placeholder="Admin password">`:''}
+ <label class="block text-sm font-medium mb-1">Clinic name</label><input value="${H(t.name)}" oninput="CT.name=this.value" class="inp mb-3">
+ <label class="block text-sm font-medium mb-1">Clinic type</label><select onchange="CT.type=this.value" class="inp mb-3"><option value="government" ${t.type=='government'?'selected':''}>Government Dental Clinic</option><option value="private" ${t.type!='government'?'selected':''}>Private Dental Clinic Center</option></select>
+ <label class="block text-sm font-medium mb-1">Colour</label><div class="flex items-center gap-2 mb-3 flex-wrap"><input type="color" value="${t.color}" oninput="CT.color=this.value;cmp()" class="w-12 h-10 p-0 border rounded">${['#dc2626','#2563eb','#059669','#7c3aed','#ea580c','#0891b2','#be185d'].map(x=>`<button onclick="CT.color='${x}';cmr(${auth})" class="w-8 h-8 rounded-full border" style="background:${x}"></button>`).join('')}</div>
+ <label class="block text-sm font-medium mb-1">Icon</label><div class="flex flex-wrap gap-2 mb-3">${Object.keys(ICONS).map(k=>`<button onclick="CT.icon='${k}';CT.logo=null;cmr(${auth})" class="rounded-full ${t.icon==k&&!t.logo?'ring-2 ring-offset-2 ring-gray-700':''}">${logoH({color:t.color,icon:k},'w-10 h-10')}</button>`).join('')}</div>
+ <label class="block text-sm font-medium mb-1">Or upload your own logo</label><input type="file" accept="image/*" onchange="cLogo(event,${auth})" class="inp mb-3">
+ <div class="flex items-center gap-3 mb-4"><span class="text-sm text-gray-500">Preview</span><div id="cmp">${logoH(t,'w-14 h-14')}</div></div>
+ ${t.id?'':`<div class="border rounded-lg p-3 mb-4 bg-gray-50"><div class="text-sm font-medium mb-1">Clinic admin account (manager) <span class="text-gray-400 font-normal">(optional)</span></div><div class="grid grid-cols-2 gap-2"><input value="${H(t.mu)}" oninput="CT.mu=this.value" class="inp" placeholder="Username" autocapitalize="none"><input value="${H(t.mp)}" oninput="CT.mp=this.value" class="inp" placeholder="Password"></div></div>`}
+ <div class="flex justify-end gap-2"><button onclick="cl()" class="px-4 py-2 rounded bg-gray-200">Cancel</button><button id="cm_save" onclick="cmSave(${auth})" class="px-4 py-2 rounded bg-red-600 text-white">Save</button></div>`}
+const cmp=()=>{$('cmp').innerHTML=logoH(CT,'w-14 h-14')};
+function cLogo(e,auth){const f=e.target.files[0];if(f)rs(f,200,d=>{CT.logo=d;cmr(auth)},true)}
+async function cmSave(auth){const t=CT;if(!t.name||!t.name.trim())return bad('Clinic name is required.');t.name=t.name.trim();
+ if(!t.id&&(t.mu||t.mp)){if(!(t.mu||'').trim()||!(t.mp||'').trim())return bad('Enter both a manager username and password, or leave both blank.');if(t.mp.trim().length<6)return bad('The manager password must be at least 6 characters.')}
+ const sb=$('cm_save');if(sb)sb.disabled=true;
+ try{if(auth){let a;try{a=await DB.signIn($('ca_u').value,$('ca_p').value)}catch(e){throw new Error('Valid admin username and password are required.')}if(a.role!='admin'){await DB.signOut();throw new Error('Only an admin can create a clinic.')}}
+  try{await CK(t)}finally{if(auth)await DB.signOut()}}catch(e){alert(e.message||'Could not save the clinic.');if(sb)sb.disabled=false}}
+async function mkClinic(t){const n={...t,id:'c'+Date.now()};delete n.mu;delete n.mp;await DB.saveClinic(n);if(t.mu&&t.mp){try{await DB.fn('create',{username:t.mu.trim(),password:t.mp.trim(),role:'manager',clinic:n.id,name:'Manager'})}catch(e){alert('The clinic was created, but the manager account failed: '+e.message)}}CL.push(n);return n}
+function newClinicLogin(){clinicModal({name:'',type:'private',color:'#2563eb',icon:'tooth',logo:null},async t=>{const n=await mkClinic(t);lcInit();lc.value=n.id;selC();cl()},1)}
+function addC(){clinicModal({name:'',type:'private',color:'#2563eb',icon:'tooth',logo:null},async t=>{await mkClinic(t);cl();go('clinics')})}
+function edC(id){const c=CL.find(x=>x.id==id);clinicModal(c,async t=>{const n={...c,...t};await DB.saveClinic(n);Object.assign(c,t);if(c.id==C.id){setTheme(C);hdr()}cl();go('clinics')})}
+async function swC(id){try{await SQ}catch(e){}try{await loadClinic(id);setCur();hdr();go('dash')}catch(e){alert(e.message)}}
+async function delC(id){const c=CL.find(x=>x.id==id);if(!c||CL.length<2||c.id==C.id)return;if(!confirm('Delete "'+c.name+'" with ALL its patients, records and staff accounts? This cannot be undone.'))return;
+ try{await DB.fn('purge_clinic',{clinic:id});await DB.deleteClinic(id);CL=CL.filter(x=>x.id!=id);S.usersLoaded=0;go('clinics')}catch(e){alert(e.message)}}
+function clinics(){return hd('Clinics',bb('New Clinic +','addC()'))+`<div class="grid md:grid-cols-2 gap-4">${CL.map(c=>`<div class="bg-white rounded-xl shadow p-4 flex items-center gap-3">${logoH(c,'w-14 h-14')}<div class="flex-1 min-w-0"><div class="font-bold leading-tight break-words">${H(c.name)}</div><div class="text-xs text-gray-500">${TYPE(c.type)}${c.id==C.id?' · Current':''}</div></div><div class="flex items-center gap-3 whitespace-nowrap">${c.id!=C.id?`<button onclick="swC('${c.id}')" class="text-xs border rounded px-2 py-1">Switch</button>`:''}<i class="fa fa-pen text-red-600 cursor-pointer" onclick="edC('${c.id}')"></i>${CL.length>1&&c.id!=C.id?`<i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delC('${c.id}')"></i>`:''}</div></div>`).join('')}</div>`}
+const login_=$('login');
+function tgl(){const s=$('sb');if(innerWidth>=1024){s.classList.toggle('lg:hidden');return}s.classList.toggle('-translate-x-full');$('ov').classList.toggle('hidden',s.classList.contains('-translate-x-full'))}
+function go(v,id){if(v!='patient'&&!(RN[U.role]||RN.reception).includes(v))v='dash';V=v;if(id){PID=id;SK='rec';MENU=0}
+ $('nav').innerHTML=NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0])).map(n=>`<div class="nv ${V==n[0]?'on':''}" onclick="go('${n[0]}')"><i class="fa ${n[2]} w-5"></i>${n[1]}</div>`).join('');
+ if(innerWidth<1024){$('sb').classList.add('-translate-x-full');$('ov').classList.add('hidden')}
+ const f={dash,appt,recent,card:cardv,ran:analytics,rinv:invMgr,rpr:printCenter,fin:finance,lab,proc,users,clinics,dis,profile,patient}[v];$('v').innerHTML=f();}
+const card=(h,b)=>`<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-4">${h}${b}</div>`;
+const hd=(t,btn)=>`<div class="flex justify-between items-center mb-4 gap-2"><h2 class="text-2xl font-bold">${t}</h2>${btn||''}</div>`;
+const gb=(l,a)=>`<button onclick="${a}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm">${l}</button>`;
+const bb=(l,a)=>`<button onclick="${a}" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">${l}</button>`;
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):'';
+const canAdd=()=>!!U&&(U.role=='reception'||U.role=='manager'),canDel=()=>!!U&&(U.role=='admin'||U.role=='manager'||U.role=='reception');
+const RN={admin:['dash','appt','recent','ran','rinv','rpr','fin','lab','proc','users','clinics','dis','profile'],manager:['dash','appt','recent','card','ran','rinv','rpr','fin','lab','proc','users','dis','profile'],doctor:['dash','appt','recent','lab','proc','dis','profile'],nurse:['dash','appt','recent','lab','profile'],reception:['dash','appt','recent','card','ran','rinv','rpr','profile']},RA=['appt','prof','inv','cred'];
+const ROLEF={admin:'ADMINISTRATION',manager:'MANAGEMENT',doctor:'DENTISTRY',nurse:'NURSING',reception:'RECEPTION'};
+const TOOTH=c=>`<svg viewBox="0 0 100 100" class="${c}" fill="#fff"><path d="M50 14C38 8 22 16 24 36c1 12 6 20 8 34 1.5 11 5 18 9 18 5 0 4-16 9-16s4 16 9 16c4 0 7.5-7 9-18 2-14 7-22 8-34C78 16 62 8 50 14z"/><path fill="#ff2a2a" d="M76 6l2.5 6 6 2.5-6 2.5L76 23l-2.5-6-6-2.5 6-2.5z"/></svg>`;
+const ago=t=>{const m=Math.max(0,Math.round((Date.now()-t)/6e4));return Math.floor(m/60)+'h '+m%60+'m ago'};
+function dash(){const P=S.patients,td=P.filter(p=>ds(p.arr)==ds(Date.now())),cnt=s=>P.filter(p=>p.st==s).length;
+ const T=[['all','All Patients ('+P.length+')'],['today',"Today's Orders ("+td.length+')'],['new','New Order ('+cnt('new')+')'],['doctor','Seen by Doctor ('+cnt('doctor')+')'],['nurse','Seen by Nurse ('+cnt('nurse')+')']];
+ let L=TAB=='all'?P:TAB=='today'?td:P.filter(p=>p.st==TAB);L=[...L].sort((a,b)=>a.arr-b.arr);
+ const C={new:'bg-red-50 border-red-400',doctor:'bg-green-50 border-green-400',nurse:'bg-pink-50 border-pink-400'},N={new:'New Order',doctor:'Seen by Doctor',nurse:'Seen by Nurse'};
+ return quick()+`<h2 class="text-2xl font-bold">Patients with Active Orders</h2><p class="text-gray-600 mb-4">Manage and monitor patient orders in real-time - First Come First Serve</p>
+ <div class="bg-white rounded-lg p-4 mb-4 text-sm flex flex-wrap gap-x-5 gap-y-1"><b><i class="fa fa-filter mr-1"></i>Status Legend:</b><span>🟩 Seen by Doctor</span><span>🟦 New order</span><span>🟪 Seen by Nurse</span></div>
+ <div class="bg-white rounded-lg p-4 mb-4 flex flex-wrap gap-2">${T.map(t=>`<button onclick="TAB='${t[0]}';go('dash')" class="px-3 py-2 rounded-md text-sm border ${TAB==t[0]?'bg-red-100 border-red-400 text-red-700':'bg-gray-100'}">${t[1]}</button>`).join('')}</div>
+ <div class="bg-white rounded-lg shadow">${L.map((p,i)=>`<div class="p-4 border-l-4 border-b ${C[p.st]}"><div class="flex justify-between"><div><b class="cursor-pointer hover:underline" onclick="go('patient','${p.id}')">${H(p.name)}</b></div><span class="text-xs bg-white/70 rounded-full px-3 py-1 h-fit">${N[p.st]}</span></div>
+ <div class="grid grid-cols-2 text-sm mt-2 gap-y-1"><span>Sex: ${p.sex}</span><span>Card: ${p.card}</span><span>Arrived: ${ago(p.arr)}</span></div>
+ <div class="text-right text-sm text-red-600 mt-2"><span class="mr-5 cursor-pointer text-gray-600" onclick="go('patient','${p.id}')"><i class="fa fa-folder-open"></i> History</span><span class="cursor-pointer" onclick="editOrder('${p.id}')"><i class="fa fa-pen"></i> Edit Order</span></div></div>`).join('')||'<p class="p-6 text-gray-500">No patients.</p>'}</div>`}
+function editOrder(id){const p=S.patients.find(x=>x.id==id);form('Edit Order',[['st','Status','sel',['new','doctor','nurse']]],p,v=>{p.st=v.st;sv();go('dash')})}
+function recent(){const l=S.patients.filter(p=>(p.name+p.phone+p.card).toLowerCase().includes(Q.toLowerCase())).sort((a,b)=>b.date-a.date);
+ return hd('Recent Patients',canAdd()?gb('New Patient +','newPat()'):'')+card('',`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Card</th><th>Name</th><th>Phone</th><th>Age</th><th>Last visit</th><th></th></tr>${l.map(p=>`<tr class="border-b hover:bg-gray-50 cursor-pointer" onclick="go('patient','${p.id}')"><td class="p-2">${p.card}</td><td><div class="flex items-center gap-2">${ph(p,'w-7 h-7')}${H(p.name)}</div></td><td>${H(p.phone)}</td><td>${p.age}</td><td>${ds(p.date)}</td><td class="text-rose-600" ${canDel()?`onclick="event.stopPropagation();delPat('${p.id}')"`:''}>${canDel()?'<i class="fa fa-trash"></i>':''}</td></tr>`).join('')}</table></div>`)}
+let CP={},LAST=null;
+const nextCard=()=>Math.max(0,...S.patients.map(p=>+p.card||0))+1;
+function cpRead(){['card','name','phone','age','sex','dob','branch'].forEach(k=>{const e=$('c_'+k);if(e)CP[k]=e.value.trim()})}
+const dobDef=()=>{const d=new Date();d.setFullYear(d.getFullYear()-30);return isoD(d)};
+function cpDob(){const d=toDate($('c_dob').value);if(d){let a=new Date().getFullYear()-d.getFullYear();const n=new Date();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;$('c_age').value=Math.max(a,0)}cpUp()}
+function cpUp(){cpRead();$('cprev').innerHTML=cprev()}
+function cpPh(e){const f=e.target.files[0];if(!f)return;cpRead();rs(f,300,d=>{CP.photo=d;go('card')})}
+function cprev(){return `<div class="rounded-3xl overflow-hidden shadow-xl text-center" style="background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 40%,white) 60%,color-mix(in srgb,var(--c) 10%,white))"><div class="pt-5 px-4 text-white"><div class="font-bold tracking-widest text-sm">${H(C.name.toUpperCase())}</div><div class="tracking-[.3em] text-xs opacity-90">PATIENT CARD</div></div>
+<div class="mx-auto mt-3 w-24 h-28 rounded-[50%] border-4 border-red-600 bg-red-200 overflow-hidden">${CP.photo?`<img src="${CP.photo}" class="w-full h-full object-cover">`:''}</div>
+<div class="px-4 mt-3 text-red-900 font-bold text-lg">${H(CP.name||'Patient name')}</div><div class="text-red-800 text-sm">${H(CP.phone||'Phone')}<br>${H(CP.age||'—')} yrs · ${H(CP.sex||'')}</div>
+<div class="text-left px-5 mt-3 pb-4 text-red-900 text-xs font-bold">CARD NO<div class="text-3xl">${H(CP.card||'')}</div><div class="font-normal mt-1">${H(CP.branch||'')} · ${fdate(Date.now())}</div></div><div class="bg-red-600 text-white py-3 tracking-[.4em] font-bold">PATIENT</div></div>`}
+function cardv(){CP.card??=nextCard();CP.sex??='Female';CP.branch??=C.name;
+ const fi=(id,l,t,v)=>`<label class="block text-sm font-medium mb-1">${l}</label><input id="c_${id}" type="${t||'text'}" value="${H(v)}" oninput="cpUp()" class="inp mb-3">`,L=S.patients.slice().sort((a,b)=>b.date-a.date).slice(0,8),lp=LAST&&S.patients.find(p=>p.id==LAST);
+ return hd('New Patient Card')+(lp?`<div class="bg-green-50 border border-green-300 rounded-lg p-4 mb-4 text-sm flex flex-wrap items-center justify-between gap-2"><span>Card <b>${H(lp.card)}</b> issued to <b>${H(lp.name)}</b>.</span><span class="space-x-2"><button onclick="pcard(S.patients.find(p=>p.id==LAST))" class="bg-red-600 text-white px-3 py-1 rounded">Print Card</button><button onclick="go('patient','${lp.id}')" class="bg-gray-200 px-3 py-1 rounded">Open Patient</button></span></div>`:'')+
+ `<div class="flex flex-col lg:flex-row gap-5 items-start"><div class="bg-white rounded-xl shadow p-5 w-full lg:flex-1"><label class="block w-24 h-24 rounded-full bg-red-100 border-2 border-red-300 overflow-hidden cursor-pointer mb-4">${CP.photo?`<img src="${CP.photo}" class="w-full h-full object-cover">`:`<div class="h-full flex flex-col items-center justify-center text-red-500 text-xs"><i class="fa fa-camera text-xl"></i>Photo</div>`}<input type="file" accept="image/*" class="hidden" onchange="cpPh(event)"></label>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4"><div>${fi('card','Card No','text',CP.card)}</div><div>${fi('name','Full name','text',CP.name)}</div><div>${fi('phone','Phone','tel',CP.phone)}</div><div>${fi('age','Age','number',CP.age)}</div><div><label class="block text-sm font-medium mb-1">Sex</label><select id="c_sex" onchange="cpUp()" class="inp mb-3">${['Female','Male'].map(o=>`<option ${CP.sex==o?'selected':''}>${o}</option>`).join('')}</select></div><div><label class="block text-sm font-medium mb-1">Date of Birth</label>${dateField('c_dob',CP.dob||dobDef(),'cpDob()')}</div><div class="sm:col-span-2">${fi('branch','Branch','text',CP.branch)}</div></div>
+ <button onclick="cpSave()" class="bg-red-600 text-white px-5 py-3 rounded-lg font-medium w-full"><i class="fa fa-id-card mr-2"></i>Register &amp; Issue Card</button></div><div id="cprev" class="w-full lg:w-80 shrink-0">${cprev()}</div></div>`+
+ card('<h3 class="font-bold mb-3">Recently issued cards</h3>',L.length?`<table class="w-full text-sm">${L.map(p=>`<tr class="border-b"><td class="py-2 font-bold">${H(p.card)}</td><td><div class="flex items-center gap-2">${ph(p,'w-7 h-7')}${H(p.name)}</div></td><td class="text-gray-500">${H(p.phone)}</td><td class="text-right"><i class="fa fa-print text-purple-600 cursor-pointer" onclick="pcard(S.patients.find(x=>x.id==${p.id}))"></i></td></tr>`).join('')}</table>`:'<p class="text-gray-500 text-sm">No patients registered yet.</p>')}
+function cpSave(){if(!canAdd())return bad('Only Reception and Manager can add new patients.');cpRead();if(!CP.name)return bad('Patient name is required.');if(!CP.card)CP.card=nextCard();if(S.patients.some(p=>p.card==CP.card))return bad('Card number already exists.');
+ const p={id:Date.now(),card:CP.card,cardNo:CP.card,name:CP.name,phone:CP.phone||'',age:CP.age||'',sex:CP.sex,dob:CP.dob||'',branch:CP.branch||C.name,photo:CP.photo,doc:U.role=='doctor'?U.name:'',doctor:U.role=='doctor'?U.name:'',date:Date.now(),arr:Date.now(),st:'new',fin:false,d:{}};
+ S.patients.push(p);sv();LAST=p.id;CP={};go('card')}
+function newPat(){if(!canAdd())return bad('Only Reception and Manager can add new patients.');
+ form('New Patient',[['card','Card No'],['name','Full name'],['phone','Phone'],['age','Age','number'],['sex','Sex','sel',['Female','Male']],['dob','Date of Birth','date'],['branch','Branch']],{branch:C.name,sex:'Female',card:nextCard()},v=>{if(!v.name)return bad('Name required');const cn=v.card||nextCard();if(S.patients.some(p=>p.card==cn))return bad('Card number already exists.');S.patients.push({id:Date.now(),...v,card:cn,cardNo:cn,doc:'',doctor:'',date:Date.now(),arr:Date.now(),st:'new',fin:false,d:{}});sv();go('recent')})}
+function delPat(id){if(!canDel())return;if(confirm('Delete this patient?')){S.patients=S.patients.filter(p=>p.id!=id);sv();go('recent')}}
+function lab(){const a=[];S.patients.forEach(p=>(p.d.lab||[]).forEach(x=>x.done=='Yes'&&a.push({...x,p})));
+ return hd('Finished Laboratory')+card('',a.length?`<table class="w-full text-sm">${a.map(x=>`<tr class="border-b"><td class="p-2">${H(x.p.name)}</td><td>${H(x.req)}</td><td>${H(x.lab)}</td></tr>`).join('')}</table>`:'<p class="text-gray-500">No finished laboratory requests.</p>')}
+function tbl(t,btn,rows){return hd(t,btn)+card('',`<table class="w-full text-sm"><tr class="text-left border-b"><th class="p-3">${t=='Procedure'?'Procedure':'Disease'}</th>${t=='Procedure'?'<th>Price</th>':'<th>Date</th>'}<th class="text-center">Actions</th></tr>${rows}</table>`)}
+const acts=(k,i)=>`<td class="text-center whitespace-nowrap"><i class="fa fa-pen text-red-600 cursor-pointer mr-5" onclick="ed('${k}',${i})"></i><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="rm('${k}',${i})"></i></td>`;
+function dis(){return tbl('Disease Information','<button onclick="ad(\'dis\')" class="bg-red-600 text-white px-4 py-2 rounded text-sm font-medium">NEW DISEASE +</button>',S.dis.map((x,i)=>`<tr class="border-b"><td class="p-3">${H(x.name)}</td><td>${H(fdate(x.date))}</td>${acts('dis',i)}</tr>`).join('')).replace('Disease Information</th>','Disease</th>')}
+function proc(){return tbl('Procedure','<button onclick="ad(\'proc\')" class="bg-red-600 text-white px-4 py-2 rounded text-sm font-medium">NEW PROCEDURE +</button>',S.proc.map((x,i)=>`<tr class="border-b"><td class="p-3">${H(x.n)}</td><td>${ETB(x.p)}</td>${acts('proc',i)}</tr>`).join(''))}
+const GF={dis:[['name','Disease name'],['date','Date']],proc:[['n','Procedure'],['p','Price (ETB)','number']]};
+function ad(k){form('New',GF[k],k=='dis'?{date:isoD(Date.now())}:{},v=>{if(!(v.n||v.name))return;S[k].push({id:Date.now(),...v});sv();go(V)})}
+function ed(k,i){form('Edit',GF[k],S[k][i],v=>{Object.assign(S[k][i],v);sv();go(V)})}
+function rm(k,i){if(confirm('Delete?')){S[k].splice(i,1);sv();go(V)}}
+const STAFF=['doctor','nurse','manager','reception'],DEFPW='Dental@123';
+const mine=u=>u.role=='admin'||u.clinic==C.id,canEd=u=>U.role=='admin'||(U.role=='manager'&&u.role!='admin');
+const fail=e=>alert(e&&e.message?e.message:'Something went wrong.');
+function users(){if(!S.usersLoaded){DB.users().then(l=>{S.users=l;S.usersLoaded=1;if(V=='users')go('users')}).catch(e=>{S.usersLoaded=0;fail(e)});return hd('User Management','')+card('','<p class="text-gray-500">Loading users...</p>')}
+ const L=S.users.filter(mine);
+ return hd('User Management',bb('Add User +','addU()'))+card('',`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Name</th><th>Username</th><th>Role</th><th>Clinic</th><th></th></tr>${L.map(u=>`<tr class="border-b"><td class="p-2">${H(u.name)}<div class="text-xs text-gray-500">${H(u.phone)}</div></td><td>${H(u.username)}</td><td class="capitalize">${H(u.role)}</td><td>${H(clName(u.role=='admin'?'all':u.clinic))}</td><td class="whitespace-nowrap text-right pr-2">${canEd(u)?`<i class="fa fa-key text-red-600 cursor-pointer mr-4" title="Reset password" onclick="resetPw('${u.id}')"></i><i class="fa fa-pen text-red-600 cursor-pointer mr-4" onclick="editU('${u.id}')"></i>${u.id==U.id?'':`<i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delU('${u.id}')"></i>`}`:''}</td></tr>`).join('')}</table></div>`)}
+function addU(){const adm=U.role=='admin';form('Add User',[['name','Full name'],['username','Username (letters, numbers)'],['password','Password (6+ characters)','password'],['role','Role','sel',adm?[...STAFF,'admin']:STAFF],...(adm?[['cname','Clinic (for staff)','sel',CL.map(c=>c.name)]]:[]),['title','Job title'],['phone','Phone'],['email','Email','email']],{role:'reception',cname:C.name},async v=>{
+ if(!v.name||!v.username||!v.password)return bad('Name, username, and password are required.');if(v.password.length<6)return bad('Password must be at least 6 characters.');
+ const cl_=v.role=='admin'?'all':((CL.find(c=>c.name==v.cname)||C).id);await DB.fn('create',{name:v.name,username:v.username,password:v.password,role:v.role,clinic:cl_,title:v.title,phone:v.phone,email:v.email});S.usersLoaded=0;go('users')})}
+async function resetPw(id){const u=S.users.find(x=>x.id==id);if(!u||!canEd(u)||!confirm('Reset the password for '+u.name+'? A new temporary password will be created.'))return;try{const r=await DB.fn('reset',{id});alert('New temporary password for '+u.username+':\n\n'+r.password+'\n\nGive it to the user and ask them to change it under Profile.')}catch(e){fail(e)}}
+function editU(id){const u=S.users.find(x=>x.id==id);if(!u||!canEd(u))return;const adm=U.role=='admin';
+ form('Edit User',[['name','Full name'],['username','Username'],['password','New password (leave blank to keep)','password'],['role','Role','sel',adm?[...STAFF,'admin']:STAFF],...(adm?[['cname','Clinic (for staff)','sel',CL.map(c=>c.name)]]:[]),['title','Job title'],['phone','Phone'],['email','Email','email']],{...u,password:'',cname:clName(u.clinic=='all'?C.id:u.clinic)},async v=>{
+ if(!v.name||!v.username)return bad('Name and username are required.');if(v.password&&v.password.length<6)return bad('Password must be at least 6 characters.');
+ const p={id,name:v.name,username:v.username,role:v.role,title:v.title,phone:v.phone,email:v.email};if(v.password)p.password=v.password;if(adm)p.clinic=v.role=='admin'?'all':((CL.find(c=>c.name==v.cname)||C).id);
+ await DB.fn('update',p);S.usersLoaded=0;if(id==U.id){U=await DB.profile();hdr()}go('users')})}
+async function delU(id){const d=S.users.find(x=>x.id==id);if(!d||!canEd(d)||d.id==U.id)return;if(confirm('Delete '+d.name+'? They will no longer be able to sign in.')){try{await DB.fn('delete',{id});S.usersLoaded=0;go('users')}catch(e){fail(e)}}}
+function idCard(){return `<div class="rounded-3xl overflow-hidden shadow-xl text-center mx-auto max-w-xs mb-5" style="background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 40%,white) 60%,color-mix(in srgb,var(--c) 10%,white))"><div class="pt-6 px-4 text-white"><div class="font-bold tracking-widest text-sm">${H(C.name.toUpperCase())}</div><div class="tracking-[.3em] text-xs opacity-90">PROFESSIONAL ID CARD</div>${logoH(C,'w-10 h-10 mx-auto mt-3')}</div>
+<label class="block mx-auto w-36 h-44 rounded-[50%] border-4 border-red-600 bg-red-200 overflow-hidden cursor-pointer">${U.avatar?`<img src="${U.avatar}" class="w-full h-full object-cover">`:'<div class="h-full flex items-center justify-center text-red-600 text-xs p-4">Tap to upload photo</div>'}<input type="file" accept="image/*" class="hidden" onchange="upAv(event)"></label>
+<div class="px-4 mt-3 text-white font-bold drop-shadow">${H((U.name||'').toUpperCase())}</div><div class="text-white text-sm tracking-wider drop-shadow">(${H((U.title||cap(U.role)).toUpperCase())})</div>
+<div class="text-red-900 text-sm mt-3">${H(U.phone)}<br>${H(U.email)}</div><div class="text-red-800 text-xs font-semibold text-left px-5 mt-3">Address: ${H(C.name)}<br>Experience: ${H(U.exp||'—')}</div>
+<div class="grid grid-cols-3 text-red-900 text-left px-5 mt-3 pb-4 text-xs font-bold"><div>ID CODE<div class="text-base">${H(U.idcode||'—')}</div></div><div class="text-center">BLOOD TYPE<div class="text-base">${H(U.blood||'—')}</div></div><div class="text-right">EXPIRY<div class="text-base">${H(U.expiry||'—')}</div></div></div>
+<div class="bg-red-600 text-white py-3 tracking-[.4em] font-bold">${ROLEF[U.role]||'STAFF'}</div></div>`}
+function upAv(e){const f=e.target.files[0];if(!f)return;rs(f,400,d=>{DB.updateProfile(U.id,{avatar:d}).then(()=>{U.avatar=d;hdr();go('profile')}).catch(fail)})}
+function profile(){const r=(a,b)=>`<div><div class="text-xs text-gray-500">${a}</div><div class="font-medium text-lg">${H(b)}</div></div>`;
+ return `<div class="max-w-2xl mx-auto"><h2 class="text-3xl font-bold text-center">My Profile</h2><p class="text-center text-gray-500 mb-5">View and manage your account details</p>${idCard()}
+ <div class="bg-white rounded-3xl shadow p-6 mb-5"><div class="flex items-center gap-3 mb-6"><span class="bg-red-500 text-white text-xs rounded-full px-3 py-1 capitalize">${U.role}</span><div><div class="text-2xl font-bold">${H(U.name)}</div><div class="text-sm text-gray-600"><i class="fa fa-phone mr-1"></i>${H(U.phone)}</div></div></div>
+ <div class="grid grid-cols-2 gap-5">${r('Username',U.username)}${r('Phone Number',U.phone)}${r('Role',U.role[0].toUpperCase()+U.role.slice(1))}${r('Email',U.email||'N/A')}${r('Clinic',U.role=='admin'?'All clinics':clName(U.clinic))}</div>
+ <button onclick="editProf()" class="w-full bg-red-600 text-white rounded-lg py-3 mt-6 font-medium"><i class="fa fa-pen mr-2"></i>Edit Profile</button></div>
+ <div class="bg-white rounded-3xl shadow p-6"><h3 class="font-bold text-lg mb-1"><i class="fa fa-lock mr-2"></i>Change Password</h3><p class="text-sm text-gray-600 mb-4">Update your password to keep your account secure.</p><button onclick="chPw()" class="w-full bg-slate-800 text-white rounded-lg py-3 font-medium">+ Change Password</button></div></div>`}
+function editProf(){form('Edit Profile',[['name','Name'],['title','Job title'],['phone','Phone'],['email','Email','email'],['branch','Branch'],['exp','Experience'],['idcode','ID code'],['blood','Blood type'],['expiry','Expiry date']],U,async v=>{if(!v.name)return bad('Name is required.');await DB.updateProfile(U.id,v);Object.assign(U,v);hdr();go('profile')})}
+function chPw(){form('Change Password',[['o','Current password','password'],['n','New password (6+ characters)','password']],{},async v=>{if(!v.o||!v.n)return bad('Enter your current and new password.');if(v.n.length<6)return bad('The new password must be at least 6 characters.');await DB.changePassword(U.username,v.o,v.n);alert('Password updated. Use it on all your devices.')})}
+
+/* patient */
+const gp=()=>S.patients.find(p=>p.id==PID);
+function patient(){const p=gp();if(!p)return recent();const rc=U.role=='reception';if(rc&&!RA.includes(SK))SK='appt';
+ const bi=[['Card No',p.card],['Sex',p.sex],['Date of Birth',p.dob?fdate(p.dob):''],['Phone',p.phone]].map(x=>`<div class="mb-2"><b class="text-sm">${x[0]}</b><div>${H(x[1])}</div></div>`).join('');
+ return `<div class="flex flex-col md:flex-row gap-5 items-start"><div class="bg-white rounded-lg shadow p-4 w-full md:w-64 text-center shrink-0 relative">
+ <label class="block w-20 h-20 mx-auto mb-2 rounded-full bg-red-100 border-2 border-red-300 overflow-hidden cursor-pointer">${p.photo?`<img src="${p.photo}" class="w-full h-full object-cover">`:`<div class="h-full flex flex-col items-center justify-center text-red-500 text-[10px]"><i class="fa fa-camera text-lg"></i>Photo</div>`}<input type="file" accept="image/*" class="hidden" onchange="upPh(event)"></label><h3 class="font-bold text-lg leading-tight">${H(p.name)}</h3><div class="text-gray-600 text-sm my-1">${H(p.phone)}<br>${p.age} yrs<br>Branch: ${H(p.branch)}</div>
+ <div class="bg-red-100 border border-red-300 rounded text-red-800 text-xs p-2 my-2"><b>Last Doctor:</b><br>${H(p.doc)}</div><div class="text-sm text-gray-600 mb-3">${fdate(p.date)}</div>
+ <div class="text-left bg-white shadow-inner rounded p-3 h-32 overflow-auto mb-3"><b>Basic Information</b>${bi}</div>
+ <div class="text-sm font-bold mb-3">Finished: <button onclick="fin()" class="ml-2 text-white text-sm px-4 py-1 rounded-full ${p.fin?'bg-green-500':'bg-red-500'}">${p.fin?'On':'Off'}</button></div>
+ <button onclick="pcard()" class="w-full border border-red-300 text-red-600 rounded-md py-2 text-sm mb-2"><i class="fa fa-id-card mr-1"></i>Patient Card</button>${rc?'':`<button onclick="MENU=!MENU;go('patient')" class="w-full bg-gray-500 text-white rounded-md py-3 text-sm mb-2">Dental records <i class="fa fa-chevron-down ml-1"></i></button>`}
+ ${MENU&&!rc?`<div class="bg-white shadow-xl rounded-lg p-2 mb-2 text-left">${DR.map(d=>`<div onclick="SK='${d[0]}';MENU=0;go('patient')" class="sb mb-2 cursor-pointer">${d[1]}</div>`).join('')}</div>`:''}
+ <div class="space-y-3">${SIDE.filter(s=>!rc||RA.includes(s[0])).map(s=>`<button class="sb ${SK==s[0]?'on':''}" onclick="SK='${s[0]}';go('patient')">${s[1]}</button>`).join('')}</div></div>
+ <div class="bg-white rounded-lg shadow p-5 flex-1 w-full min-h-[420px]">${sec(p)}</div></div>`}
+function fin(){const p=gp();p.fin=!p.fin;sv();go('patient')}
+function sec(p){const k=SK,c=SEC[k],a=p.d[k]||[];
+ if(k=='presc')return presc(p);if(k=='consent')return consent(p);
+ const sub=k=='inv'?`<p class="text-center text-gray-500 -mt-3 mb-3">${H(p.name)}</p>`:'';
+ const sm=k=='inv'&&a.length?(()=>{const T=a.reduce((z,x)=>z+tot(x),0),P=a.reduce((z,x)=>z+(+x.paid||0),0);return `<div class="grid grid-cols-3 gap-2 text-center text-xs mb-4"><div class="bg-red-50 rounded p-2">Billed<br><b class="text-sm">${ETB(T)}</b></div><div class="bg-green-50 rounded p-2">Paid<br><b class="text-sm">${ETB(P)}</b></div><div class="bg-red-50 rounded p-2">Balance<br><b class="text-sm">${ETB(T-P)}</b></div></div>`})():'';
+ const extra=k=='rec'?gb('view Dental chart','chart()'):'';
+ return hd(c.t,extra+gb(c.b+' +',`addI('${k}')`))+sub+sm+(a.length?(k=='img'?gal(a):a.map((x,i)=>iCard(k,x,i)).join('')):`<p class="text-gray-500">${c.e}</p>`)}
+const net=x=>(+x.price||0)*(+x.qty||1)-(+x.disc||0),vatAmt=x=>x.vat==VATO[1]?Math.round(net(x)*15)/100:0,tot=x=>net(x)+vatAmt(x);
+function iCard(k,x,i){const c=SEC[k],ic=(cl,t,a)=>`<i class="fa ${t} ${cl} cursor-pointer" onclick="${a}"></i>`,del=ic('text-rose-600','fa-trash',`delI('${k}',${i})`),ed=ic('text-red-600','fa-pen',`editI('${k}',${i})`);
+ if(k=='inv'||k=='prof'){const t=tot(x),paid=+x.paid||0,bal=t-paid,inv=k=='inv',stt=bal<=0?['Paid','bg-green-100 text-green-700']:paid>0?['Partial','bg-sky-100 text-sky-700']:['Pending','bg-yellow-100 text-yellow-700'];
+  return `<div class="bg-gray-50 rounded-lg shadow p-4 mb-3 text-sm"><div class="flex justify-between items-start"><div><b>${inv?'Invoice '+H(invNo(gp(),x,i)):'Proforma'} &middot; Date:</b> ${H(dsp(x))}</div><div class="space-x-3">${ic('text-purple-600','fa-print',`pr('${k}',${i})`)}${inv?ic('text-green-600','fa-money-bill',`pay(${i})`):ic('text-green-600','fa-file-invoice',`toInv(${i})`)}${ed}${del}</div></div>
+  <div class="grid grid-cols-2 gap-2 mt-3"><div><b>Total:</b> ${ETB(t)}</div>${inv?`<div><b>Paid:</b> ${ETB(paid)}</div><div><b>Balance:</b> ${ETB(bal)}</div><div><b>Status:</b> <span class="px-2 rounded ${stt[1]}">${stt[0]}</span></div>`:''}<div><b>Created By:</b> ${H(x.by||U.name)}</div><div><b>Discount:</b> ${ETB(x.disc)}</div>${vatAmt(x)?`<div><b>VAT 15%:</b> ${ETB(vatAmt(x))}</div>`:''}</div>
+  <b class="block mt-3 border-b pb-1">Items</b><div class="bg-gray-100 rounded p-3 mt-2 flex justify-between gap-2"><div>${H(x.item)}${x.desc?' – '+H(x.desc):''} (x${x.qty||1})<br><span class="text-gray-500">Price per unit: ${ETB(x.price)}</span></div><b>${ETB(t)}</b></div>${inv?payLines(gp(),x,i):''}</div>`}
+ if(k=='note')return `<div class="bg-yellow-50 rounded-lg shadow p-4 mb-3 text-sm"><div class="flex justify-between"><b class="text-base">${H(x.title||'Note')}</b><div class="space-x-3">${ed}${del}</div></div><p class="whitespace-pre-wrap my-2">${H(x.note)}</p><div class="text-xs text-gray-500">${H(x.date)} · ${H(x.by||'')}</div></div>`;
+ return `<div class="bg-gray-50 rounded-lg shadow p-4 mb-3 text-sm flex justify-between gap-3"><div>${c.f.filter(f=>x[f[0]]).map(f=>`<div><b>${f[1]}:</b> ${H(f[2]=='date'?fdate(x[f[0]]):x[f[0]])}</div>`).join('')}${x.date?`<div class="text-xs text-gray-400 mt-1">${H(dsp(x))} · ${H(x.by||'')}</div>`:''}</div><div class="space-x-3 whitespace-nowrap">${ed}${del}</div></div>`}
+function fF(k,x){x=x||{};const O=(l,c)=>[...new Set([...(c?[c]:[]),...l])];return SEC[k].f.map(f=>{if(f[2]!='sel')return f;const K=f[0];return K=='item'?[K,f[1],'sel',O(['Custom item',...S.proc.map(p=>p.n)],x[K])]:K=='treat'?[K,f[1],'sel',O(['',...S.proc.map(p=>p.n)],x[K])]:K=='method'?[K,f[1],'sel',O(PAYM,x[K])]:K=='finding'?[K,f[1],'sel',O(['',...S.dis.map(d=>d.name)],x[K])]:f})}
+function rs(f,max,cb,png){
+ const bad_=()=>alert('This picture could not be opened. Please take a new photo with the camera, or choose a JPG / PNG picture (HEIC or screenshots from some apps are not supported).');
+ const draw=(im,w,h)=>{try{const k=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));const x=c.getContext('2d');if(!png){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,0,0,c.width,c.height);cb(png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.8))}catch(e){bad_()}};
+ const viaImg=()=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{draw(im,im.naturalWidth||im.width||max,im.naturalHeight||im.height||max);URL.revokeObjectURL(u)};im.onerror=()=>{URL.revokeObjectURL(u);const r=new FileReader();r.onerror=bad_;r.onload=()=>{const m=new Image();m.onload=()=>draw(m,m.naturalWidth||max,m.naturalHeight||max);m.onerror=bad_;m.src=String(r.result).replace(/^data:[^;,]*/,'data:image/jpeg')};r.readAsDataURL(f)};im.src=u};
+ if(window.createImageBitmap){createImageBitmap(f,{imageOrientation:'from-image'}).then(b=>draw(b,b.width,b.height),()=>createImageBitmap(f).then(b=>draw(b,b.width,b.height),viaImg))}else viaImg()}
+function gal(a){return `<div class="grid grid-cols-2 md:grid-cols-3 gap-3">${a.map((x,i)=>`<div class="bg-gray-50 rounded-lg shadow overflow-hidden"><img src="${x.src}" class="w-full h-32 object-cover cursor-pointer bg-black" onclick="vw(${i})"><div class="p-2 text-xs"><div class="flex justify-between items-center"><span class="bg-red-100 text-red-700 rounded px-2">${H(x.kind||'Photo')}</span><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delI('img',${i})"></i></div>${x.tooth?`<div class="mt-1">Tooth/Area: ${H(x.tooth)}</div>`:''}${x.note?`<div class="text-gray-600">${H(x.note)}</div>`:''}<div class="text-gray-400">${H(x.date||'')}</div></div></div>`).join('')}</div>`}
+let VZ=1,VI=0,VB=100,VX=0;
+function vw(i){const a=gp().d.img;if(i<0||i>=a.length)return;VI=i;const p=gp(),x=a[i];VZ=1;VB=100;VX=0;
+ $('mb').innerHTML=`<div class="flex items-center justify-between mb-2"><b>${H(x.kind||'Photo')} ${H(x.tooth||'')}</b><span class="text-xs text-gray-500">${i+1} / ${a.length}</span></div><div id="vbox" class="bg-black rounded overflow-auto" style="height:55vh;touch-action:pan-x pan-y pinch-zoom"><img id="vimg" src="${x.src}" style="width:100%;max-width:none;display:block"></div>
+ <div class="flex flex-wrap items-center gap-2 mt-3 text-sm"><button onclick="vz(-.25)" class="px-3 py-1 rounded bg-gray-200"><i class="fa fa-magnifying-glass-minus"></i></button><button onclick="vz(.25)" class="px-3 py-1 rounded bg-gray-200"><i class="fa fa-magnifying-glass-plus"></i></button><button onclick="vz(0)" class="px-3 py-1 rounded bg-gray-200">Reset</button><button onclick="VX=!VX;vf()" class="px-3 py-1 rounded bg-gray-200">Invert</button><label class="flex items-center gap-1">Brightness <input type="range" min="50" max="200" value="100" oninput="VB=this.value;vf()"></label></div>
+ <div class="text-sm my-2">${H(x.note||'')} <span class="text-gray-400">${H(x.date||'')}</span></div>
+ <div class="flex flex-wrap justify-between gap-2"><span><button onclick="vw(${i-1})" class="px-3 py-2 rounded bg-gray-200"><i class="fa fa-chevron-left"></i></button> <button onclick="vw(${i+1})" class="px-3 py-2 rounded bg-gray-200"><i class="fa fa-chevron-right"></i></button></span><span><a download="${H(p.name)}-${i+1}.jpg" href="${x.src}" class="px-4 py-2 rounded bg-red-600 text-white inline-block">Download</a> <button onclick="cl()" class="px-4 py-2 rounded bg-gray-200">Close</button></span></div>`;md.classList.replace('hidden','flex')}
+function vz(d){VZ=d?Math.min(5,Math.max(1,VZ+d)):1;vf()}
+function vf(){const m=$('vimg');m.style.width=(VZ*100)+'%';m.style.filter=`brightness(${VB}%)${VX?' invert(1)':''}`}
+function upPh(e){const f=e.target.files[0];if(f)rs(f,300,d=>{gp().photo=d;sv();go('patient')})}
+const ph=(p,c)=>p.photo?`<img src="${p.photo}" class="${c} rounded-full object-cover">`:`<span class="${c} rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">${H((p.name||'?')[0].toUpperCase())}</span>`;
+function pick(){const it=$('f_item');if(it)it.onchange=()=>{const q=S.proc.find(x=>x.n==it.value);if(q)$('f_price').value=q.p}}
+const NUMK=['price','qty','disc','paid','amt'];
+function chk(k,v,old){for(const n of NUMK)if(v[n]!==undefined&&v[n]!==''&&!(+v[n]>=0))return 'Please enter a valid, non-negative number.';
+ if(k=='inv'||k=='prof'){if(v.qty!==''&&+v.qty<=0)return 'Quantity must be at least 1.';if(+v.disc>(+v.price||0)*(+v.qty||1)+.005)return 'Discount cannot exceed the item total.';if(k=='inv'&&(+v.paid||0)>tot(v)+.005)return 'Amount paid cannot exceed the invoice total.';if(k=='inv'&&(+v.paid||0)>0&&(old===undefined||(+v.paid||0)!=old)&&v.method&&v.method!='Cash'&&!v.ref)return 'Enter the '+v.method+' transaction / reference number.'}return ''}
+const tsOf=(x,p)=>x.ts||Date.parse(x.date)||(p&&p.date)||0;
+const invNo=(p,x,i)=>x.no||('INV-'+String(p.card).padStart(3,'0')+'-'+(i+1));
+function nextInvNo(){let m=0;S.patients.forEach(p=>(p.d.inv||[]).forEach(x=>{const n=parseInt(String(x.no||'').replace(/\D/g,''))||0;if(n>m)m=n}));return 'INV-'+String(m+1).padStart(4,'0')}
+function ensureInvNos(){const L=[];S.patients.forEach(p=>(p.d.inv||[]).forEach(x=>{if(!x.no)L.push([tsOf(x,p),x])}));L.sort((a,b)=>a[0]-b[0]);L.forEach(a=>a[1].no=nextInvNo())}
+function mkItem(k,v,p){const t=Date.now(),x={...v,date:v.date||isoD(Date.now()),ts:t,by:U.name};if(k=='inv'){x.no=nextInvNo();x.paid=+v.paid||0;x.pays=x.paid>0?[{ts:t,amt:x.paid,by:U.name,method:v.method||'Cash',ref:v.ref||''}]:[]}delete x.method;delete x.ref;(p.d[k]=p.d[k]||[]).push(x);return x}
+function addI(k,pre){const c=SEC[k],p=gp();
+ if(k=='img')return form('Upload Image / X-ray',[...SEC.img.f,['file','Image file(s)','file']],{kind:'X-ray'},v=>{const fs=[...$('f_file').files];if(!fs.length)return bad('Choose at least one image.');let n=0;fs.forEach(f=>rs(f,1100,d=>{(p.d.img=p.d.img||[]).push({src:d,kind:v.kind,tooth:v.tooth,note:v.note,date:isoD(Date.now()),by:U.name});if(++n==fs.length){sv();go('patient')}}))});
+ form(c.b,fF(k),{qty:1,tooth:pre?String(pre):''},v=>{const e=chk(k,v);if(e)return bad(e);mkItem(k,v,p);sv();go('patient')});pick()}
+function editI(k,i){const p=gp(),x=p.d[k][i];const old=+x.paid||0;form('Edit',fF(k,x),k=='inv'?{...x,method:'Cash',ref:''}:x,v=>{const e=chk(k,v,old);if(e)return bad(e);Object.assign(x,v);if(k=='inv'){x.paid=+x.paid||0;const sp=(x.pays||[]).reduce((a,y)=>a+y.amt,0);if(Math.abs(sp-x.paid)>.005)x.pays=x.paid>0?[{ts:tsOf(x,p),amt:x.paid,method:v.method||'Cash',ref:v.ref||''}]:[];delete x.method;delete x.ref}sv();go('patient')});pick()}
+function payAt(pid,i){const p=S.patients.find(q=>q.id==pid),x=p&&p.d.inv&&p.d.inv[i];if(!x)return;const bal=tot(x)-(+x.paid||0);if(bal<=0.005)return alert('This invoice is already fully paid.');
+ form('Add Payment - '+invNo(p,x,i),[['amt','Amount (ETB)','number'],['method','Payment method','sel',PAYM],['ref','Transaction / reference no. (not needed for cash)']],{amt:bal,method:'Cash'},v=>{const a=+v.amt;if(!(a>0))return bad('Enter an amount greater than 0.');if(a>bal+.005)return bad('The amount is more than the balance ('+ETB(bal)+').');if(v.method!='Cash'&&!v.ref)return bad('Enter the '+v.method+' transaction / reference number.');x.paid=(+x.paid||0)+a;(x.pays=x.pays||[]).push({ts:Date.now(),amt:a,by:U.name,method:v.method,ref:v.ref});sv();go(V)})}
+const pay=i=>payAt(PID,i);
+function toInv(i){const p=gp(),x={...p.d.prof[i]};['paid','pays','no','ts','date','by'].forEach(k=>delete x[k]);mkItem('inv',{...x,paid:0},p);SK='inv';go('patient')}
+function delI(k,i){if(confirm('Delete?')){gp().d[k].splice(i,1);sv();go('patient')}}
+function consent(p){const c=p.d.consent||{ck:[],o:'',t:''};
+ return `<h2 class="text-2xl font-bold mb-3">Consent</h2><div class="grid grid-cols-2 gap-4 mb-5">${CONS.map(x=>`<label class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 cs" value="${x}" ${c.ck.includes(x)?'checked':''}>${x}</label>`).join('')}</div>
+ <label class="font-semibold text-gray-600">Other</label><textarea id="co" rows="4" class="inp mb-4">${H(c.o)}</textarea><label class="font-semibold text-gray-600">Treatment Type</label><textarea id="ct" rows="4" class="inp mb-4">${H(c.t)}</textarea>
+ <button onclick="svC()" class="bg-green-500 text-white px-5 py-2 rounded">Submit</button>`}
+function svC(){const p=gp();p.d.consent={ck:[...document.querySelectorAll('.cs:checked')].map(x=>x.value),o:co.value,t:ct.value};sv();alert('Consent saved.')}
+let MED=[];
+function presc(p){const a=p.d.presc||[];
+ return `<h2 class="text-2xl font-bold mb-3">Create Prescription</h2><label class="font-semibold">Diagnosis</label><input id="pd" class="inp mb-4" placeholder="e.g., Bacterial infection">
+ <label class="font-semibold">Add Medication</label><input id="ps" class="inp mb-2" placeholder="Search medications..." oninput="fm()"><div class="flex gap-2 mb-2"><select id="pm" class="inp"><option value="">Select a medication</option>${MEDS.map(m=>`<option>${m}</option>`).join('')}</select><button onclick="am()" class="bg-red-500 text-white px-4 rounded">Add</button></div>
+ <div id="mc" class="flex flex-wrap gap-2 mb-3">${MED.map(m=>`<span class="bg-red-100 text-red-800 text-sm rounded-full px-3 py-1">${m}</span>`).join('')}</div>
+ <label class="font-semibold">Prescription Description</label><textarea id="pt" rows="5" class="inp mb-4" placeholder="e.g., Take Amoxicillin 500mg, three times a day for 7 days"></textarea><button onclick="sp()" class="bg-red-500 text-white px-5 py-2 rounded">Submit</button>
+ ${a.length?'<h3 class="font-bold mt-6 mb-2">Previous prescriptions</h3>'+a.map((x,i)=>`<div class="bg-gray-50 rounded p-3 mb-2 text-sm flex justify-between"><div><b>${x.date}</b> — ${H(x.dx)}<br>${H(x.meds.join(', '))}<br>${H(x.txt)}</div><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delI('presc',${i})"></i></div>`).join(''):''}`}
+function fm(){const q=ps.value.toLowerCase();pm.innerHTML='<option value="">Select a medication</option>'+MEDS.filter(m=>m.toLowerCase().includes(q)).map(m=>`<option>${m}</option>`).join('')}
+function am(){if(pm.value&&!MED.includes(pm.value)){MED.push(pm.value);mc.innerHTML=MED.map(m=>`<span class="bg-red-100 text-red-800 text-sm rounded-full px-3 py-1">${m}</span>`).join('')}}
+function sp(){const p=gp();(p.d.presc=p.d.presc||[]).push({dx:pd.value,meds:MED,txt:pt.value,date:isoD(Date.now())});MED=[];sv();go('patient')}
+function chart(){const p=gp(),h={};(p.d.rec||[]).forEach(r=>h[r.tooth]=(h[r.tooth]||0)+1);const t=n=>`<button onclick="cl();addI('rec',${n})" class="w-9 h-11 text-xs rounded border ${h[n]?'bg-red-500 text-white':'bg-white'}">${n}</button>`,U1=[...Array(16)].map((_,i)=>i+1),L1=[...Array(16)].map((_,i)=>32-i);
+ $('mb').innerHTML=`<h3 class="font-bold text-lg mb-1">Dental chart</h3><p class="text-xs text-gray-500 mb-3">Red teeth already have records. Tap a tooth to add a record for it.</p><div class="text-xs text-gray-400 mb-1">Upper</div><div class="grid grid-cols-8 gap-1 mb-3">${U1.map(t).join('')}</div><div class="text-xs text-gray-400 mb-1">Lower</div><div class="grid grid-cols-8 gap-1">${L1.map(t).join('')}</div><button onclick="cl()" class="mt-4 bg-gray-600 text-white px-4 py-2 rounded">Close</button>`;md.classList.replace('hidden','flex')}
+const cl=()=>md.classList.replace('flex','hidden');
+function form(t,f,v,ok){v=v||{};$('mb').innerHTML=`<h3 class="font-bold text-xl mb-4">${t}</h3>${f.map(x=>`<label class="block text-sm font-medium mb-1">${x[1]}</label>`+(x[2]=='date'?dateField('f_'+x[0],v[x[0]]):x[2]=='area'?`<textarea id="f_${x[0]}" rows="3" class="inp mb-3">${H(v[x[0]])}</textarea>`:x[2]=='sel'?`<select id="f_${x[0]}" class="inp mb-3">${x[3].map(o=>`<option ${v[x[0]]==o?'selected':''}>${H(o)}</option>`).join('')}</select>`:`<input id="f_${x[0]}" type="${x[2]||'text'}" ${x[2]=='file'?'accept="image/*" multiple':''}${x[2]=='number'?' min="0" step="any" inputmode="decimal"':''} class="inp mb-3" value="${H(v[x[0]])}">`)).join('')}
+ <div class="flex justify-end gap-2 mt-2"><button onclick="cl()" class="px-4 py-2 rounded bg-gray-200">Cancel</button><button id="fok" class="px-4 py-2 rounded bg-red-600 text-white">Save</button></div>`;
+ $('fok').onclick=()=>{const o={};f.forEach(x=>o[x[0]]=$('f_'+x[0]).value.trim());const b=$('fok'),r=ok(o);if(r&&typeof r.then=='function'){b.disabled=true;r.then(x=>{if(x!==false)cl();else b.disabled=false},e=>{b.disabled=false;alert(e&&e.message?e.message:'Something went wrong.')})}else if(r!==false)cl()};md.classList.replace('hidden','flex')}
+md.onclick=e=>{if(e.target==md)cl()};
+/* ===== Reception & manager tools: printing, appointments, invoice manager, analytics, print center, sample data ===== */
+const DAY=864e5,NOW=()=>Date.now();
+const fd=t=>t?fdate(t):'-';
+const ft=t=>new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+const sod=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const ST={new:'New order',doctor:'Seen by doctor',nurse:'Seen by nurse'};
+const sum=(a,f)=>a.reduce((z,x)=>z+(+f(x)||0),0);
+function apptTs(x){const d=String(x.date||''),m=d.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m){const t=String(x.time||'').match(/^(\d{1,2}):(\d{2})/);return new Date(+m[1],+m[2]-1,+m[3],t?+t[1]:0,t?+t[2]:0).getTime()}const v=Date.parse(d+' '+(x.time||''))||Date.parse(d);return isNaN(v)?NaN:v}
+function allInv(){const L=[];S.patients.forEach(p=>(p.d.inv||[]).forEach((x,i)=>{const t=tot(x),paid=+x.paid||0,bal=Math.max(0,t-paid);L.push({p,x,i,no:invNo(p,x,i),t,paid,bal,st:bal<=.005?'Paid':paid>0?'Partial':'Pending',ts:tsOf(x,p)})}));return L.sort((a,b)=>b.ts-a.ts)}
+function payEvents(r){const ev=(r.x.pays||[]).map(y=>({ts:y.ts,amt:+y.amt||0,method:y.method||'Cash',ref:y.ref||'',by:y.by||''})),rem=r.paid-sum(ev,y=>y.amt);if(rem>.005)ev.push({ts:r.ts,amt:rem,method:'Cash',ref:'',by:r.x.by||''});return ev}
+function allAppts(){const L=[];S.patients.forEach(p=>(p.d.appt||[]).forEach((x,i)=>L.push({p,x,i,ts:apptTs(x)})));return L.sort((a,b)=>(isNaN(a.ts)?1e15:a.ts)-(isNaN(b.ts)?1e15:b.ts))}
+function payLines(p,x,i){const evs=payEvents({x,paid:+x.paid||0,ts:tsOf(x,p)});return evs.length?`<div class="mt-2 text-xs text-gray-600"><b>Payments</b>${evs.map(y=>`<div>${H(fd(y.ts))} &middot; <b>${H(y.method)}</b>${y.ref?' &middot; Ref '+H(y.ref):''} &middot; ${ETB(y.amt)}</div>`).join('')}</div>`:''}
+const stChip=s=>`<span class="px-2 py-0.5 rounded text-xs ${s=='Paid'?'bg-green-100 text-green-700':s=='Partial'?'bg-sky-100 text-sky-700':'bg-yellow-100 text-yellow-700'}">${s}</span>`;
+const tile=(l,v,sub)=>`<div class="bg-white rounded-xl shadow p-4"><div class="text-xs text-gray-500">${l}</div><div class="text-xl font-bold mt-1 break-words">${v}</div>${sub?`<div class="text-xs text-gray-500 mt-1">${sub}</div>`:''}</div>`;
+
+/* ---------- printing (hidden iframe: no pop-up blockers) ---------- */
+const PCSS=()=>`@page{margin:14mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Arial,Helvetica,sans-serif;color:#111;font-size:12px;margin:0;padding:6px}h2{font-size:15px;margin:16px 0 6px}.hd{display:flex;gap:12px;align-items:center;border-bottom:3px solid ${C.color};padding-bottom:10px;margin-bottom:12px}.lgo{width:48px;height:48px;border-radius:50%;background:${C.color};display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}.lgo img{width:100%;height:100%;object-fit:cover}.lgo svg{width:60%;height:60%;fill:#fff}.muted{color:#555}.hd h1{font-size:19px;margin:0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:${C.color};color:#fff;text-align:left;padding:6px 8px;font-size:11px}td{border-bottom:1px solid #ddd;padding:6px 8px;vertical-align:top}.n{text-align:right}tfoot td{font-weight:bold;border-top:2px solid #333}.kpi{display:inline-block;vertical-align:top;min-width:130px;border:1px solid #ccc;border-radius:6px;padding:6px 12px;margin:0 8px 8px 0}.kpi b{display:block;font-size:15px}.sig{margin-top:50px;display:flex;justify-content:space-between}.sig div{border-top:1px solid #333;width:40%;text-align:center;padding-top:4px}.blk{break-inside:avoid;margin-bottom:10px}.pc{width:290px;border-radius:16px;overflow:hidden;background:linear-gradient(${C.color},color-mix(in srgb,${C.color} 35%,#fff) 60%,#fff);text-align:center;display:inline-block;margin:8px;vertical-align:top;break-inside:avoid;color:#7f1d1d}.pc .t1{color:#fff;padding:16px 8px 2px;font-weight:bold;letter-spacing:2px;font-size:12px}.pc .t2{color:#fff;letter-spacing:4px;font-size:10px}.pc img,.pc .ph{width:84px;height:100px;object-fit:cover;border-radius:50%;margin:12px auto 0;border:4px solid ${C.color};display:block;background:#fecaca}.pc .ph{line-height:92px;font-size:30px;font-weight:bold;color:${C.color}}.pc h3{margin:10px 8px 2px;font-size:16px}.pc .no{text-align:left;padding:12px 22px;font-weight:bold;font-size:11px}.pc .no b{display:block;font-size:26px}.pc .no small{font-weight:normal;font-size:10px}.pc .ft{background:${C.color};color:#fff;padding:10px;letter-spacing:6px;font-weight:bold}`;
+function printHtml(title,body){const f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);const d=f.contentWindow.document;d.open();d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${H(title)}</title><style>${PCSS()}</style></head><body>${body}</body></html>`);d.close();setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){alert('Printing is not available in this browser.')}setTimeout(()=>f.remove(),90000)},350)}
+const docHead=(t,sub)=>`<div class="hd"><div class="lgo">${C.logo?`<img src="${C.logo}">`:`<svg viewBox="0 0 100 100">${ICONS[C.icon]||ICONS.tooth}</svg>`}</div><div><h1>${H(C.name)}</h1><div class="muted">${TYPE(C.type)}</div></div><div style="margin-left:auto;text-align:right"><b style="font-size:16px">${H(t)}</b><div class="muted">${sub||''}</div><div class="muted">Printed ${fdate(Date.now())} ${ft(Date.now())} by ${H(U.name)}</div></div></div>`;
+function cardHtml(p){return `<div class="pc"><div class="t1">${H(C.name.toUpperCase())}</div><div class="t2">PATIENT CARD</div>${p.photo?`<img src="${p.photo}">`:`<div class="ph">${H((p.name||'?')[0].toUpperCase())}</div>`}<h3>${H(p.name)}</h3><div>${H(p.phone)}<br>${H(p.age||'-')} yrs &middot; ${H(p.sex)}</div><div class="no">CARD NO<b>${H(p.card)}</b><small>${H(p.branch||C.name)} &middot; Registered ${fd(p.date)}</small></div><div class="ft">PATIENT</div></div>`}
+function pcard(p){p=p||gp();if(!p)return;printHtml('Patient Card - '+p.name,`<div style="text-align:center">${cardHtml(p)}</div>`)}
+function cardsSheet(){if(!S.patients.length)return alert('No patients to print.');printHtml('Patient Cards',S.patients.slice().sort((a,b)=>(+a.card||0)-(+b.card||0)).map(cardHtml).join(''))}
+const tbl2=(head,rows,foot,num)=>{num=num||[];const c=(v,i)=>`<td class="${num.includes(i)?'n':''}">${v}</td>`;return `<table><thead><tr>${head.map((h,i)=>`<th class="${num.includes(i)?'n':''}">${H(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c).join('')}</tr>`).join('')||`<tr><td colspan="${head.length}" class="muted">No records.</td></tr>`}</tbody>${foot?`<tfoot><tr>${foot.map(c).join('')}</tr></tfoot>`:''}</table>`};
+function pInfo(p){return `<table style="margin:0 0 6px"><tr><td><b>Patient:</b> ${H(p.name)}</td><td><b>Card No:</b> ${H(p.card)}</td><td><b>Phone:</b> ${H(p.phone)}</td></tr><tr><td><b>Sex / Age:</b> ${H(p.sex)} / ${H(p.age||'-')}</td><td colspan="2"><b>Branch:</b> ${H(p.branch||C.name)}</td></tr></table>`}
+function pr(k,i){printItem(gp(),k,i)}
+function printItem(p,k,i){const x=p.d[k][i],inv=k=='inv',t=tot(x),paid=+x.paid||0,r={p,x,i,paid,ts:tsOf(x,p)},ttl=inv?'Invoice '+invNo(p,x,i):'Proforma Invoice';
+ const items=tbl2(['Item','Qty','Unit price','Discount','Total'],[[H(x.item)+(x.desc?' - '+H(x.desc):''),x.qty||1,ETB(x.price),ETB(x.disc),ETB(t)]].concat(vatAmt(x)?[['VAT 15% (included in total)','','','',ETB(vatAmt(x))]]:[]),null,[1,2,3,4]);
+ const pays=inv?`<h2>Payments</h2>`+tbl2(['Date','Method','Reference','Received by','Amount'],payEvents(r).map(y=>[fd(y.ts),H(y.method),H(y.ref||''),H(y.by),ETB(y.amt)]),['','','','Total paid',ETB(paid)],[4]):'';
+ const bal=inv?`<p style="font-size:14px"><b>Total: ${ETB(t)}</b> &nbsp; Paid: ${ETB(paid)} &nbsp; <b>Balance: ${ETB(Math.max(0,t-paid))}</b> &nbsp; ${t-paid<=.005?'(PAID IN FULL)':''}</p>`:`<p style="font-size:14px"><b>Total: ${ETB(t)}</b></p><p class="muted">This proforma is an estimate and not a demand for payment.</p>`;
+ printHtml(ttl+' - '+p.name,docHead(ttl,'Date: '+dsp(x))+pInfo(p)+`<p class="muted">Prepared by: ${H(x.by||U.name)}</p>`+items+bal+pays+`<div class="sig"><div>Patient signature</div><div>Authorised by</div></div>`)}
+
+/* ---------- csv ---------- */
+function csvDl(name,head,rows){const q=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},t='﻿'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download=name+'-'+isoD(NOW())+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
+
+/* ---------- appointments ---------- */
+let AF='upcoming';
+function appt(){const t0=sod(NOW()),A=allAppts().map(a=>({...a,day:isNaN(a.ts)?NaN:sod(a.ts)}));
+ const F={today:a=>a.day==t0,upcoming:a=>!(a.day<t0),past:a=>a.day<t0,all:()=>true},L=A.filter(F[AF]);
+ const tabs=[['today',"Today ("+A.filter(F.today).length+')'],['upcoming','Upcoming ('+A.filter(F.upcoming).length+')'],['past','Past ('+A.filter(F.past).length+')'],['all','All ('+A.length+')']];
+ const badge=a=>a.day==t0?'<span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">Today</span>':a.day>t0?'<span class="px-2 py-0.5 rounded text-xs bg-sky-100 text-sky-700">Upcoming</span>':'<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Past</span>';
+ return hd('Appointments',canDel()?gb('New Appointment +','newAppt()'):'')+`<div class="bg-white rounded-lg p-3 mb-4 flex flex-wrap gap-2">${tabs.map(t=>`<button onclick="AF='${t[0]}';go('appt')" class="px-3 py-2 rounded-md text-sm border ${AF==t[0]?'bg-red-100 border-red-400 text-red-700':'bg-gray-100'}">${t[1]}</button>`).join('')}</div>`+
+ card('',L.length?`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Date</th><th>Time</th><th>Patient</th><th>Note</th><th></th><th></th></tr>${L.map(a=>`<tr class="border-b"><td class="p-2 whitespace-nowrap">${isNaN(a.ts)?H(a.x.date):fd(a.ts)}</td><td>${H(a.x.time||'')}</td><td><b class="cursor-pointer hover:underline" onclick="go('patient','${a.p.id}')">${H(a.p.name)}</b><div class="text-xs text-gray-500">${H(a.p.phone)}</div></td><td>${H(a.x.note)}</td><td>${isNaN(a.ts)?'':badge(a)}</td><td class="text-right pr-2">${canDel()?`<i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delAppt('${a.p.id}',${a.i})"></i>`:''}</td></tr>`).join('')}</table></div>`:'<p class="text-gray-500">No appointments in this view.</p>')}
+function delAppt(pid,i){if(!canDel())return;const p=S.patients.find(q=>q.id==pid);if(p&&confirm('Delete this appointment?')){p.d.appt.splice(i,1);sv();go('appt')}}
+const plabel=p=>p.card+' - '+p.name;
+function newAppt(){if(!S.patients.length)return alert('Register a patient first.');
+ form('New Appointment',[['pt','Patient','sel',S.patients.map(plabel)],['date','Date','date'],['time','Time','time'],['note','Note']],{date:isoD(NOW()),time:'09:00'},v=>{const p=S.patients.find(q=>plabel(q)==v.pt);if(!p)return bad('Choose a patient.');if(!v.date)return bad('Choose a date.');mkItem('appt',{date:v.date,time:v.time,note:v.note},p);sv();AF='upcoming';go('appt')})}
+
+/* ---------- dashboard quick actions ---------- */
+function quick(){if(!canAdd()&&U.role!='admin')return '';const t0=sod(NOW()),n=allAppts().filter(a=>sod(a.ts)==t0).length,due=sum(allInv(),r=>r.bal);
+ const q=(i,l,a,sub)=>`<button onclick="${a}" class="bg-white rounded-xl shadow p-3 text-left hover:shadow-md"><i class="fa ${i} text-red-600"></i><div class="font-medium text-sm mt-1">${l}</div><div class="text-xs text-gray-500">${sub||'&nbsp;'}</div></button>`;
+ return `<div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">${canAdd()?q('fa-user-plus','Register patient',"go('card')",'New card'):''}${q('fa-file-invoice-dollar','New invoice','newInvG()',ETB(due)+' due')}${q('fa-calendar-check',"Today's appointments","AF='today';go('appt')",n+' booked')}${q('fa-chart-line','Analytics',"go('ran')",'Trends & revenue')}${q('fa-print','Print center',"go('rpr')",'Reports & cards')}</div>`}
+
+/* ---------- invoice manager ---------- */
+let IM={q:'',st:'all',rg:'all'};
+function imFilter(){const q=IM.q.toLowerCase(),t0=sod(NOW()),lim={all:0,today:t0,w7:t0-6*DAY,m30:t0-29*DAY}[IM.rg];return allInv().filter(r=>(IM.st=='all'||r.st==IM.st)&&r.ts>=lim&&(r.no+r.p.name+r.p.card+r.p.phone+(r.x.item||'')).toLowerCase().includes(q))}
+function imBody(){const L=imFilter(),T=sum(L,r=>r.t),P=sum(L,r=>r.paid),B=sum(L,r=>r.bal);
+ const sm=`<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">${tile('Invoices',L.length,L.filter(r=>r.bal>.005).length+' unpaid')}${tile('Billed',ETB(T))}${tile('Collected',ETB(P),T?Math.round(P/T*100)+'% of billed':'')}${tile('Outstanding',ETB(B))}</div>`;
+ const rows=L.map(r=>`<tr class="border-b hover:bg-gray-50"><td class="p-2 font-medium whitespace-nowrap">${H(r.no)}</td><td class="whitespace-nowrap">${fd(r.ts)}</td><td><b class="cursor-pointer hover:underline" onclick="openInv('${r.p.id}')">${H(r.p.name)}</b><div class="text-xs text-gray-500">Card ${H(r.p.card)}</div></td><td>${H(r.x.item)}</td><td class="text-right">${ETB(r.t)}</td><td class="text-right">${ETB(r.paid)}</td><td class="text-right">${ETB(r.bal)}</td><td>${stChip(r.st)}</td><td class="whitespace-nowrap text-right pr-2">${r.bal>.005?`<i class="fa fa-money-bill text-green-600 cursor-pointer mr-3" title="Add payment" onclick="payAt('${r.p.id}',${r.i})"></i>`:''}<i class="fa fa-print text-purple-600 cursor-pointer mr-3" title="Print" onclick="printItem(S.patients.find(q=>q.id==${r.p.id}),'inv',${r.i})"></i><i class="fa fa-folder-open text-gray-600 cursor-pointer" title="Open patient" onclick="openInv('${r.p.id}')"></i></td></tr>`).join('');
+ return sm+`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Invoice</th><th>Date</th><th>Patient</th><th>Item</th><th class="text-right">Total</th><th class="text-right">Paid</th><th class="text-right">Balance</th><th>Status</th><th></th></tr>${rows||'<tr><td colspan="9" class="p-4 text-gray-500">No invoices match.</td></tr>'}</table></div>`}
+function imUp(){$('imb').innerHTML=imBody()}
+function openInv(pid){PID=pid;SK='inv';MENU=0;go('patient')}
+function invMgr(){const chip=(k,v,l)=>`<button onclick="IM.${k}='${v}';go('rinv')" class="px-3 py-1.5 rounded-md text-sm border ${IM[k]==v?'bg-red-100 border-red-400 text-red-700':'bg-gray-100'}">${l}</button>`;
+ return hd('Invoice Manager',`<span class="flex gap-2">${gb('New Invoice +','newInvG()')}<button onclick="imCsv()" class="bg-gray-700 text-white px-3 py-2 rounded-md text-sm"><i class="fa fa-file-csv mr-1"></i>CSV</button><button onclick="imPrint()" class="bg-gray-700 text-white px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button></span>`)+
+ `<div class="bg-white rounded-lg p-3 mb-4 flex flex-wrap gap-2 items-center"><input value="${H(IM.q)}" oninput="IM.q=this.value;imUp()" placeholder="Search invoice no, patient, card, phone" class="inp" style="max-width:300px">${[['all','All'],['Pending','Pending'],['Partial','Partial'],['Paid','Paid']].map(a=>chip('st',a[0],a[1])).join('')}<span class="text-gray-300">|</span>${[['all','All time'],['today','Today'],['w7','7 days'],['m30','30 days']].map(a=>chip('rg',a[0],a[1])).join('')}</div><div id="imb">${imBody()}</div>`}
+function imPrint(){const L=imFilter();printHtml('Invoices',docHead('Invoices',L.length+' invoices')+tbl2(['Invoice','Date','Patient','Item','Total','Paid','Balance','Status'],L.map(r=>[r.no,fd(r.ts),H(r.p.name),H(r.x.item),ETB(r.t),ETB(r.paid),ETB(r.bal),r.st]),['','','','Total',ETB(sum(L,r=>r.t)),ETB(sum(L,r=>r.paid)),ETB(sum(L,r=>r.bal)),''],[4,5,6]))}
+function imCsv(){const L=imFilter();csvDl('invoices',['Invoice','Date','Date (Ethiopian)','Card','Patient','Item','Total','Paid','Balance','Status'],L.map(r=>[r.no,isoD(r.ts),fdate(r.ts,'ec'),r.p.card,r.p.name,r.x.item,r.t,r.paid,r.bal,r.st]))}
+function newInvG(){if(!S.patients.length)return alert('Register a patient first.');
+ form('New Invoice',[['pt','Patient','sel',S.patients.map(plabel)],...fF('inv')],{qty:1,paid:0},v=>{const p=S.patients.find(q=>plabel(q)==v.pt);if(!p)return bad('Choose a patient.');const e=chk('inv',v);if(e)return bad(e);delete v.pt;mkItem('inv',v,p);sv();go('rinv')});pick()}
+
+/* ---------- analytics ---------- */
+let AR=30;
+const nice=m=>{if(m<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(m))),f=m/e;return (f<=1?1:f<=2?2:f<=5?5:10)*e};
+const short=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'k':String(Math.round(n));
+function buckets(){const t0=sod(NOW())+DAY,B=[];if(AR==0){let first=Math.min(NOW(),...S.patients.map(p=>p.date||NOW()),...allInv().map(r=>r.ts||NOW()));if(CALM()!='gc'){const e0=toEC(new Date(first)),le=toEC(new Date(NOW()));let y=e0.y,m=e0.m;while((y<le.y||(y==le.y&&m<=le.m))&&B.length<36){const ny=m==13?y+1:y,nm=m==13?1:m+1;B.push({s:+fromEC(y,m,1),e:+fromEC(ny,nm,1),l:EC_M[m-1]+' '+String(y).slice(2)});y=ny;m=nm}return B}let d=new Date(first);d=new Date(d.getFullYear(),d.getMonth(),1);const end=new Date(NOW());while(d<=end&&B.length<36){const e=new Date(d.getFullYear(),d.getMonth()+1,1);B.push({s:+d,e:+e,l:d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'})});d=e}return B}
+ if(AR==90){for(let i=12;i>=0;i--){const e=t0-i*7*DAY,s=e-7*DAY;B.push({s,e,l:fshort(s)})}return B}
+ for(let i=AR-1;i>=0;i--){const s=t0-(i+1)*DAY;B.push({s,e:s+DAY,l:fshort(s)})}return B}
+function barChart(labels,series){const W=640,Ht=210,l=44,r=6,t=12,b=28,n=labels.length,mx=nice(Math.max(series[0].money?0:4,...series.flatMap(s=>s.v))),gw=(W-l-r)/n,bw=Math.max(2,Math.min(26,gw*.78/series.length)),step=Math.ceil(n/9);
+ let o=`<svg viewBox="0 0 ${W} ${Ht}" style="width:100%;height:auto;display:block" role="img" aria-label="${H(series.map(s=>s.n).join(' and '))} by period">`;
+ for(let i=0;i<=4;i++){const y=t+(Ht-t-b)*(1-i/4);o+=`<line x1="${l}" x2="${W-r}" y1="${y}" y2="${y}" stroke="#e5e7eb"/><text x="${l-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#6b7280">${short(mx*i/4)}</text>`}
+ labels.forEach((lb,i)=>{const gx=l+i*gw+(gw-bw*series.length)/2;series.forEach((s,j)=>{const h=(Ht-t-b)*(s.v[i]/mx);o+=`<rect x="${gx+j*bw}" y="${Ht-b-h}" width="${bw-1}" height="${Math.max(0,h)}" rx="2" style="fill:${s.c}"><title>${H(lb)} - ${H(s.n)}: ${s.money?ETB(s.v[i]):s.v[i]}</title></rect>`});if(i%step==0)o+=`<text x="${l+i*gw+gw/2}" y="${Ht-10}" text-anchor="middle" font-size="10" fill="#6b7280">${H(lb)}</text>`});
+ o+='</svg>';if(series.length>1)o+=`<div style="font-size:12px;margin-top:4px">${series.map(s=>`<span style="margin-right:14px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${s.c};margin-right:4px"></span>${H(s.n)}</span>`).join('')}</div>`;return o}
+function hbar(items,money){const mx=Math.max(1,...items.map(i=>i[1]));return items.length?items.map(i=>`<div style="display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12px"><div style="width:36%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${H(i[0])}">${H(i[0])}</div><div style="flex:1;background:#f1f5f9;border-radius:4px;height:14px"><div style="width:${Math.max(2,i[1]/mx*100)}%;height:14px;border-radius:4px;background:${i[2]||'var(--c)'}"></div></div><div style="width:92px;text-align:right">${money?ETB(i[1]):i[1]}</div></div>`).join(''):'<div style="color:#6b7280;font-size:12px">No data yet.</div>'}
+function analyticsData(){const t0=sod(NOW()),lim=AR?t0-(AR-1)*DAY:0,inv=allInv(),inR=inv.filter(r=>r.ts>=lim),pays=inv.flatMap(r=>payEvents(r).map(y=>({...y,r}))).filter(y=>y.ts>=lim),Bk=buckets();
+ const billed=sum(inR,r=>r.t),coll=sum(pays,y=>y.amt),out=sum(inv,r=>r.bal),nOut=inv.filter(r=>r.bal>.005).length,newP=S.patients.filter(p=>p.date>=lim).length,today=S.patients.filter(p=>sod(p.arr)==t0),up=allAppts().filter(a=>a.ts>=NOW()-DAY/2&&a.ts<t0+8*DAY).length;
+ const kpis=[['Patients',S.patients.length,newP+' new in period'],['Arrived today',today.length,today.filter(p=>p.st=='new').length+' waiting'],['Appointments (7 days)',up,''],['Billed',ETB(billed),inR.length+' invoices'],['Collected',ETB(coll),'payments in period'],['Outstanding',ETB(out),nOut+' unpaid invoices'],['Collection rate',billed?Math.round(sum(inR,r=>r.paid)/billed*100)+'%':'-','of period invoices'],['Average invoice',inR.length?ETB(billed/inR.length):'-','']];
+ const inB=(a,f,s,e)=>a.filter(x=>f(x)>=s&&f(x)<e);
+ const rev=barChart(Bk.map(x=>x.l),[{n:'Billed',c:'var(--c)',money:1,v:Bk.map(x=>sum(inB(inv,r=>r.ts,x.s,x.e),r=>r.t))},{n:'Collected',c:'#64748b',money:1,v:Bk.map(x=>sum(inB(pays,y=>y.ts,x.s,x.e),y=>y.amt))}]);
+ const np=barChart(Bk.map(x=>x.l),[{n:'New patients',c:'var(--c)',v:Bk.map(x=>inB(S.patients,p=>p.date,x.s,x.e).length)}]);
+ const byI={};inR.forEach(r=>{const k=r.x.item=='Custom item'?(r.x.desc||'Custom item'):r.x.item;byI[k]=(byI[k]||0)+r.t});const top=Object.entries(byI).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ const stAmt=[['Paid',sum(inv.filter(r=>r.st=='Paid'),r=>r.t),'#16a34a'],['Partly paid (paid part)',sum(inv.filter(r=>r.st=='Partial'),r=>r.paid),'#0ea5e9'],['Outstanding balance',out,'#d97706']];
+ const ag=[['0-12',0,12],['13-17',13,17],['18-35',18,35],['36-55',36,55],['56+',56,200]].map(a=>[a[0],S.patients.filter(p=>+p.age>=a[1]&&+p.age<=a[2]).length]);
+ const sx=['Female','Male'].map(s=>[s,S.patients.filter(p=>p.sex==s).length,s=='Female'?'var(--c)':'#64748b']);
+ const q=[['New order',today.filter(p=>p.st=='new').length],['Seen by doctor',today.filter(p=>p.st=='doctor').length],['Seen by nurse',today.filter(p=>p.st=='nurse').length]];
+ return {kpis,lbl:AR?'Last '+AR+' days':'All time',blocks:[['Billed vs collected',rev,1],['New patients',np,1],['Top procedures by billed amount',hbar(top,1)],['Money position (all invoices)',hbar(stAmt,1)],['Payments received by method',hbar(Object.entries(pays.reduce((m,y)=>(m[y.method]=(m[y.method]||0)+y.amt,m),{})).sort((a,b)=>b[1]-a[1]),1)],['Patients by age group',hbar(ag)],['Patients by sex',hbar(sx)],["Today's queue",hbar(q)]],csv:{bk:Bk,inv,pays}}}
+function analytics(){const d=analyticsData(),rb=[[7,'7 days'],[30,'30 days'],[90,'90 days'],[0,'All time']];
+ return hd('Analytics',`<span class="flex gap-2"><button onclick="anPrint()" class="bg-gray-700 text-white px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button><button onclick="anCsv()" class="bg-gray-700 text-white px-3 py-2 rounded-md text-sm"><i class="fa fa-file-csv mr-1"></i>CSV</button></span>`)+
+ `<div class="bg-white rounded-lg p-3 mb-4 flex flex-wrap gap-2 items-center"><b class="text-sm mr-1">Period</b>${rb.map(a=>`<button onclick="AR=${a[0]};go('ran')" class="px-3 py-1.5 rounded-md text-sm border ${AR==a[0]?'bg-red-100 border-red-400 text-red-700':'bg-gray-100'}">${a[1]}</button>`).join('')}</div>
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">${d.kpis.map(k=>tile(k[0],k[1],k[2])).join('')}</div>
+ <div class="grid lg:grid-cols-2 gap-4">${d.blocks.map(b=>`<div class="bg-white rounded-xl shadow p-4 ${b[2]?'lg:col-span-2':''}"><h3 class="font-bold mb-2">${b[0]}</h3>${b[1]}</div>`).join('')}</div>`}
+function anPrint(){const d=analyticsData();printHtml('Analytics report',docHead('Analytics Report',d.lbl)+d.kpis.map(k=>`<div class="kpi">${k[0]}<b>${k[1]}</b><span class="muted">${k[2]}</span></div>`).join('')+d.blocks.map(b=>`<div class="blk"><h2>${b[0]}</h2>${b[1]}</div>`).join('').replace(/var\(--c\)/g,C.color))}
+function anCsv(){const d=analyticsData(),B=d.csv.bk;csvDl('analytics',['Period','Billed','Collected','New patients'],B.map(x=>[x.l,sum(d.csv.inv.filter(r=>r.ts>=x.s&&r.ts<x.e),r=>r.t),sum(d.csv.pays.filter(y=>y.ts>=x.s&&y.ts<x.e),y=>y.amt),S.patients.filter(p=>p.date>=x.s&&p.date<x.e).length]))}
+
+/* ---------- print center ---------- */
+let RO={apt:'today',cash:isoD(NOW()),invr:'all',pmt:'m30'},PRP=null;
+function repLim(k){const t0=sod(NOW());return {all:0,today:t0,w7:t0-6*DAY,m30:t0-29*DAY}[k]}
+const REP=[
+ {id:'pat',t:'Patient Register',ic:'fa-users',d:'Every registered patient with card, contact and status.',run:()=>({head:['Card','Name','Sex','Age','Phone','Registered','Status'],rows:S.patients.slice().sort((a,b)=>(+a.card||0)-(+b.card||0)).map(p=>[p.card,p.name,p.sex,p.age,p.phone,fd(p.date),ST[p.st]||'']),sub:S.patients.length+' patients'})},
+ {id:'que',t:"Today's Patient Queue",ic:'fa-user-clock',d:'Patients who arrived today, first come first served.',run:()=>{const t0=sod(NOW()),L=S.patients.filter(p=>sod(p.arr)==t0).sort((a,b)=>a.arr-b.arr);return {head:['#','Arrived','Card','Name','Phone','Status'],rows:L.map((p,i)=>[i+1,ft(p.arr),p.card,p.name,p.phone,ST[p.st]||'']),sub:fd(NOW())}}},
+ {id:'apt',t:'Appointment Schedule',ic:'fa-calendar-check',d:'Appointments for the period you choose.',opt:['apt',[['today','Today'],['w7','Next 7 days'],['up','All upcoming'],['all','Everything']]],run:o=>{const t0=sod(NOW()),f={today:a=>a.ts>=t0&&a.ts<t0+DAY,w7:a=>a.ts>=t0&&a.ts<t0+8*DAY,up:a=>a.ts>=t0,all:()=>true}[o],L=allAppts().filter(a=>f(a)||(o=='all'&&isNaN(a.ts)));return {head:['Date','Time','Card','Patient','Phone','Note'],rows:L.map(a=>[isNaN(a.ts)?a.x.date:fd(a.ts),a.x.time||'',a.p.card,a.p.name,a.p.phone,a.x.note||'']),sub:L.length+' appointments'}}},
+ {id:'out',t:'Outstanding Balances',ic:'fa-hand-holding-dollar',d:'Unpaid and partly paid invoices to follow up.',run:()=>{const L=allInv().filter(r=>r.bal>.005).sort((a,b)=>b.bal-a.bal);return {head:['Invoice','Date','Patient','Phone','Total','Paid','Balance'],rows:L.map(r=>[r.no,fd(r.ts),r.p.name,r.p.phone,r.t,r.paid,r.bal]),money:[4,5,6],foot:['','','','Total',sum(L,r=>r.t),sum(L,r=>r.paid),sum(L,r=>r.bal)],sub:L.length+' unpaid invoices'}}},
+ {id:'cash',t:'Daily Payments Report',ic:'fa-cash-register',d:'All payments received on one day by cash, Telebirr, CBE and eBirr, ready for cash-up.',opt:['cash','date'],run:o=>{const s=o?new Date(o+'T00:00:00').getTime():sod(NOW()),ev=allInv().flatMap(r=>payEvents(r).map(y=>({...y,r}))).filter(y=>y.ts>=s&&y.ts<s+DAY).sort((a,b)=>a.ts-b.ts),M={};ev.forEach(y=>M[y.method]=(M[y.method]||0)+y.amt);return {head:['Time','Invoice','Patient','Method','Reference','Received by','Amount'],rows:ev.map(y=>[ft(y.ts),y.r.no,y.r.p.name,y.method,y.ref||'',y.by,y.amt]),money:[6],foot:['','','','','','Total received',sum(ev,y=>y.amt)],sub:fd(s)+' - '+(Object.entries(M).map(e=>e[0]+': '+ETB(e[1])).join(', ')||'no payments')}}},
+ {id:'pmt',t:'Payments by Method',ic:'fa-mobile-screen-button',d:'Totals for Cash, Telebirr, CBE Birr, CBE bank, eBirr and others.',opt:['pmt',[['m30','Last 30 days'],['today','Today'],['w7','Last 7 days'],['all','All time']]],run:o=>{const ev=allInv().flatMap(r=>payEvents(r)).filter(y=>y.ts>=repLim(o)),M={};ev.forEach(y=>{const m=M[y.method]=M[y.method]||{n:0,a:0};m.n++;m.a+=y.amt});const tot_=sum(ev,y=>y.amt),L=Object.entries(M).sort((a,b)=>b[1].a-a[1].a);return {head:['Method','Payments','Amount','Share'],rows:L.map(e=>[e[0],e[1].n,e[1].a,tot_?Math.round(e[1].a/tot_*100)+'%':'']),money:[2],foot:['Total',ev.length,tot_,''],sub:ev.length+' payments'}}},
+ {id:'invr',t:'Invoice Register',ic:'fa-file-invoice-dollar',d:'Every invoice with status, for the period you choose.',opt:['invr',[['all','All time'],['today','Today'],['w7','Last 7 days'],['m30','Last 30 days']]],run:o=>{const L=allInv().filter(r=>r.ts>=repLim(o));return {head:['Invoice','Date','Patient','Item','Total','Paid','Balance','Status'],rows:L.map(r=>[r.no,fd(r.ts),r.p.name,r.x.item,r.t,r.paid,r.bal,r.st]),money:[4,5,6],foot:['','','','Total',sum(L,r=>r.t),sum(L,r=>r.paid),sum(L,r=>r.bal),''],sub:L.length+' invoices'}}},
+ {id:'lab',t:'Laboratory Requests',ic:'fa-flask',d:'Pending and finished lab work.',run:()=>{const L=[];S.patients.forEach(p=>(p.d.lab||[]).forEach(x=>L.push([dsp(x),p.name,x.req,x.lab,x.done])));return {head:['Date','Patient','Request','Laboratory','Finished'],rows:L,sub:L.length+' requests'}}},
+ {id:'cre',t:'Credit Ledger',ic:'fa-wallet',d:'Credits and advances recorded for patients.',run:()=>{const L=[];S.patients.forEach(p=>(p.d.cred||[]).forEach(x=>L.push([dsp(x),p.name,+x.amt||0,x.note||''])));return {head:['Date','Patient','Amount','Note'],rows:L,money:[2],foot:['','Total',sum(L,r=>r[2]),''],sub:L.length+' entries'}}}];
+function repOpt(r){const o=RO[r.opt[0]];return o}
+function runRep(id,mode,optOverride){const r=REP.find(x=>x.id==id),o=optOverride!==undefined?optOverride:(r.opt?RO[r.opt[0]]:undefined),d=r.run(o),m=d.money||[],fm=row=>row.map((v,i)=>m.includes(i)&&typeof v=='number'?ETB(v):H(v));
+ if(mode=='csv')return csvDl(r.id,d.head,d.rows);
+ printHtml(r.t,docHead(r.t,H(d.sub||''))+tbl2(d.head,d.rows.map(fm),d.foot?fm(d.foot):null,m.concat(d.head.map((h,i)=>/^(Total|Paid|Balance|Amount)$/.test(h)?i:-1).filter(i=>i>=0))))}
+/* ---------- Finance: staff fees/salaries, clinic expenses, monthly profit (manager/admin only) ---------- */
+const EXPCAT=['Rent','Utilities','Supplies & materials','Lab fees','Equipment','Maintenance','Marketing','Transport','Other'];
+const monthKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const monthLabel=k=>{const [y,m]=k.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'})};
+function finRevenue(mk){let tot=0;allInv().forEach(r=>payEvents(r).forEach(ev=>{if(monthKey(ev.ts)==mk)tot+=ev.amt}));return tot}
+function finAddSal(){form('Add Employee Fee / Salary',[['name','Employee name'],['role','Role','sel',['Doctor','Nurse','Reception','Manager','Admin','Other']],['amount','Amount (ETB)','number'],['date','Date','date'],['note','Note']],{date:isoD(Date.now())},v=>{
+ if(!v.name||!(+v.amount>0))return bad('Enter the employee name and an amount greater than 0.');S.fin.sal.push({id:Date.now(),...v,amount:+v.amount,by:U.name,ts:Date.now()});sv();go('fin')})}
+function finEditSal(id){const x=S.fin.sal.find(r=>r.id==id);if(!x)return;form('Edit Fee / Salary',[['name','Employee name'],['role','Role','sel',['Doctor','Nurse','Reception','Manager','Admin','Other']],['amount','Amount (ETB)','number'],['date','Date','date'],['note','Note']],x,v=>{
+ if(!v.name||!(+v.amount>0))return bad('Enter the employee name and an amount greater than 0.');Object.assign(x,v,{amount:+v.amount});sv();go('fin')})}
+function finDelSal(id){if(!confirm('Delete this record?'))return;S.fin.sal=S.fin.sal.filter(r=>r.id!=id);sv();go('fin')}
+function finAddExp(){form('Add Clinic Expense',[['item','Expense','sel',EXPCAT],['desc','Description'],['amount','Amount (ETB)','number'],['date','Date','date'],['note','Note']],{item:EXPCAT[0],date:isoD(Date.now())},v=>{
+ if(!(+v.amount>0))return bad('Enter an amount greater than 0.');S.fin.exp.push({id:Date.now(),...v,amount:+v.amount,by:U.name,ts:Date.now()});sv();go('fin')})}
+function finEditExp(id){const x=S.fin.exp.find(r=>r.id==id);if(!x)return;form('Edit Expense',[['item','Expense','sel',EXPCAT],['desc','Description'],['amount','Amount (ETB)','number'],['date','Date','date'],['note','Note']],x,v=>{
+ if(!(+v.amount>0))return bad('Enter an amount greater than 0.');Object.assign(x,v,{amount:+v.amount});sv();go('fin')})}
+function finDelExp(id){if(!confirm('Delete this record?'))return;S.fin.exp=S.fin.exp.filter(r=>r.id!=id);sv();go('fin')}
+function finPrintSal(){printHtml('Employee Fees & Salaries - '+C.name,docHead('Employee Fees & Salaries','Printed '+fd(Date.now()))+tbl2(['Date','Name','Role','Amount','Note'],S.fin.sal.slice().sort((a,b)=>b.ts-a.ts).map(x=>[fd(x.ts),H(x.name),H(x.role),ETB(x.amount),H(x.note||'')]),['','','Total',ETB(sum(S.fin.sal,x=>x.amount)),''],[3]))}
+function finPrintExp(){printHtml('Clinic Expenses - '+C.name,docHead('Clinic Expenses','Printed '+fd(Date.now()))+tbl2(['Date','Expense','Description','Amount','Note'],S.fin.exp.slice().sort((a,b)=>b.ts-a.ts).map(x=>[fd(x.ts),H(x.item),H(x.desc||''),ETB(x.amount),H(x.note||'')]),['','','Total',ETB(sum(S.fin.exp,x=>x.amount)),''],[3]))}
+function finPrintReport(mk){mk=mk||FM;const rev=finRevenue(mk),sal=S.fin.sal.filter(x=>monthKey(x.ts)==mk),exp=S.fin.exp.filter(x=>monthKey(x.ts)==mk),salT=sum(sal,x=>x.amount),expT=sum(exp,x=>x.amount),profit=rev-salT-expT;
+ printHtml('Monthly Report - '+monthLabel(mk),docHead('Monthly Report',monthLabel(mk))+
+  tbl2(['','Amount'],[['Revenue (payments received)',ETB(rev)],['Employee fees & salaries',ETB(salT)],['Clinic expenses',ETB(expT)]],['','']) +
+  `<h2>${profit>=0?'Net Profit':'Net Loss'}: ${ETB(Math.abs(profit))}</h2>`+
+  (sal.length?`<h2>Employee Fees & Salaries</h2>`+tbl2(['Date','Name','Role','Amount'],sal.map(x=>[fd(x.ts),H(x.name),H(x.role),ETB(x.amount)]),['','','Total',ETB(salT)],[3]):'')+
+  (exp.length?`<h2>Clinic Expenses</h2>`+tbl2(['Date','Expense','Description','Amount'],exp.map(x=>[fd(x.ts),H(x.item),H(x.desc||''),ETB(x.amount)]),['','','Total',ETB(expT)],[3]):''))}
+let FY=new Date().getFullYear(),FYD=null;
+const FAPI=/vercel\.app$/.test(location.hostname)?'':'https://dentalclinicmanagments-app.vercel.app';
+async function finYear(csvOut){const box=$('finyr');if(!box)return;box.innerHTML='<p class="text-sm text-gray-500">Loading...</p>';
+ try{const t=await DB.token();if(!t)throw new Error('Please sign in again.');
+  const r=await fetch(FAPI+'/api/finance?year='+FY+(csvOut?'&format=csv':'')+(U.role=='admin'?'&clinic='+encodeURIComponent(C.id):''),{headers:{Authorization:'Bearer '+t}});
+  if(r.status==404)throw new Error('The yearly server report is only available on the Vercel version of this app.');
+  if(csvOut){if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||'Could not export.');const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download='finance-'+FY+'.csv';document.body.appendChild(a);a.click();a.remove();box.innerHTML='';return}
+  const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not load the report.');FYD=d;finYearShow()}
+ catch(e){box.innerHTML='<p class="text-sm text-red-600">'+H(e.message||'Could not load the report.')+'</p>'}}
+const finYearRows=d=>d.months.filter(m=>m.revenue||m.salaries||m.expenses||m.billed).map(m=>[monthLabel(m.month),ETB(m.billed),ETB(m.revenue),ETB(m.salaries),ETB(m.expenses),ETB(m.profit)]);
+const finYearHtml=d=>{const rows=finYearRows(d),T=d.totals,mt=['Cash','Telebirr','CBE Birr','CBE (bank)','eBirr','Other bank','Card'].map(k=>[k,d.months.reduce((z,m)=>z+(m.byMethod[k]||0),0)]).filter(x=>x[1]);
+ return `<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">${tile('Billed',ETB(T.billed))}${tile('Received',ETB(T.revenue))}${tile('Fees, salaries &amp; expenses',ETB(T.salaries+T.expenses))}${tile(T.profit>=0?'Net profit':'Net loss',ETB(Math.abs(T.profit)))}</div>
+ <div>${rows.map(r=>`<div class="border rounded-lg p-3 mb-2 text-sm"><div class="font-bold mb-1">${H(r[0])}</div><div class="grid grid-cols-2 gap-x-3 gap-y-1"><span>Billed</span><b class="text-right">${r[1]}</b><span>Received</span><b class="text-right">${r[2]}</b><span>Salaries</span><b class="text-right">${r[3]}</b><span>Expenses</span><b class="text-right">${r[4]}</b><span>Profit</span><b class="text-right">${r[5]}</b></div></div>`).join('')||'<p class="p-2 text-gray-500 text-sm">No activity in '+d.year+'.</p>'}</div>
+ ${mt.length?`<p class="text-xs text-gray-600 mt-3"><b>Received by method:</b> ${mt.map(x=>H(x[0])+' '+ETB(x[1])).join(' &middot; ')}</p>`:''}`};
+function finYearShow(){if(FYD)$('finyr').innerHTML=finYearHtml(FYD)}
+function finYearPrint(){const d=FYD;if(!d)return alert('Load the report first.');const T=d.totals;printHtml('Yearly Report '+d.year,docHead('Yearly Financial Report',String(d.year))+tbl2(['Month','Billed','Received','Salaries & fees','Expenses','Profit'],finYearRows(d),['Total',ETB(T.billed),ETB(T.revenue),ETB(T.salaries),ETB(T.expenses),ETB(T.profit)],[1,2,3,4,5]))}
+function finYearSet(v){FY=+v;FYD=null;go('fin')}
+let FM=monthKey(Date.now());
+function finMonth(v){FM=v;go('fin')}
+function finance(){
+ const mk=FM,rev=finRevenue(mk),sal=S.fin.sal.filter(x=>monthKey(x.ts)==mk),exp=S.fin.exp.filter(x=>monthKey(x.ts)==mk),salT=sum(sal,x=>x.amount),expT=sum(exp,x=>x.amount),profit=rev-salT-expT,
+  months=[...new Set([mk,...S.fin.sal.map(x=>monthKey(x.ts)),...S.fin.exp.map(x=>monthKey(x.ts)),monthKey(Date.now())])].sort().reverse();
+ const salRows=S.fin.sal.slice().sort((a,b)=>b.ts-a.ts),expRows=S.fin.exp.slice().sort((a,b)=>b.ts-a.ts);
+ return hd('Finance')+
+  card(`<div class="flex flex-wrap items-center justify-between gap-2 mb-3"><h3 class="font-bold">Monthly Report</h3><div class="flex items-center gap-2"><select onchange="finMonth(this.value)" class="inp" style="width:auto">${months.map(m=>`<option value="${m}" ${m==mk?'selected':''}>${monthLabel(m)}</option>`).join('')}</select><button onclick="finPrintReport('${mk}')" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button></div></div>`,
+   `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">${tile('Revenue (payments received)',ETB(rev))}${tile('Fees, salaries &amp; expenses',ETB(salT+expT),'Salaries '+ETB(salT)+' + Expenses '+ETB(expT))}${tile(profit>=0?'Net Profit':'Net Loss',ETB(Math.abs(profit)))}</div>`)+
+  card(`<div class="flex flex-wrap items-center justify-between gap-2 mb-3"><h3 class="font-bold">Yearly Summary <span class="text-xs font-normal text-gray-500">(fast server report)</span></h3><div class="flex flex-wrap items-center gap-2"><select onchange="finYearSet(this.value)" class="inp" style="width:auto">${[0,1,2,3].map(i=>new Date().getFullYear()-i).map(y=>`<option ${y==FY?'selected':''}>${y}</option>`).join('')}</select><button onclick="finYear()" class="bg-green-500 text-white px-3 py-2 rounded-md text-sm">Load</button><button onclick="finYear(1)" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-file-csv mr-1"></i>CSV</button><button onclick="finYearPrint()" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button></div></div>`,`<div id="finyr">${FYD&&FYD.year==FY?finYearHtml(FYD):'<p class="text-sm text-gray-500">Press Load to see the whole year, month by month.</p>'}</div>`)+
+  card(`<div class="flex justify-between items-center mb-3"><h3 class="font-bold">Employee Fees &amp; Salaries</h3><div class="flex gap-2">${gb('Add +','finAddSal()')}<button onclick="finPrintSal()" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button></div></div>`,
+   salRows.length?`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Date</th><th>Name</th><th>Role</th><th class="text-right">Amount</th><th></th></tr>${salRows.map(x=>`<tr class="border-b"><td class="p-2">${H(fd(x.ts))}</td><td>${H(x.name)}<div class="text-xs text-gray-500">${H(x.note||'')}</div></td><td>${H(x.role)}</td><td class="text-right font-medium">${ETB(x.amount)}</td><td class="text-right pr-2 whitespace-nowrap"><i class="fa fa-pen text-red-600 cursor-pointer mr-3" onclick="finEditSal(${x.id})"></i><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="finDelSal(${x.id})"></i></td></tr>`).join('')}</table></div>`:'<p class="text-gray-500 text-sm">No fee or salary records yet.</p>')+
+  card(`<div class="flex justify-between items-center mb-3"><h3 class="font-bold">Clinic Expenses</h3><div class="flex gap-2">${gb('Add +','finAddExp()')}<button onclick="finPrintExp()" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-print mr-1"></i>Print</button></div></div>`,
+   expRows.length?`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Date</th><th>Expense</th><th>Description</th><th class="text-right">Amount</th><th></th></tr>${expRows.map(x=>`<tr class="border-b"><td class="p-2">${H(fd(x.ts))}</td><td>${H(x.item)}</td><td>${H(x.desc||'')}<div class="text-xs text-gray-500">${H(x.note||'')}</div></td><td class="text-right font-medium">${ETB(x.amount)}</td><td class="text-right pr-2 whitespace-nowrap"><i class="fa fa-pen text-red-600 cursor-pointer mr-3" onclick="finEditExp(${x.id})"></i><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="finDelExp(${x.id})"></i></td></tr>`).join('')}</table></div>`:'<p class="text-gray-500 text-sm">No expense records yet.</p>')}
+
+function printCenter(){if(PRP&&!S.patients.some(p=>p.id==PRP))PRP=null;PRP=PRP||(S.patients[0]||{}).id;
+ const rc=REP.map(r=>{let cnt='';try{cnt=r.run(r.opt?RO[r.opt[0]]:undefined).rows.length}catch(e){}const ctl=!r.opt?'':r.opt[1]=='date'?`<div class="mt-2">${dateField('ro_'+r.opt[0],RO[r.opt[0]],"RO."+r.opt[0]+"=document.getElementById('ro_"+r.opt[0]+"').value;go('rpr')")}</div>`:`<select onchange="RO.${r.opt[0]}=this.value;go('rpr')" class="inp mt-2">${r.opt[1].map(o=>`<option value="${o[0]}" ${RO[r.opt[0]]==o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`;
+  return `<div class="bg-white rounded-xl shadow p-4 flex flex-col"><div class="flex items-start gap-3"><i class="fa ${r.ic} text-red-600 text-xl mt-1"></i><div><div class="font-bold leading-tight">${r.t}</div><div class="text-xs text-gray-500 mt-1">${r.d}</div></div></div>${ctl}<div class="text-xs text-gray-500 mt-2">${cnt} record${cnt==1?'':'s'}</div><div class="flex gap-2 mt-auto pt-3"><button onclick="runRep('${r.id}','print')" class="bg-red-600 text-white px-3 py-2 rounded-md text-sm flex-1"><i class="fa fa-print mr-1"></i>Print</button><button onclick="runRep('${r.id}','csv')" class="bg-gray-200 px-3 py-2 rounded-md text-sm"><i class="fa fa-file-csv mr-1"></i>CSV</button></div></div>`}).join('');
+ const p=S.patients.find(x=>x.id==PRP),demo=S.patients.filter(x=>x.demo).length;
+ const pb=(l,a,i)=>`<button onclick="${a}" class="bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-3 text-sm text-left"><i class="fa ${i} mr-2 text-red-600"></i>${l}</button>`;
+ return hd('Print Center')+`<h3 class="font-bold mb-2">Reports</h3><div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">${rc}</div>
+ ${card('<h3 class="font-bold mb-3">Patient documents</h3>',S.patients.length?`<select class="inp mb-3" style="max-width:420px" onchange="PRP=this.value;go('rpr')">${S.patients.map(x=>`<option value="${x.id}" ${x.id==PRP?'selected':''}>${H(plabel(x))}</option>`).join('')}</select><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">${pb('Patient card','pcard(S.patients.find(x=>x.id==PRP))','fa-id-card')}${pb('Account statement','stmt()','fa-file-lines')}${pb('Dental record summary','recSum()','fa-tooth')}${pb('Appointment slip','apSlip()','fa-calendar-day')}</div>`:'<p class="text-gray-500 text-sm">No patients yet.</p>')}
+ ${card('<h3 class="font-bold mb-3">Bulk &amp; sample data</h3>',`<div class="flex flex-wrap gap-3"><button onclick="cardsSheet()" class="bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-3 text-sm"><i class="fa fa-address-card mr-2 text-red-600"></i>Print all patient cards</button><button onclick="addDemo()" class="bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-3 text-sm"><i class="fa fa-flask-vial mr-2 text-red-600"></i>Add sample records</button>${demo?`<button onclick="rmDemo()" class="bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-3 text-sm text-rose-700"><i class="fa fa-eraser mr-2"></i>Remove ${demo} sample patients</button>`:''}</div><p class="text-xs text-gray-500 mt-2">Sample patients are fictional and flagged, so they can be removed without touching real records.</p>`)}`}
+function stmt(){const p=S.patients.find(x=>x.id==PRP);if(!p)return;const L=allInv().filter(r=>r.p.id==p.id).reverse();printHtml('Statement - '+p.name,docHead('Account Statement',fd(NOW()))+pInfo(p)+tbl2(['Invoice','Date','Item','Total','Paid','Balance','Status'],L.map(r=>[r.no,fd(r.ts),H(r.x.item),ETB(r.t),ETB(r.paid),ETB(r.bal),r.st]),['','','Total',ETB(sum(L,r=>r.t)),ETB(sum(L,r=>r.paid)),ETB(sum(L,r=>r.bal)),''],[3,4,5])+`<div class="sig"><div>Patient signature</div><div>Cashier</div></div>`)}
+function recSum(){const p=S.patients.find(x=>x.id==PRP);if(!p)return;const R=p.d.rec||[],Pr=p.d.presc||[];printHtml('Dental records - '+p.name,docHead('Dental Record Summary',fd(NOW()))+pInfo(p)+'<h2>Dental findings</h2>'+tbl2(['Date','Tooth','Diagnosis','Treatment','Notes'],R.map(x=>[H(dsp(x)),H(x.tooth),H(x.finding),H(x.treat),H(x.note)]))+'<h2>Prescriptions</h2>'+tbl2(['Date','Diagnosis','Medication','Instructions'],Pr.map(x=>[H(dsp(x)),H(x.dx),H((x.meds||[]).join(', ')),H(x.txt)])))}
+function apSlip(){const p=S.patients.find(x=>x.id==PRP);if(!p)return;const n=allAppts().filter(a=>a.p.id==p.id&&a.ts>=sod(NOW())).shift();if(!n)return alert('This patient has no upcoming appointment.');printHtml('Appointment - '+p.name,docHead('Appointment Slip','')+pInfo(p)+`<p style="font-size:18px;margin:24px 0"><b>${fd(n.ts)}</b> ${H(n.x.time||'')}</p><p>${H(n.x.note||'')}</p><p class="muted">Please arrive 10 minutes early and bring your patient card.</p>`)}
+
+/* ---------- sample data ---------- */
+function seedPatients(start){let sd=11;const R=()=>(sd=sd*16807%2147483647)/2147483647,pk=a=>a[Math.floor(R()*a.length)],t=NOW(),t0=sod(t),base=t,out=[];
+ const N=[['Abebe Kebede','Male',34],['Tigist Alemu','Female',28],['Dawit Haile','Male',41],['Selamawit Tesfaye','Female',36],['Mulugeta Bekele','Male',52],['Hanna Girma','Female',19],['Yonas Assefa','Male',25],['Meron Tadesse','Female',31],['Biruk Solomon','Male',9],['Rahel Desta','Female',45],['Kidus Negash','Male',29],['Saron Mekonnen','Female',23],['Fikru Wolde','Male',61],['Liya Abera','Female',15],['Henok Getachew','Male',38],['Bethlehem Yilma','Female',33]];
+ const docs=['Dr. Ebsa Tofik Abdulkariim'],lbs=['Addis Dental Lab','Smile Ceramics Lab'];
+ N.forEach((n,k)=>{const reg=t-Math.floor(R()*75)*DAY-Math.floor(R()*8)*36e5,arr=k<5?Math.max(t0+k*6e4,t-(k+1)*2700000):reg,p={id:base+k,card:(start||1)+k,name:n[0],sex:n[1],age:n[2],phone:'+2519'+String(10000000+Math.floor(R()*89999999)),dob:String(new Date().getFullYear()-n[2]),branch:C.name,doc:docs[0],doctor:docs[0],date:Math.min(reg,arr),arr,st:k<5?['new','doctor','nurse','new','doctor'][k]:'doctor',fin:k>=5&&R()<.6,d:{},demo:true};
+  p.cardNo=p.card;const D=p.d,dt=x=>isoD(x),pm=()=>{const m=pk(['Cash','Cash','Telebirr','CBE Birr','eBirr','CBE (bank)']);return {method:m,ref:m=='Cash'?'':m.replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase()+String(1e9+Math.floor(R()*9e8)).slice(1)}};
+  D.rec=[{tooth:String(1+Math.floor(R()*32)),finding:pk(DIS),treat:pk(PRO)[0],note:'',date:dt(p.date),by:docs[0],ts:p.date}];
+  const ni=1+Math.floor(R()*3);D.inv=[];for(let j=0;j<ni;j++){const pro=pk(PRO),qty=pro[0]=='Extraction'?1+Math.floor(R()*2):1,disc=R()<.25?100:0,total=pro[1]*qty-disc,ts=Math.min(t-6e4,p.date+R()*(t-p.date)),m=R(),paid=m<.5?total:m<.8?Math.round(total*(.4+R()*.2)/10)*10:0,pays=[];
+   if(paid>0){if(paid==total&&total>1500&&R()<.4){const a=Math.round(total/2);pays.push({ts,amt:a,by:'Reception',method:'Cash'},{ts:Math.min(t,ts+2*DAY),amt:total-a,by:'Reception',method:pk(['Cash','Mobile money'])})}else pays.push({ts,amt:paid,by:'Reception',method:pk(['Cash','Mobile money','Bank transfer'])})}
+   pays.forEach(y=>Object.assign(y,pm()));D.inv.push({item:pro[0],desc:'',price:pro[1],qty,disc,paid,pays,date:dt(ts),ts,by:'Reception'})}
+  if(R()<.45){const pro=pk(PRO);D.prof=[{item:pro[0],desc:'Estimate',price:pro[1],qty:1,disc:0,date:dt(p.date),ts:p.date,by:'Reception'}]}
+  D.appt=[];if(k%2==0||k==3){const off=k==2||k==3?0:1+Math.floor(R()*9);D.appt.push({date:isoD(t0+off*DAY+12*36e5),time:pk(['09:00','10:30','14:00','15:30','16:45']),note:pk(['Follow-up check','Scaling session','Root canal visit 2','Crown fitting','Extraction review']),date0:1,ts:t})}
+  if(k%5==1)D.appt.push({date:isoD(t0-(3+k)*DAY),time:'11:00',note:'Initial consultation',ts:t});
+  if(k%4==1)D.lab=[{req:pk(['Zirconia crown','Partial denture','Night guard']),lab:pk(lbs),done:k%8==1?'Yes':'No',date:dt(p.date),by:docs[0],ts:p.date}];
+  if(k==3||k==10)D.cred=[{amt:500,note:'Advance payment',date:dt(p.date),by:'Reception',ts:p.date}];
+  if(k%5==0)D.note=[{title:'Allergy check',note:'Confirmed no known drug allergies.',date:dt(p.date),by:docs[0],ts:p.date}];
+  D.appt.forEach(a=>delete a.date0);out.push(p)});return out}
+function addDemo(){if(!canAdd())return alert('Only Reception and Manager can add records.');S.patients.push(...seedPatients(nextCard()));ensureInvNos();sv();go('rpr')}
+function rmDemo(){const n=S.patients.filter(p=>p.demo).length;if(n&&confirm('Remove '+n+' sample patients and all their records?')){S.patients=S.patients.filter(p=>!p.demo);sv();go('rpr')}}
+</script>
+<script>start();</script>
+</body></html>
