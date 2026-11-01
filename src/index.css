@@ -90,3 +90,15 @@ html.dark #login #lr,html.dark #login #lru{accent-color:var(--c)}
 html.dark #login>div{background:#162033!important}
 html.dark #login .inp,html.dark #login select{background-color:#0f1a2e!important}
 html.dark #login #lchips button{background:#0f1a2e}
+/* dark mode: dental record form (sections, chips, labels, tooth grid) */
+html.dark .rf-s{border-color:#2f3f5c!important}
+html.dark .rf-s>h3,html.dark .rf-h,html.dark .rf-g>summary{color:#fca5a5!important}
+html.dark .rf-h{border-bottom-color:#2f3f5c!important}
+html.dark .rf-lb,html.dark .rf-cb,html.dark .rf-x,html.dark .rf-o{color:#e2e8f0!important}
+html.dark .rf-chip{background:#26344f!important;color:#e2e8f0!important}
+html.dark .rf-c{background:#1b2740!important}
+html.dark .rf-sub,html.dark .rf-g{border-color:#2f3f5c!important}
+html.dark .rf-un{color:#8091ab!important}
+html.dark table.rf-t td{color:#e2e8f0}
+html.dark .rf-th{background:#1b2740!important;color:#e2e8f0!important;border-color:#51648a!important}
+html.dark .rf-th.st-H{background:#14532d!important}html.dark .rf-th.st-C{background:#7f1d1d!important}html.dark .rf-th.st-F{background:#1e3a8a!important}html.dark .rf-th.st-Cr{background:#78350f!important}html.dark .rf-th.st-RCT{background:#4c1d95!important}html.dark .rf-th.st-I{background:#166534!important}html.dark .rf-th.st-M{background:#374151!important}
