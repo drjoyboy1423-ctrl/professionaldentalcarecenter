@@ -10,9 +10,9 @@ const cors = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const DEFAULT_APPS = [
+  "https://professionaldentalcarecenter-nine.vercel.app",
   "https://dental-clinic-reco-jee.vercel.app",
   "https://dental-clinic-reco-jee-dental-clinic-managements-app.vercel.app",
-  "https://professionaldentalcarecenter-nine.vercel.app",
   "https://professionaldentalcarecenter-professionaldentalcarecenter.vercel.app",
   "https://professionaldentalcarecenter.netlify.app",
 ];
