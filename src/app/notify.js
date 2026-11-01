@@ -4,13 +4,14 @@ const NFK=()=>'nf:'+(U&&U.id||U&&U.username||'u')+':'+(C&&C.id||'');
 const nfLoad=()=>{try{return JSON.parse(localStorage.getItem(NFK())||'null')}catch(e){return null}};
 const nfSave=s=>{try{localStorage.setItem(NFK(),JSON.stringify(s))}catch(e){}};
 function nfScan(){if(!U||!C)return;
- const pts={},lab={};S.patients.forEach(p=>{pts[p.id]=1;(p.d&&p.d.lab||[]).forEach((x,i)=>{lab[p.id+':'+(x.ts||i)]=x.done=='Yes'?1:0})});
- const st=nfLoad();if(!st){nfSave({pts,lab,list:[]});return}
+ const pts={},lab={},ap={};S.patients.forEach(p=>{pts[p.id]=1;(p.d&&p.d.appt||[]).forEach((x,i)=>{ap[p.id+':'+(x.ts||i)]=1});(p.d&&p.d.lab||[]).forEach((x,i)=>{lab[p.id+':'+(x.ts||i)]=x.done=='Yes'?1:0})});
+ const st=nfLoad();if(!st){nfSave({pts,lab,ap,list:[]});return}
  const add=[],me=U.name,role=U.role;
  S.patients.forEach(p=>{if(!st.pts[p.id]&&p.by!=me){const mine=p.doc?p.doc==me:(role=='doctor'||role=='nurse');if(mine&&role!='reception')add.push({t:'New patient',m:p.name+(p.doc?' (assigned to you)':' was registered'),pid:p.id,sk:'rec',ts:Date.now()})}
+  (p.d&&p.d.appt||[]).forEach((x,i)=>{const k=p.id+':'+(x.ts||i);if(st.ap&&!st.ap[k]&&x.doc&&x.doc==me&&x.by!=me)add.push({t:'New appointment',m:p.name+' - '+(x.date||'')+' '+(x.time||''),pid:p.id,sk:'appt',ts:Date.now()})});
   (p.d&&p.d.lab||[]).forEach((x,i)=>{const k=p.id+':'+(x.ts||i);if(lab[k]&&st.lab[k]===0){const mine=x.by?x.by==me:role=='doctor';if(mine)add.push({t:'Lab result ready',m:(x.req||'Lab request')+' - '+p.name,pid:p.id,sk:'lab',ts:Date.now()})}})});
  const list=add.map(a=>({...a,r:0})).concat(st.list||[]).slice(0,50);
- nfSave({pts,lab,list});if(add.length){nfBadge();toast(add.length==1?add[0].t+': '+add[0].m:add.length+' new notifications');try{if(window.Notification&&Notification.permission=='granted'&&document.hidden)new Notification(add[0].t,{body:add[0].m})}catch(e){}}}
+ nfSave({pts,lab,ap,list});if(add.length){nfBadge();toast(add.length==1?add[0].t+': '+add[0].m:add.length+' new notifications');try{if(window.Notification&&Notification.permission=='granted'&&document.hidden)new Notification(add[0].t,{body:add[0].m})}catch(e){}}}
 function nfBadge(){const b=$('nfb');if(!b)return;const n=((nfLoad()||{}).list||[]).filter(x=>!x.r).length;b.textContent=n>9?'9+':n;b.style.display=n?'':'none'}
 function nfOpen(){const st=nfLoad()||{list:[]},l=st.list||[];
  $('mb').innerHTML=`<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-lg">Notifications</h3>${l.length?`<button onclick="nfClear()" class="text-xs text-blue-700">Clear all</button>`:''}</div>${l.length?l.map((x,i)=>`<div onclick="nfGo(${i})" class="border rounded-lg p-3 mb-2 cursor-pointer ${x.r?'bg-white':'bg-blue-50 border-blue-300'}"><div class="flex justify-between text-sm"><b>${H(x.t)}</b><span class="text-[11px] text-gray-500">${new Date(x.ts).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div><div class="text-sm text-gray-700">${H(x.m)}</div></div>`).join(''):'<p class="text-sm text-gray-500 py-6 text-center">No notifications yet. You will be told here when a new patient is assigned to you or a lab result you requested is finished.</p>'}

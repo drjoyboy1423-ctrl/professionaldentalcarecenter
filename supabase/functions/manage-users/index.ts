@@ -32,10 +32,16 @@ Deno.serve(async (req) => {
     const { data: ud, error: ue } = await sb.auth.getUser(token);
     if (ue || !ud?.user) return fail("Please sign in again.", 401);
     const { data: me } = await sb.from("profiles").select("*").eq("id", ud.user.id).single();
-    if (!me || !["admin", "manager"].includes(me.role)) return fail("You do not have permission to manage users.", 403);
-    const isAdmin = me.role === "admin";
     const body = await req.json();
     const action = body.action as string;
+    // Any signed-in staff member may list the doctors of their own clinic (names only), e.g. reception booking an appointment.
+    if (me && action === "doctors") {
+      const clinic = me.role === "admin" ? String(body.clinic || "") : me.clinic;
+      const { data: ds } = await sb.from("profiles").select("id,name,username").eq("clinic", clinic).eq("role", "doctor").order("name");
+      return json({ ok: true, doctors: (ds ?? []).map((d) => ({ id: d.id, name: d.name || d.username })) });
+    }
+    if (!me || !["admin", "manager"].includes(me.role)) return fail("You do not have permission to manage users.", 403);
+    const isAdmin = me.role === "admin";
 
     const getTarget = async (id: string) => {
       const { data: t } = await sb.from("profiles").select("*").eq("id", id).single();
