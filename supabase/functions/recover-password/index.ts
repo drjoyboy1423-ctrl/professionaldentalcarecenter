@@ -12,6 +12,9 @@ const json = (b: unknown, s = 200) =>
 const DEFAULT_APPS = [
   "https://dental-clinic-reco-jee.vercel.app",
   "https://dental-clinic-reco-jee-dental-clinic-managements-app.vercel.app",
+  "https://professionaldentalcarecenter-nine.vercel.app",
+  "https://professionaldentalcarecenter-professionaldentalcarecenter.vercel.app",
+  "https://professionaldentalcarecenter.netlify.app",
 ];
 const apps = () => [...DEFAULT_APPS, ...(Deno.env.get("APP_URLS") || "").split(",").map((s) => s.trim().replace(/\/+$/, "")).filter(Boolean)];
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
