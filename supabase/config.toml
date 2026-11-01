@@ -1,0 +1,5 @@
+[functions.manage-users]
+verify_jwt = false
+
+[functions.recover-password]
+verify_jwt = false

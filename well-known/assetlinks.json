@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.dentalcare.smartdent",
+    "sha256_cert_fingerprints": ["AD:28:B4:54:F6:99:1D:65:3D:CC:30:77:00:56:DF:C6:C2:99:51:61:B3:E8:9B:39:6A:B0:43:FB:AA:BD:C0:EA"]
+  }
+}]

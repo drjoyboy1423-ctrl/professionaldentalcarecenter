@@ -1,0 +1,11 @@
+function dash(){const P=S.patients,td=P.filter(p=>ds(p.arr)==ds(Date.now())),cnt=s=>P.filter(p=>p.st==s).length;
+ const T=[['all','All Patients ('+P.length+')'],['today',"Today's Orders ("+td.length+')'],['new','New Order ('+cnt('new')+')'],['doctor','Seen by Doctor ('+cnt('doctor')+')'],['nurse','Seen by Nurse ('+cnt('nurse')+')']];
+ let L=TAB=='all'?P:TAB=='today'?td:P.filter(p=>p.st==TAB);L=[...L].sort((a,b)=>a.arr-b.arr);
+ const C={new:'bg-red-50 border-red-400',doctor:'bg-green-50 border-green-400',nurse:'bg-pink-50 border-pink-400'},N={new:'New Order',doctor:'Seen by Doctor',nurse:'Seen by Nurse'};
+ return quick()+`<h2 class="text-2xl font-bold">Patients with Active Orders</h2><p class="text-gray-600 mb-4">Manage and monitor patient orders in real-time - First Come First Serve</p>
+ <div class="bg-white rounded-lg p-4 mb-4 text-sm flex flex-wrap gap-x-5 gap-y-1"><b><i class="fa fa-filter mr-1"></i>Status Legend:</b><span>🟩 Seen by Doctor</span><span>🟦 New order</span><span>🟪 Seen by Nurse</span></div>
+ <div class="bg-white rounded-lg p-4 mb-4 flex flex-wrap gap-2">${T.map(t=>`<button onclick="TAB='${t[0]}';go('dash')" class="px-3 py-2 rounded-md text-sm border ${TAB==t[0]?'bg-red-100 border-red-400 text-red-700':'bg-gray-100'}">${t[1]}</button>`).join('')}</div>
+ <div class="bg-white rounded-lg shadow">${L.map((p,i)=>`<div class="p-4 border-l-4 border-b ${C[p.st]}"><div class="flex justify-between"><div><b class="cursor-pointer hover:underline" onclick="go('patient','${p.id}')">${H(p.name)}</b></div><span class="text-xs bg-white/70 rounded-full px-3 py-1 h-fit">${N[p.st]}</span></div>
+ <div class="grid grid-cols-2 text-sm mt-2 gap-y-1"><span>Sex: ${p.sex}</span><span>Card: ${p.card}</span><span>Arrived: ${ago(p.arr)}</span></div>
+ <div class="text-right text-sm text-red-600 mt-2"><span class="mr-5 cursor-pointer text-gray-600" onclick="go('patient','${p.id}')"><i class="fa fa-folder-open"></i> History</span><span class="cursor-pointer" onclick="editOrder('${p.id}')"><i class="fa fa-pen"></i> Edit Order</span></div></div>`).join('')||'<p class="p-6 text-gray-500">No patients.</p>'}</div>`}
+function editOrder(id){const p=S.patients.find(x=>x.id==id);form('Edit Order',[['st','Status','sel',['new','doctor','nurse']]],p,v=>{p.st=v.st;sv();go('dash')})}
