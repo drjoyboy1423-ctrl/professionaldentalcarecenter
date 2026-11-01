@@ -8,7 +8,7 @@ const logoH=(c,sz)=>`<div class="${sz} rounded-full flex items-center justify-ce
 const TYPE=t=>t=='government'?'Government Dental Clinic':'Private Dental Clinic Center';
 let CL=[],CLA=[],C=null;
 S={users:[],usersLoaded:0,patients:[],dis:[],proc:[]};
-let SNAP=new Map(),SNAPL={dis:'',proc:'',fin:''},SQ=Promise.resolve(),SERR=0;
+let SNAP=new Map(),SNAPL={dis:'',proc:'',fin:'',stock:''},SQ=Promise.resolve(),SERR=0;
 const stab=o=>JSON.stringify(o,(k,v)=>v&&typeof v=='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v);
 const clName=id=>id=='all'?'All clinics':(CL.find(c=>c.id==id)||{name:'-'}).name;
 /* Head office (administrator) identity: its own name, logo and colour, different from every clinic */
@@ -16,19 +16,20 @@ const HQ={id:'__hq',name:'Professional Dental Care Center',color:'#1e3a8a',icon:
 const isHQ=()=>!!U&&U.role=='admin';
 function setTheme(c){if(isHQ())c=HQ;const r=document.documentElement.style;r.setProperty('--c',c.color);r.setProperty('--cd',`color-mix(in srgb,${c.color} 60%,black)`);r.setProperty('--cl',`color-mix(in srgb,${c.color} 10%,white)`)}
 const migrate=(p,i)=>{p.card??=(p.cardNo&&p.cardNo!='N/A'?p.cardNo:i+1);p.doc??=p.doctor||'';p.doctor??=p.doc;p.date=typeof p.date=='number'?p.date:(Date.parse(p.date)||Date.now());p.arr??=p.date;p.st??='new';p.fin??=false;p.d??={}};
-function applyData(d){S.patients=d.patients||[];S.patients.forEach(migrate);S.dis=d.dis||DIS.map((n,i)=>({id:i+1,name:n,date:'12/3/2025'}));S.proc=d.proc||PRO.map((x,i)=>({id:i+1,n:x[0],p:x[1]}));S.fin=d.fin||{sal:[],exp:[]};S.fin.sal=S.fin.sal||[];S.fin.exp=S.fin.exp||[];
- SNAP=new Map(S.patients.map(p=>[String(p.id),stab(p)]));SNAPL={dis:stab(S.dis),proc:stab(S.proc),fin:stab(S.fin)};ensureInvNos();if(S.patients.some(p=>SNAP.get(String(p.id))!==stab(p)))sv()}
+function applyData(d){S.patients=d.patients||[];S.patients.forEach(migrate);S.dis=d.dis||DIS.map((n,i)=>({id:i+1,name:n,date:'12/3/2025'}));S.proc=d.proc||PRO.map((x,i)=>({id:i+1,n:x[0],p:x[1]}));S.fin=d.fin||{sal:[],exp:[]};S.fin.sal=S.fin.sal||[];S.fin.exp=S.fin.exp||[];S.stock=d.stock||(()=>{try{return JSON.parse(localStorage.getItem('stock:'+(C&&C.id))||'null')}catch(e){return null}})();
+ SNAP=new Map(S.patients.map(p=>[String(p.id),stab(p)]));SNAPL={dis:stab(S.dis),proc:stab(S.proc),fin:stab(S.fin),stock:stab(S.stock)};ensureInvNos();if(S.patients.some(p=>SNAP.get(String(p.id))!==stab(p)))sv()}
 async function loadClinic(id){C=CL.find(c=>c.id==id)||CL[0];applyData(await DB.loadClinicData(C.id,true));setTheme(C);document.title=isHQ()?HQ.name:C.name}
 function toast(m,ok){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;max-width:92vw;padding:10px 16px;border-radius:10px;color:#fff;font-size:14px;box-shadow:0 4px 14px #0004';document.body.appendChild(t)}t.style.background=ok?'#15803d':'#b91c1c';t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',ok?1800:6000)}
 function sv(){SQ=SQ.then(syncNow).then(()=>{if(SERR){SERR=0;toast('Saved',1)}},e=>{SERR=1;toast('Could not save: '+(e.message||e)+'. Your changes will retry on the next save.')})}
 async function syncNow(){if(!C||!U)return;const cid=C.id,cur=new Map(S.patients.map(p=>[String(p.id),stab(p)])),ins=[],upd=[],del=[];
  S.patients.forEach(p=>{const k=String(p.id),o=SNAP.get(k);if(o===undefined)ins.push(p);else if(o!==cur.get(k))upd.push(p)});SNAP.forEach((v,k)=>{if(!cur.has(k))del.push(k)});
  if(ins.length||upd.length||del.length){await DB.savePatients(cid,ins,upd,del);ins.concat(upd).forEach(p=>SNAP.set(String(p.id),cur.get(String(p.id))));del.forEach(k=>SNAP.delete(k))}
- for(const k of ['dis','proc','fin']){const j=stab(S[k]);if(j!==SNAPL[k]){await DB.saveList(cid,k,S[k]);SNAPL[k]=j}}}
+ for(const k of ['dis','proc','fin']){const j=stab(S[k]);if(j!==SNAPL[k]){await DB.saveList(cid,k,S[k]);SNAPL[k]=j}}
+ if(S.stock){const j=stab(S.stock);if(j!==SNAPL.stock){SNAPL.stock=j;try{await DB.saveList(cid,'stock',S.stock);S.stockErr=0;try{localStorage.removeItem('stock:'+cid)}catch(e){}}catch(e){S.stockErr=1;try{localStorage.setItem('stock:'+cid,JSON.stringify(S.stock))}catch(_){}}}}}
 let RF=0;
 async function refresh(){if(RF||!C||!U)return;RF=1;try{await SQ;const cid=C.id,d=await DB.loadClinicData(cid);if(cid!=C.id)return;const mine_=new Map(S.patients.map(p=>[String(p.id),stab(p)]));
  let pending=mine_.size!=SNAP.size;mine_.forEach((v,k)=>{if(SNAP.get(k)!==v)pending=true});if(pending)return;
- const rem=new Map(d.patients.map(p=>[String(p.id),stab(p)]));let diff=rem.size!=SNAP.size||stab(d.dis||S.dis)!=SNAPL.dis||stab(d.proc||S.proc)!=SNAPL.proc||stab(d.fin||S.fin)!=SNAPL.fin;rem.forEach((v,k)=>{if(SNAP.get(k)!==v)diff=true});
+ const rem=new Map(d.patients.map(p=>[String(p.id),stab(p)]));let diff=rem.size!=SNAP.size||stab(d.dis||S.dis)!=SNAPL.dis||stab(d.proc||S.proc)!=SNAPL.proc||stab(d.fin||S.fin)!=SNAPL.fin||(d.stock&&stab(d.stock)!=SNAPL.stock);rem.forEach((v,k)=>{if(SNAP.get(k)!==v)diff=true});
  if(diff&&md.classList.contains('hidden')){applyData(d);if(V!='card')go(V)}}catch(e){}finally{RF=0}}
 setInterval(()=>{if(U&&C&&!document.hidden&&md.classList.contains('hidden')&&V!='card')refresh()},45000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&U&&C&&md.classList.contains('hidden')&&V!='card')refresh()});

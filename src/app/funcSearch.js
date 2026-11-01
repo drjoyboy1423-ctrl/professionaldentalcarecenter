@@ -1,5 +1,10 @@
 /* Search box also finds app functions (e.g. type "refund" to see where to refund). */
 const FN=[
+ {t:'Place an order (X-ray, lab, prescription)',h:'Doctor: Dashboard > Place Order on a patient',k:'order place xray x-ray lab prescription prosthodontic crown cbct opg',v:'dash',ic:'fa-file-circle-plus',r:['doctor','manager','admin']},
+ {t:'Orders inbox',h:'See doctor orders and mark them Completed',k:'orders inbox completed pending doctor order',v:'ord',ic:'fa-inbox',r:['reception','manager','admin']},
+ {t:'Dental materials / stock',h:'Stock levels, Order Now, Use 1',k:'materials stock inventory supplies purchase order composite alginate',v:'mat',ic:'fa-boxes-stacked',r:['reception','manager','admin']},
+ {t:'Reports dashboard',h:'KPIs, monthly and yearly registrations, print official report',k:'report dashboard kpi registrations print csv official',v:'rep',ic:'fa-chart-pie',r:['manager','admin']},
+ {t:'Assign a doctor to a patient',h:'Dashboard > Assign Doctor',k:'assign doctor patient',v:'dash',ic:'fa-user-doctor',r:['reception','manager','admin']},
  {t:'Refund a payment',h:'Open the patient > Invoices, then tap the red arrow icon on the invoice',k:'refund return money back reimburse',v:'rinv',ic:'fa-rotate-left',r:['manager','admin']},
  {t:'Take a payment',h:'Open an invoice and tap the green money icon',k:'payment pay receive cash telebirr cbe collect',v:'rinv',ic:'fa-money-bill',r:['manager','reception','admin']},
  {t:'Daily cash close',h:'Cash received by day, method and staff, with refunds',k:'cash close drawer daily cashup cash-up count',v:'cash',ic:'fa-cash-register'},
