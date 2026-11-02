@@ -67,7 +67,9 @@ Deno.serve(async (req) => {
     let emailed = 0;
     const key = Deno.env.get("RESEND_API_KEY");
     const { data: admins } = await sb.from("profiles").select("email,name").eq("role", "admin");
-    const to = [...new Set((admins ?? []).map((a) => String(a.email || "").trim()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];
+    // Backup copies also go to the clinic's own backup mailbox (set BACKUP_EMAILS = comma list to change it).
+    const extra = (Deno.env.get("BACKUP_EMAILS") || "professionaldentalcarecenter@gmail.com").split(",");
+    const to = [...new Set([...(admins ?? []).map((a) => String(a.email || "")), ...extra].map((e) => e.trim().toLowerCase()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];
     if (key && to.length) {
       const html = `<p>Weekly backup finished on <b>${day}</b>. The links work for 7 days; the files stay saved in your Supabase storage (newest ${KEEP} per clinic).</p><table cellpadding="6" style="border-collapse:collapse">${rows.map((r) => `<tr><td style="border-bottom:1px solid #ddd"><b>${esc(r.name)}</b><br>${r.patients} patients, ${r.kb} KB</td><td style="border-bottom:1px solid #ddd"><a href="${r.url}">Download backup</a></td></tr>`).join("")}</table><p style="color:#666;font-size:12px">Keep these files private: they contain patient data. To restore, open Clinics &gt; Restore backup in the app.</p>`;
       const r = await fetch("https://api.resend.com/emails", {

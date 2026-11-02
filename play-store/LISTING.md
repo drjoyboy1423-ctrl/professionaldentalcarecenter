@@ -5,7 +5,7 @@
 - **Package:** app.dentalcare.smartdent
 - **Category:** Medical  (or Business)  | **Type:** App | **Price:** Free
 - **Privacy policy URL:** https://professionaldentalcarecenter-nine.vercel.app/privacy
-- **Contact email:** dr.joyboy1423@gmail.com
+- **Contact email:** professionaldentalcarecenter@gmail.com (also dr.joyboy1423@gmail.com)
 - **Contact phone:** +251 915 018 709 (Play Console asks for a phone number with country code: +251915018709)
 - **Website:** https://professionaldentalcarecenter-nine.vercel.app
 
