@@ -1,6 +1,6 @@
 function dash(){if(U.role=='doctor')return docDash();const P=S.patients,td=P.filter(p=>ds(p.arr)==ds(Date.now())),cnt=s=>P.filter(p=>p.st==s).length;
  const T=[['all','All Patients ('+P.length+')'],['today',"Today's Orders ("+td.length+')'],['new','New Order ('+cnt('new')+')'],['doctor','Seen by Doctor ('+cnt('doctor')+')'],['nurse','Seen by Nurse ('+cnt('nurse')+')']];
- let L=TAB=='all'?P:TAB=='today'?td:P.filter(p=>p.st==TAB);L=[...L].sort((a,b)=>a.arr-b.arr);
+ let L=TAB=='all'?P:TAB=='today'?td:P.filter(p=>p.st==TAB);L=dsort(L,p=>p.arr);
  const C={new:'bg-red-50 border-red-400',doctor:'bg-green-50 border-green-400',nurse:'bg-pink-50 border-pink-400'},N={new:'New Order',doctor:'Seen by Doctor',nurse:'Seen by Nurse'};
  return quick()+(['reception','manager','admin','nurse'].includes(U.role)?ordStats():'')+(U.role=='nurse'||U.role=='manager'?sterBanner():'')+`<h2 class="text-2xl font-bold">Patients with Active Orders</h2><p class="text-gray-600 mb-4">Manage and monitor patient orders in real-time - First Come First Serve</p>
  <div class="bg-white rounded-lg p-4 mb-4 text-sm flex flex-wrap gap-x-5 gap-y-1"><b><i class="fa fa-filter mr-1"></i>Status Legend:</b><span>🟩 Seen by Doctor</span><span>🟦 New order</span><span>🟪 Seen by Nurse</span></div>
