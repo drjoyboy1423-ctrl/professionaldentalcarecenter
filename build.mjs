@@ -28,10 +28,10 @@ html = out.join('\n');
 // anything left that points at a local file is a mistake
 const markup = html.replace(/<(script|style)>[\s\S]*?<\/\1>/g, '');
 for (const m of markup.matchAll(/(?:src|href)="((?!https?:|\/\/|data:|#)[^"]+)"/g))
-  if (!/^(favicon\.svg|manifest\.webmanifest|icon-192\.png|\/_vercel\/)/.test(m[1])) throw new Error('Unbundled local reference: ' + m[1]);
+  if (!/^(favicon\.svg|manifest\.webmanifest|icon-192\.png|\/privacy|\/_vercel\/)/.test(m[1])) throw new Error('Unbundled local reference: ' + m[1]);
 
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
-for (const f of ['favicon.svg', 'robots.txt', 'manifest.webmanifest', 'sw.js', 'icon-192.png', 'icon-512.png']) if (existsSync(f)) copyFileSync(f, 'dist/' + f);
+for (const f of ['favicon.svg', 'robots.txt', 'manifest.webmanifest', 'sw.js', 'icon-192.png', 'icon-512.png', 'privacy.html']) if (existsSync(f)) copyFileSync(f, 'dist/' + f);
 console.log('dist/index.html', Buffer.byteLength(html), 'bytes');
 if (existsSync('well-known/assetlinks.json')) { mkdirSync('dist/.well-known', { recursive: true }); copyFileSync('well-known/assetlinks.json', 'dist/.well-known/assetlinks.json'); }

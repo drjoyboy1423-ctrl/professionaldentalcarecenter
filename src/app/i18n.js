@@ -544,6 +544,7 @@ Maxillofacial|የፊት መንጋጋ|Afaan fi fuula|Maxillofacial
 due|የሚከፈል|kaffalamuu qabu|la bixin doono
 Other sign-in options (clinic / administrator)|ሌሎች የመግቢያ አማራጮች (ክሊኒክ / አስተዳዳሪ)|Filannoowwan seensaa biroo (kilinikii / bulchaa)|Doorashooyin kale oo gelitaan (kiliinik / maamule)
 Hide other sign-in options|ሌሎች የመግቢያ አማራጮችን ደብቅ|Filannoowwan seensaa biroo dhoksi|Qari doorashooyinka kale ee gelitaanka
+Privacy policy|የግላዊነት ፖሊሲ|Imaammata iccitii|Siyaasadda khaasnimada
 Count on the shelf|በመደርደሪያ ላይ የተቆጠረ|Kan shelfii irra lakkaa'ame|Tirada khayraadka
 `.trim().split('\n').forEach(l=>{const a=l.split('|');if(a.length==4){T.am[a[0]]=a[1];T.om[a[0]]=a[2];T.so[a[0]]=a[3]}});return T})();
 let LG=(()=>{const v=lsGet('dental_lang');return LANGS.some(l=>l[0]==v)?v:'en'})();
