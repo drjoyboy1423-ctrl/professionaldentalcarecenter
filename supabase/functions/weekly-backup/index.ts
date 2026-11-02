@@ -70,16 +70,23 @@ Deno.serve(async (req) => {
     // Backup copies also go to the clinic's own backup mailbox (set BACKUP_EMAILS = comma list to change it).
     const extra = (Deno.env.get("BACKUP_EMAILS") || "professionaldentalcarecenter@gmail.com").split(",");
     const to = [...new Set([...(admins ?? []).map((a) => String(a.email || "")), ...extra].map((e) => e.trim().toLowerCase()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];
-    if (key && to.length) {
+    let mailError = "";
+    if (!key) mailError = "Email is not set up (RESEND_API_KEY secret is missing).";
+    else if (!to.length) mailError = "No valid email address to send to.";
+    else {
       const html = `<p>Weekly backup finished on <b>${day}</b>. The links work for 7 days; the files stay saved in your Supabase storage (newest ${KEEP} per clinic).</p><table cellpadding="6" style="border-collapse:collapse">${rows.map((r) => `<tr><td style="border-bottom:1px solid #ddd"><b>${esc(r.name)}</b><br>${r.patients} patients, ${r.kb} KB</td><td style="border-bottom:1px solid #ddd"><a href="${r.url}">Download backup</a></td></tr>`).join("")}</table><p style="color:#666;font-size:12px">Keep these files private: they contain patient data. To restore, open Clinics &gt; Restore backup in the app.</p>`;
-      const r = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: Deno.env.get("MAIL_FROM") || "Professional Dental Care Center <onboarding@resend.dev>", to, subject: `Weekly backup ${day}: ${rows.length} clinic${rows.length == 1 ? "" : "s"}`, html }),
-      });
-      if (r.ok) emailed = to.length; else console.log("backup email failed", r.status, await r.text());
+      // one email per address, so one rejected address never blocks the others
+      for (const addr of to) {
+        const r = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ from: Deno.env.get("MAIL_FROM") || "Professional Dental Care Center <onboarding@resend.dev>", to: [addr], subject: `Weekly backup ${day}: ${rows.length} clinic${rows.length == 1 ? "" : "s"}`, html }),
+        });
+        if (r.ok) emailed++;
+        else { const t = await r.text(); console.log("backup email failed", addr, r.status, t); mailError = `${addr}: ${t.slice(0, 160)}`; }
+      }
     }
-    return json({ ok: true, clinics: rows.length, emailed, day });
+    return json({ ok: true, clinics: rows.length, emailed, mailError, day });
   } catch (e) {
     return json({ error: (e as Error).message || "Backup failed." }, 500);
   }
