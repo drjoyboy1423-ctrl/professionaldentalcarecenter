@@ -6,6 +6,7 @@
 - **Category:** Medical  (or Business)  | **Type:** App | **Price:** Free
 - **Privacy policy URL:** https://professionaldentalcarecenter-nine.vercel.app/privacy
 - **Contact email:** dr.joyboy1423@gmail.com
+- **Contact phone:** +251 915 018 709 (Play Console asks for a phone number with country code: +251915018709)
 - **Website:** https://professionaldentalcarecenter-nine.vercel.app
 
 ## Short description (max 80)
@@ -75,7 +76,7 @@ Choose: the app is **not** a medical device and gives no diagnosis or treatment 
 - Purpose: App functionality; Account management.
 - Shared with third parties: No (hosting providers act only as processors).
 - Encrypted in transit: **Yes (HTTPS)**.
-- Users can request data deletion: **Yes** - by email, see privacy policy section 8. Account / data deletion URL: https://professionaldentalcarecenter-nine.vercel.app/privacy
+- Users can request data deletion: **Yes** - by phone or email, see privacy policy section 8. Account / data deletion URL: https://professionaldentalcarecenter-nine.vercel.app/privacy
 - Optional data: none. Data is not used for ads or analytics.
 
 ## Review access (IMPORTANT - Google needs a working login)
