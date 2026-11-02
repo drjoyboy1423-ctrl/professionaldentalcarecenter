@@ -6,7 +6,7 @@ const ORD={
  rx:{t:'Drug Prescriptions',i:'fa-pills',o:[...MEDS,'Other (write in note)']},
  bl:{t:'Invoices / Billing',i:'fa-file-invoice-dollar',o:['Treatment invoice','Proforma / estimate','Payment plan','Letter / insurance form']}
 };
-const canOrder=()=>!!U&&['doctor','manager','admin'].includes(U.role),canDone=()=>!!U&&['reception','manager','admin'].includes(U.role);
+const canOrder=()=>!!U&&['doctor','admin'].includes(U.role),canDone=()=>!!U&&['reception','manager','admin'].includes(U.role);
 const ordList=P=>{const L=[];(P||S.patients).forEach(p=>((p.d||{}).ord||[]).forEach((o,i)=>L.push({p,o,i})));return L.sort((a,b)=>b.o.at-a.o.at)};
 const ordBadge=o=>o.st=='done'?'<span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">Completed</span>':'<span class="px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">Pending</span>';
 const ordUrg=o=>o.urg=='Urgent'?'<span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">Urgent</span>':'<span class="text-xs text-gray-500">Routine</span>';
@@ -14,7 +14,7 @@ const ordTag=n=>`<span class="inline-block bg-red-600 text-white rounded-full te
 let OD={pid:null,cat:'xr'},OF={t:'all',s:'pending'},OT='pending',DT='act',DQ='';
 
 /* --- place an order --- */
-function ordNew(pid){if(!canOrder())return;const p=S.patients.find(x=>x.id==pid);if(!p)return;if(p.fin)return alert('This patient is finished. Reactivate the patient first.');OD={pid,cat:'xr'};ordPaint()}
+function ordNew(pid){if(!canOrder())return;const p=S.patients.find(x=>x.id==pid);if(!p)return;if(!ptW(p,'rec'))return alert(ptMsg(p));if(p.fin)return alert('This patient is finished. Reactivate the patient first.');OD={pid,cat:'xr'};ordPaint()}
 function ordCat(k){OD.cat=k;ordPaint()}
 function ordPaint(){const p=S.patients.find(x=>x.id==OD.pid),c=ORD[OD.cat];if(!p)return;
  $('mb').innerHTML=`<h3 class="font-bold text-xl mb-1">Place Order</h3><p class="text-sm text-gray-600 mb-3">${H(p.name)} &middot; Card ${H(p.card)}</p>
@@ -34,9 +34,9 @@ function ordDone(pid,id){if(!canDone())return;const p=S.patients.find(x=>x.id==p
 function ordUndo(pid,id){if(!canDone())return;const p=S.patients.find(x=>x.id==pid),o=p&&(p.d.ord||[]).find(x=>x.id==id);if(!o||!confirm('Mark this order as pending again?'))return;o.st='pending';delete o.doneAt;delete o.doneBy;(p.d.lab||[]).forEach(x=>{if(x.ord==id)x.done='No'});sv();go(V)}
 
 /* --- assign doctor / finish --- */
-async function assignDoc(pid){if(!canAdd()&&U.role!='admin')return;const p=S.patients.find(x=>x.id==pid);if(!p)return;const docs=await docEnsure();if(!docs.length)return alert('No doctors found for this clinic. Add a doctor in Users first.');
+async function assignDoc(pid){if(U.role!='reception')return;const p=S.patients.find(x=>x.id==pid);if(!p)return;const docs=await docEnsure();if(!docs.length)return alert('No doctors found for this clinic. Add a doctor in Users first.');
  form('Assign Doctor',[['doctor','Doctor for '+p.name,'sel',docs]],{doctor:p.doc},v=>{p.doc=v.doctor;p.doctor=v.doctor;sv();go(V)})}
-function ordFin(pid){const p=S.patients.find(x=>x.id==pid);if(!p||!['doctor','manager','admin','reception'].includes(U.role))return;if(U.role=='doctor'&&p.doc!=U.name)return;
+function ordFin(pid){const p=S.patients.find(x=>x.id==pid);if(!p||!ptW(p,'rec'))return;
  if(!p.fin&&!confirm('Mark '+p.name+' as finished / inactive? The patient moves to the Finished list.'))return;p.fin=!p.fin;sv();go(V)}
 
 /* --- dashboards --- */
@@ -72,15 +72,18 @@ function dirQ(v){DQ=v;$('dirb').innerHTML=dirRows()}
 function dirPage(){return hd('All Patients (Directory)')+`<p class="text-gray-600 mb-3 text-sm">Read-only list of every patient in this clinic, newest registration first. Open records from your own patient list.</p><input class="inp mb-3" placeholder="Search name, card, phone or doctor" value="${H(DQ)}" oninput="dirQ(this.value)">`+card('',`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">#</th><th>Card</th><th>Name</th><th>Sex</th><th>Age</th><th>Phone</th><th>Doctor</th><th>Registered</th><th>Status</th></tr><tbody id="dirb">${dirRows()}</tbody></table></div>`)}
 
 /* --- Finished / Inactive --- */
-function donePage(){const L=S.patients.filter(p=>p.fin&&(U.role!='doctor'||p.doc==U.name)).sort((a,b)=>b.date-a.date),can=p=>['manager','admin','reception'].includes(U.role)||(U.role=='doctor'&&p.doc==U.name);
+function donePage(){const L=S.patients.filter(p=>p.fin&&(U.role!='doctor'||p.doc==U.name)).sort((a,b)=>b.date-a.date),can=p=>ptW(p,'rec');
  return hd('Finished / Inactive Patients')+card('',L.length?`<div class="overflow-x-auto"><table class="w-full text-sm"><tr class="text-left border-b"><th class="p-2">Card</th><th>Name</th><th>Doctor</th><th>Registered</th><th>Orders</th><th></th></tr>${L.map(p=>`<tr class="border-b"><td class="p-2">${H(p.card)}</td><td><b class="cursor-pointer hover:underline" onclick="go('patient','${p.id}')">${H(p.name)}</b></td><td>${H(p.doc||'-')}</td><td>${fd(p.date)}</td><td>${(p.d.ord||[]).length}</td><td class="text-right pr-2">${can(p)?`<span class="text-green-700 cursor-pointer text-xs" onclick="ordFin('${p.id}')"><i class="fa fa-rotate-left"></i> Reactivate</span>`:''}</td></tr>`).join('')}</table></div>`:'<p class="text-gray-500 p-4">No finished patients.</p>')}
 
-/* --- notifications: new order -> reception/manager; order completed and patient assigned -> doctor --- */
-function ordNf(){if(!U||!C||typeof nfLoad!='function')return;const key='on:'+(U.id||U.username)+':'+C.id,me=U.name,role=U.role,st0=(()=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null}})(),os={},asg={};
- ordList().forEach(r=>{os[r.o.id]=r.o.st});S.patients.forEach(p=>{asg[p.id]=p.doc||''});
- const save=()=>{try{localStorage.setItem(key,JSON.stringify({os,asg}))}catch(e){}};if(!st0){save();return}
- const add=[];ordList().forEach(r=>{const was=st0.os[r.o.id];if(was===undefined&&['reception','manager','admin'].includes(role)&&r.o.by!=me)add.push({t:'New order',m:r.o.type+' - '+r.p.name+' ('+r.o.by+')',pid:r.p.id,sk:'note'});
-  if(was=='pending'&&r.o.st=='done'&&r.o.by==me)add.push({t:'Order completed',m:r.o.type+' - '+r.p.name,pid:r.p.id,sk:'note'})});
- if(role=='doctor')S.patients.forEach(p=>{if(p.doc==me&&st0.asg[p.id]!==undefined&&st0.asg[p.id]!=me&&p.by!=me)add.push({t:'Patient assigned to you',m:p.name,pid:p.id,sk:'rec'})});
+/* --- notifications: order arrived / ready -> reception, manager, nurse; own order ready -> doctor; patient assigned -> doctor; item request -> manager and doctors --- */
+function ordNf(){if(!U||!C||typeof nfLoad!='function')return;const key='on:'+(U.id||U.username)+':'+C.id,me=U.name,role=U.role,st0=(()=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null}})(),os={},asg={},rq={};
+ ordList().forEach(r=>{os[r.o.id]=r.o.st});S.patients.forEach(p=>{asg[p.id]=p.doc||''});((S.stock&&S.stock.req)||[]).forEach(x=>{rq[x.id]=1});
+ const save=()=>{try{localStorage.setItem(key,JSON.stringify({os,asg,rq}))}catch(e){}};if(!st0){save();return}
+ const add=[],watch=['reception','manager','admin','nurse'].includes(role);
+ ordList().forEach(r=>{const was=st0.os[r.o.id];
+  if(was===undefined&&watch&&r.o.by!=me)add.push({t:'New order',m:r.o.type+' - '+r.p.name+' ('+r.o.by+')',pid:r.p.id,sk:'note'});
+  if(was=='pending'&&r.o.st=='done'&&((role=='doctor'&&r.o.by==me)||(watch&&r.o.doneBy!=me)))add.push({t:'Order ready',m:r.o.type+' - '+r.p.name,pid:r.p.id,sk:'note'})});
+ if(role=='doctor')S.patients.forEach(p=>{if(p.doc==me&&st0.asg[p.id]!==undefined&&st0.asg[p.id]!=me)add.push({t:'Patient assigned to you',m:p.name,pid:p.id,sk:'rec'})});
+ if(['manager','doctor','admin'].includes(role)&&S.stock)(S.stock.req||[]).forEach(x=>{if(st0.rq&&!st0.rq[x.id]&&x.by!=me)add.push({t:'Item request',m:x.q+' x '+x.n+' ('+x.by+')',pid:0,sk:'rec'})});
  save();if(!add.length)return;const n=nfLoad()||{pts:{},lab:{},ap:{},list:[]};n.list=add.map(a=>({...a,ts:Date.now(),r:0})).concat(n.list||[]).slice(0,50);nfSave(n);nfBadge();toast(add.length==1?add[0].t+': '+add[0].m:add.length+' new notifications')}
 const _apo=applyData;applyData=function(){const r=_apo.apply(this,arguments);try{ordNf()}catch(e){}return r};
