@@ -20,7 +20,7 @@
     <p id="lwel" class="mt-2" style="color:var(--c)">Welcome back! Please sign in to your account.</p></div>
    <label class="font-medium text-sm" style="color:var(--cd)">Clinic</label>
     <select id="lc" onchange="selC()" class="inp mt-1 mb-2" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)"></select>
-    <div id="lchips" class="flex flex-wrap gap-2 mb-2"></div>
+    <div id="lchips" class="flex flex-wrap gap-2 mb-2" style="display:none"></div>
     <div class="flex items-center justify-between text-xs mb-4 gap-2 flex-wrap" style="color:var(--cd)"><label class="flex items-center gap-1"><input type="checkbox" id="lr" checked> Remember this clinic</label><label class="flex items-center gap-1"><input type="checkbox" id="lru" checked> Remember my username</label><button id="lnc" onclick="newClinicLogin()" class="underline" style="display:none">+ Create clinic</button></div>
     <label class="font-medium text-sm" style="color:var(--cd)">Username</label>
    <input id="lp" autocomplete="username" enterkeyhint="next" class="inp mt-1 mb-4" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)" placeholder="Username or email" autocapitalize="none" autocorrect="off">
@@ -28,7 +28,7 @@
    <div class="relative mt-1 mb-6"><input id="lw" type="password" autocomplete="current-password" enterkeyhint="go" class="inp" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)" placeholder="Enter your password" onkeydown="if(event.key=='Enter')login()">
     <i class="fa fa-eye absolute right-3 top-3 cursor-pointer" style="color:var(--c)" onclick="lw.type=lw.type=='password'?'text':'password'"></i></div>
    <button id="lbtn" onclick="login()" class="lg w-full text-white font-semibold py-3 rounded-xl shadow"><i class="fa fa-right-to-bracket mr-2"></i>Sign In</button>
-   <p class="text-xs text-center mt-3 text-gray-500"><button type="button" class="underline" style="color:var(--cd)" onclick="forgotPw()">Forgot your password? Send a reset link to my email</button></p><p id="le" class="text-sm text-center mt-3 hidden" style="color:var(--c)">Invalid username or password.</p>
+   <p class="text-xs text-center mt-3 text-gray-500"><button type="button" class="underline" style="color:var(--cd)" onclick="forgotPw()">Forgot your password? Send a reset link to my email</button></p><p class="text-xs text-center mt-2"><button type="button" id="lmore" class="underline text-gray-500" onclick="const c=$('lchips'),o=c.style.display=='none';c.style.display=o?'':'none';this.textContent=o?'Hide other sign-in options':'Other sign-in options (clinic / administrator)'">Other sign-in options (clinic / administrator)</button></p><p id="le" class="text-sm text-center mt-3 hidden" style="color:var(--c)">Invalid username or password.</p>
    <p class="text-center text-sm mt-6 pt-4 border-t border-red-100" style="color:var(--c)">Powered by <b>SmartDent</b></p></div>
   <div class="hidden md:flex w-1/2 items-center justify-center text-center p-10" style="background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,white))">
    <div><div class="text-5xl font-bold" style="color:#ffffff">Professional Dental</div><div class="text-3xl font-light mt-1" style="color:#ffffff">Care Center</div></div></div>
@@ -41,7 +41,6 @@
    <div id="clh" class="flex items-center gap-3 mt-6 text-left"></div></div>
   <nav id="nav" class="flex-1 overflow-auto py-3"></nav>
   <div class="nv border-t" onclick="logout()"><i class="fa fa-right-from-bracket"></i>Logout</div>
-  <div class="text-center text-xs text-gray-500 py-3 border-t">Powered by <b style="color:var(--cd)">SmartDent</b></div>
  </aside>
  <div class="flex-1 flex flex-col min-w-0">
   <header class="flex items-center gap-3 p-3">
