@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     }
 
     const day = new Date().toISOString().slice(0, 10);
-    const rows: { name: string; patients: number; kb: number; url: string }[] = [];
+    const rows: { name: string; patients: number; kb: number; url: string; file: string }[] = [];
     for (const c of clinics) {
       const patients: unknown[] = [];
       for (let i = 0; ; i += 1000) {
@@ -61,7 +61,20 @@ Deno.serve(async (req) => {
       const old = (all ?? []).slice(KEEP).map((f) => `${c.id}/${f.name}`);
       if (old.length) await sb.storage.from(BUCKET).remove(old);
       const { data: s } = await sb.storage.from(BUCKET).createSignedUrl(path, 7 * 86400, { download: `backup-${c.id}-${day}.json` });
-      rows.push({ name: c.name, patients: patients.length, kb: Math.round(file.length / 1024), url: s?.signedUrl ?? "" });
+      rows.push({ name: c.name, patients: patients.length, kb: Math.round(file.length / 1024), url: s?.signedUrl ?? "", file: `backup-${c.id}-${day}.json` });
+    }
+
+    // Optional: also save each backup file straight into a Google Drive folder (see supabase/GOOGLE-DRIVE-BACKUP.md).
+    let drive = 0, driveError = "";
+    const hook = Deno.env.get("DRIVE_WEBHOOK_URL"), dtok = Deno.env.get("DRIVE_TOKEN");
+    if (hook && dtok) {
+      for (const r of rows) {
+        try {
+          const dr = await fetch(hook, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ token: dtok, name: r.file, url: r.url }) });
+          const dj = await dr.json().catch(() => ({}));
+          if (dr.ok && dj.ok) drive++; else driveError = `${r.name}: ${dj.error || dr.status}`;
+        } catch (e) { driveError = `${r.name}: ${(e as Error).message}`; }
+      }
     }
 
     let emailed = 0;
@@ -88,7 +101,7 @@ Deno.serve(async (req) => {
         else { const t = await r.text(); console.log("backup email failed", addr, r.status, t); mailError = `${addr}: ${t.slice(0, 160)}`; }
       }
     }
-    return json({ ok: true, clinics: rows.length, emailed, mailError, day });
+    return json({ ok: true, clinics: rows.length, emailed, mailError, drive, driveError, driveOn: !!(hook && dtok), day });
   } catch (e) {
     return json({ error: (e as Error).message || "Backup failed." }, 500);
   }
