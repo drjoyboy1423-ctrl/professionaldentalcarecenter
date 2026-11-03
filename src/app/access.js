@@ -13,3 +13,11 @@ const _mkI=mkItem;mkItem=function(k,v,p){if(p&&!ptW(p,k)){alert(ptMsg(p));return
 const _ptv=patient;patient=function(){const p=gp(),h=_ptv.apply(this,arguments);if(!p||ptW(p,SK))return h;
  const o=h.replace(/<button onclick="fin\(\)"[^>]*>[^<]*<\/button>/,'<b class="ml-2">'+(p.fin?'Yes':'No')+'</b>').replace(/<i [^>]*onclick="(editI|delI|recEdit|recDel|toInv)\([^"]*"[^>]*><\/i>/g,'').replace(/<button[^>]*onclick="(addI|recNew|ordNew|sp|svC)\([^"]*"[^>]*>[\s\S]*?<\/button>/g,'');
  return `<div class="bg-sky-50 border border-sky-300 rounded-lg p-2 text-sm mb-3 w-full"><i class="fa fa-eye mr-1"></i>Read-only. ${H(ptMsg(p))}</div>`+o};
+
+/* ---------- Reception sees a summary of the patient (not the clinical record) ---------- */
+RA.length=0;RA.push('sum','appt','inv','cred');
+function recSum(p){const inv=allInv([p]),due=sum(inv,r=>r.bal),paid=sum(inv,r=>r.paid),ap=(p.d.appt||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)),nx=ap.find(x=>(x.ts||0)>=NOW()-864e5),ords=p.d.ord||[],pend=ords.filter(o=>o.st=='pending').length,dn=ords.length-pend,vis=(p.d.rec||[]).length;
+ const r=(k,v)=>`<div class="flex justify-between border-b py-2 text-sm"><span class="text-gray-600">${k}</span><b>${v}</b></div>`;
+ return `<h3 class="text-lg font-bold mb-1">Patient summary</h3><p class="text-xs text-gray-500 mb-3">Reception sees a summary only. The clinical record is kept for the doctor and nurse.</p>`+
+ r('Assigned doctor',H(p.doc||'Not assigned yet'))+r('Status',{new:'New order',doctor:'Seen by doctor',nurse:'Seen by nurse'}[p.st]||H(p.st||''))+r('Finished',p.fin?'Yes':'No')+r('Registered',fdate(p.date))+r('Visits recorded',vis)+r('Next / last appointment',ap.length?H((nx||ap[0]).date||'')+' '+H((nx||ap[0]).time||''):'None')+r('Orders',pend+' waiting, '+dn+' ready')+r('Invoices',inv.length+' ('+ETB(paid)+' paid)')+r('Balance due',`<span class="${due>0?'text-red-600':'text-green-600'}">${ETB(due)}</span>`)}
+const _secRc=sec;sec=function(p){return U&&U.role=='reception'&&SK=='sum'?recSum(p):_secRc.apply(this,arguments)};
