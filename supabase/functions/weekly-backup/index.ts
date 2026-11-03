@@ -67,8 +67,8 @@ Deno.serve(async (req) => {
     let emailed = 0;
     const key = Deno.env.get("RESEND_API_KEY");
     const { data: admins } = await sb.from("profiles").select("email,name").eq("role", "admin");
-    // Backup copies also go to the clinic's own backup mailbox (set BACKUP_EMAILS = comma list to change it).
-    const extra = (Deno.env.get("BACKUP_EMAILS") || "professionaldentalcarecenter@gmail.com").split(",");
+    // Extra backup mailboxes: set the BACKUP_EMAILS secret (comma list). Empty by default so a client's data only goes to its own admins.
+    const extra = (Deno.env.get("BACKUP_EMAILS") || "").split(",");
     const to = [...new Set([...(admins ?? []).map((a) => String(a.email || "")), ...extra].map((e) => e.trim().toLowerCase()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];
     let mailError = "";
     if (!key) mailError = "Email is not set up (RESEND_API_KEY secret is missing).";

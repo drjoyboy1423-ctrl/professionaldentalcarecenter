@@ -1,0 +1,11 @@
+/* ---------- Support access: the clinic owner (admin) can give the app's support person a temporary admin login, and remove it any time ---------- */
+const SUP_USER='support';
+async function supLoad(){const b=$('supbox');if(!b)return;try{const L=await DB.users(),s=L.find(u=>String(u.username).toLowerCase()==SUP_USER);
+ b.innerHTML=s?`<p class="text-sm mb-3"><i class="fa fa-circle-check text-amber-600 mr-1"></i>Support access is <b>ON</b>. The support person can sign in with the username <b>${SUP_USER}</b> and can see your clinic data.</p><button onclick="supOff('${s.id}')" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm">Turn support access off</button>`
+ :`<p class="text-sm mb-3 text-gray-600">Support access is <b>OFF</b>. Nobody but your own staff can see your data. Turn it on only when you ask the app's support person for help, then turn it off again.</p><button onclick="supOn()" class="border px-4 py-2 rounded-md text-sm bg-white">Turn support access on</button>`}
+ catch(e){b.textContent='Could not check support access.'}}
+async function supOn(){if(U.role!='admin')return;if(!confirm('Give the support person a temporary administrator login? They will be able to see all clinic data until you turn it off.'))return;
+ const a='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(12)),pw=[...r].map(x=>a[x%a.length]).join('');
+ try{await DB.fn('create',{name:'Support',username:SUP_USER,password:pw,role:'admin',clinic:'all',title:'Support'});S.usersLoaded=0;alert('Support access is ON.\n\nUsername: '+SUP_USER+'\nPassword: '+pw+'\n\nSend these only to the support person. Write the password down now: it is shown once. Turn access off when the help is finished.');supLoad()}catch(e){alert(e.message||'Could not turn it on.')}}
+async function supOff(id){if(U.role!='admin'||!confirm('Turn support access off? The support login will stop working immediately.'))return;try{await DB.fn('delete',{id});S.usersLoaded=0;supLoad()}catch(e){alert(e.message||'Could not turn it off.')}}
+const _spSet=settingsPage;settingsPage=function(){const h=_spSet.apply(this,arguments);if(!U||U.role!='admin')return h;setTimeout(supLoad,0);return h+card('<h3 class="font-bold mb-1"><i class="fa fa-headset mr-2"></i>Support access</h3>','<div id="supbox" class="text-sm text-gray-500">Checking...</div>')};

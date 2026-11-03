@@ -19,7 +19,7 @@ async function logout(){if(LOUT)return;if(typeof offLogoutOk=='function'&&!(awai
  try{Object.keys(localStorage).filter(k=>k=='dental_auth'||/^sb-.*-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
  location.reload()}
 function boot(){if(!U||!C)return;login_.classList.add('hidden');app.classList.remove('hidden');hdr();go('dash')}
-async function start(){const ov=$('boot');try{await DB.init();CL=await DB.clinics();CLA=CL.filter(c=>c.archived);CL=CL.filter(c=>!c.archived);lcInit();const p=RECOV?null:await DB.profile();if(p){U=p;let cid=sessionStorage.getItem(K.cc)||lsGet(K.cc)||'';if(!CL.some(c=>c.id==cid))cid=U.role=='admin'?(CL[0]||{}).id:U.clinic;await loadClinic(cid);boot()}}
+async function start(){const ov=$('boot');try{await DB.init();CL=await DB.clinics();CLA=CL.filter(c=>c.archived);CL=CL.filter(c=>!c.archived);if(!CL.length&&!CLA.length&&await DB.setupOpen()){setupShow();return}lcInit();const p=RECOV?null:await DB.profile();if(p){U=p;let cid=sessionStorage.getItem(K.cc)||lsGet(K.cc)||'';if(!CL.some(c=>c.id==cid))cid=U.role=='admin'?(CL[0]||{}).id:U.clinic;await loadClinic(cid);boot()}}
  catch(e){ov.innerHTML=`<div class="text-center p-6"><p class="mb-3">${H(e.message||'Could not start the app.')}</p><button onclick="location.reload()" class="lg text-white font-semibold px-5 py-2 rounded-xl">Try again</button></div>`;return}
  ov.style.display='none';if(RECOV)resetPwForm()}
 

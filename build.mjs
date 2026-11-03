@@ -30,6 +30,13 @@ const markup = html.replace(/<(script|style)>[\s\S]*?<\/\1>/g, '');
 for (const m of markup.matchAll(/(?:src|href)="((?!https?:|\/\/|data:|#)[^"]+)"/g))
   if (!/^(favicon\.svg|manifest\.webmanifest|icon-192\.png|\/privacy|\/_vercel\/)/.test(m[1])) throw new Error('Unbundled local reference: ' + m[1]);
 
+// Per-client deployment: set SB_URL and SB_KEY (public publishable key) in the host's build settings to point this build at that client's own Supabase project.
+if (process.env.SB_URL && process.env.SB_KEY) {
+  const re = /const SB_URL='[^']*',SB_KEY='[^']*'/;
+  if (!re.test(html)) throw new Error('SB_URL line not found');
+  html = html.replace(re, () => `const SB_URL=${JSON.stringify(process.env.SB_URL.replace(/\/+$/, ''))},SB_KEY=${JSON.stringify(process.env.SB_KEY)}`);
+  console.log('Using Supabase project from SB_URL');
+}
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
 for (const f of ['favicon.svg', 'robots.txt', 'manifest.webmanifest', 'sw.js', 'icon-192.png', 'icon-512.png', 'privacy.html']) if (existsSync(f)) copyFileSync(f, 'dist/' + f);

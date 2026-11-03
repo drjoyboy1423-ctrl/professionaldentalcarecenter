@@ -3,3 +3,9 @@ verify_jwt = false
 
 [functions.recover-password]
 verify_jwt = false
+
+[functions.setup-owner]
+verify_jwt = false
+
+[functions.weekly-backup]
+verify_jwt = false
