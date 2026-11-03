@@ -5,7 +5,7 @@ const FN=[
  {t:'Dental materials / stock',h:'Stock levels, Order Now, Use 1',k:'materials stock inventory supplies purchase order composite alginate',v:'mat',ic:'fa-boxes-stacked',r:['reception','manager','admin']},
  {t:'Reports dashboard',h:'KPIs, monthly and yearly registrations, print official report',k:'report dashboard kpi registrations print csv official',v:'rep',ic:'fa-chart-pie',r:['manager','admin']},
  {t:'Assign a doctor to a patient',h:'Dashboard > Assign Doctor',k:'assign doctor patient',v:'dash',ic:'fa-user-doctor',r:['reception','manager','admin']},
- {t:'Refund a payment',h:'Open the patient > Invoices, then tap the red arrow icon on the invoice',k:'refund return money back reimburse',v:'rinv',ic:'fa-rotate-left',r:['manager','admin']},
+ {t:'Refund a payment',h:'Open your patient > Invoice, then tap the red arrow icon on the invoice',k:'refund return money back reimburse',v:'recent',ic:'fa-rotate-left',r:['manager','admin','doctor']},
  {t:'Take a payment',h:'Open an invoice and tap the green money icon',k:'payment pay receive cash telebirr cbe collect',v:'rinv',ic:'fa-money-bill',r:['manager','reception','admin']},
  {t:'Daily cash close',h:'Cash received by day, method and staff, with refunds',k:'cash close drawer daily cashup cash-up count',v:'cash',ic:'fa-cash-register'},
  {t:'Invoices',h:'All invoices, balances and print',k:'invoice bill balance unpaid remaining credit paid',v:'rinv',ic:'fa-file-invoice-dollar'},
