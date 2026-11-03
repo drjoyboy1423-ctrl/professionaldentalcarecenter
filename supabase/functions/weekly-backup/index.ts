@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
 
     // Optional: also save each backup file straight into a Google Drive folder (see supabase/GOOGLE-DRIVE-BACKUP.md).
     let drive = 0, driveError = "";
-    const hook = Deno.env.get("DRIVE_WEBHOOK_URL"), dtok = Deno.env.get("DRIVE_TOKEN");
+    const hook = (Deno.env.get("DRIVE_WEBHOOK_URL") || "").trim(), dtok = (Deno.env.get("DRIVE_TOKEN") || "").replace(/[\s\u200b"']/g, "");
     if (hook && dtok) {
       for (const r of rows) {
         try {
