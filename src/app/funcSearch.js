@@ -9,6 +9,7 @@ const FN=[
  {t:'Take a payment',h:'Open an invoice and tap the green money icon',k:'payment pay receive cash telebirr cbe collect',v:'rinv',ic:'fa-money-bill',r:['manager','reception','admin']},
  {t:'Daily cash close',h:'Cash received by day, method and staff, with refunds',k:'cash close drawer daily cashup cash-up count',v:'cash',ic:'fa-cash-register'},
  {t:'Invoices',h:'All invoices, balances and print',k:'invoice bill balance unpaid remaining credit paid',v:'rinv',ic:'fa-file-invoice-dollar'},
+ {t:'Dental Records',h:'Read-only dashboard of every dental record in the clinic',k:'dental records dashboard clinical history tooth diagnosis treatment',v:'drd',ic:'fa-tooth',r:['admin','manager','doctor','nurse']},
  {t:'New patient',h:'Register a new patient card',k:'new patient register card add',v:'card',ic:'fa-id-card'},
  {t:'Appointments',h:'Book and view appointments',k:'appointment booking schedule calendar visit',v:'appt',ic:'fa-calendar-check'},
  {t:'Laboratory results',h:'Lab requests and finished results',k:'lab laboratory result crown request finished',v:'lab',ic:'fa-flask'},
