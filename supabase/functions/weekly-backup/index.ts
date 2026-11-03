@@ -69,7 +69,9 @@ Deno.serve(async (req) => {
     const { data: admins } = await sb.from("profiles").select("email,name").eq("role", "admin");
     // Extra backup mailboxes: set the BACKUP_EMAILS secret (comma list). Empty by default so a client's data only goes to its own admins.
     const extra = (Deno.env.get("BACKUP_EMAILS") || "").split(",");
-    const to = [...new Set([...(admins ?? []).map((a) => String(a.email || "")), ...extra].map((e) => e.trim().toLowerCase()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];
+    // pull a clean address out of each entry (ignores stray quotes, spaces, brackets or "NAME=" text)
+    const clean = (v: string) => (String(v).match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/) || [""])[0].toLowerCase();
+    const to = [...new Set([...(admins ?? []).map((a) => String(a.email || "")), ...extra].map(clean).filter(Boolean))];
     let mailError = "";
     if (!key) mailError = "Email is not set up (RESEND_API_KEY secret is missing).";
     else if (!to.length) mailError = "No valid email address to send to.";
