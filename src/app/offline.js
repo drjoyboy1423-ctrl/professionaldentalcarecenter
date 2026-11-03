@@ -14,12 +14,12 @@ const _prof0=DB.profile;DB.profile=async function(){try{const p=await _prof0.app
 const _load0=DB.loadClinicData;DB.loadClinicData=async function(cid,startup){try{const d=await _load0.apply(DB,arguments);if(startup)IDB.set('cache:'+cid,{...d,fin:undefined});return d}catch(e){if(startup&&isNet(e)){const c=await IDB.get('cache:'+cid);if(c){offState(1);return c}}throw e}};
 /* sync: when the internet is down the working copy is kept on the device ("dirty") and retried */
 let OFFCT=0;
-const offCache=()=>{clearTimeout(OFFCT);OFFCT=setTimeout(()=>{if(C&&S)IDB.set('cache:'+C.id,{patients:S.patients,dis:S.dis,proc:S.proc,fin:S.fin})},3000)};
+const offCache=()=>{clearTimeout(OFFCT);OFFCT=setTimeout(()=>{if(C&&S)IDB.set('cache:'+C.id,{patients:S.patients,dis:S.dis,proc:S.proc,fin:S.fin,stock:S.stock})},3000)};
 const _sync0=syncNow;syncNow=async function(){const cid=C&&C.id;try{await _sync0();if(cid){OFFSV=0;offState(OFFL&&!navigator.onLine?1:0);IDB.del('dirty:'+cid);offCache()}}
- catch(e){if(cid&&isNet(e)){await IDB.set('dirty:'+cid,{patients:S.patients,dis:S.dis,proc:S.proc,fin:S.fin,ts:Date.now()});offState(1,1);return}throw e}};
+ catch(e){if(cid&&isNet(e)){await IDB.set('dirty:'+cid,{patients:S.patients,dis:S.dis,proc:S.proc,fin:S.fin,stock:S.stock,ts:Date.now()});offState(1,1);return}throw e}};
 /* changes made while offline and still not uploaded are restored after a reload, then uploaded */
 const _lc0=loadClinic;loadClinic=async function(id){await _lc0.apply(this,arguments);const d=C&&await IDB.get('dirty:'+C.id);
- if(d&&d.patients){S.patients=d.patients;S.patients.forEach(migrate);if(d.dis)S.dis=d.dis;if(d.proc)S.proc=d.proc;if(d.fin)S.fin=d.fin;offState(!navigator.onLine,1);sv()}};
+ if(d&&d.patients){S.patients=d.patients;S.patients.forEach(migrate);if(d.dis)S.dis=d.dis;if(d.proc)S.proc=d.proc;if(d.fin)S.fin=d.fin;if(d.stock)S.stock=d.stock;offState(!navigator.onLine,1);sv()}};
 addEventListener('offline',()=>offState(1));
 addEventListener('online',()=>{offState(0,OFFSV);if(U&&C){sv();setTimeout(()=>{if(typeof refresh=='function')refresh()},4000)}});
 addEventListener('load',()=>{if(navigator.onLine===false)offState(1)});
