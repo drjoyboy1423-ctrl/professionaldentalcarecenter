@@ -10,6 +10,8 @@ const FN=[
  {t:'Daily cash close',h:'Cash received by day, method and staff, with refunds',k:'cash close drawer daily cashup cash-up count',v:'cash',ic:'fa-cash-register'},
  {t:'Invoices',h:'All invoices, balances and print',k:'invoice bill balance unpaid remaining credit paid',v:'rinv',ic:'fa-file-invoice-dollar'},
  {t:'Dental Records',h:'Read-only dashboard of every dental record in the clinic',k:'dental records dashboard clinical history tooth diagnosis treatment',v:'drd',ic:'fa-tooth',r:['admin','manager','doctor','nurse']},
+ {t:'Payroll',h:'Monthly staff salary sheet with tax and pension, printable',k:'payroll salary staff pension income tax net pay monthly sheet employees xlsx',v:'pay',ic:'fa-money-check-dollar',r:['manager','admin']},
+ {t:'Doctor earnings',h:'Each doctor\'s procedures, collected income and commission per month',k:'doctor earnings commission salary income percent paid',v:'earn',ic:'fa-user-doctor',r:['manager','admin']},
  {t:'New patient',h:'Register a new patient card',k:'new patient register card add',v:'card',ic:'fa-id-card'},
  {t:'Appointments',h:'Book and view appointments',k:'appointment booking schedule calendar visit',v:'appt',ic:'fa-calendar-check'},
  {t:'Laboratory results',h:'Lab requests and finished results',k:'lab laboratory result crown request finished',v:'lab',ic:'fa-flask'},

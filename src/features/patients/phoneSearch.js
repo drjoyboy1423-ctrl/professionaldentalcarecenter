@@ -1,0 +1,13 @@
+/* ---------- Find patients by phone number easily: any format (0911..., +251 911..., 911-22-33), partial digits, Enter opens a single match, duplicate warning when registering ---------- */
+const phDig=s=>String(s||'').replace(/\D/g,'').replace(/^251/,'').replace(/^0+/,'');
+const phLike=q=>/^[\d\s+()\-.]+$/.test(String(q||'').trim())&&String(q).replace(/\D/g,'').length>=3;
+function phMatch(p,q){if(!phLike(q))return false;const n=phDig(q);return n.length>=3&&phDig(p.phone).includes(n)}
+const phFind=q=>S.patients.filter(p=>phMatch(p,q));
+/* lists use the same matching */
+const _pfList=pfList;pfList=function(){const o=Q;let r=_pfList.apply(this,arguments);if(phLike(o)){const ids=new Set(r.map(p=>p.id));const extra=phFind(o).filter(p=>!ids.has(p.id));if(extra.length)r=r.concat(extra)}return r};
+const _dirRows=dirRows;dirRows=function(){if(!phLike(DQ))return _dirRows.apply(this,arguments);const L=dsort(phFind(DQ),p=>p.date);const keep=DQ;DQ='\u0000';const html=_dirRows.apply(this,arguments);DQ=keep;return L.length?L.map((p,i)=>`<tr class="border-b cursor-pointer" onclick="go('patient','${p.id}')"><td class="p-2">${i+1}</td><td>${H(p.card)}</td><td><b>${H(p.name)}</b></td><td>${H(p.sex)}</td><td>${H(p.age||'-')}</td><td>${H(p.phone)}</td><td>${p.doc?H(p.doc):'<span class="text-xs text-gray-400">Not assigned</span>'}</td><td class="whitespace-nowrap">${fd(p.date)}</td><td></td></tr>`).join(''):html};
+/* Enter in the top search box: one phone match opens that patient straight away */
+document.addEventListener('keydown',e=>{if(e.key!='Enter'||!e.target||e.target.id!='q'||!U)return;const v=e.target.value;if(!phLike(v)||(typeof bcFind=='function'&&bcFind(v.trim())))return;const m=phFind(v);if(m.length==1){e.preventDefault();go('patient',m[0].id)}});
+/* registering: warn when the phone number already belongs to a patient */
+const _cprevPh=cprev;cprev=function(){const h=_cprevPh.apply(this,arguments),d=CP&&CP.phone&&phDig(CP.phone).length>=7?S.patients.filter(p=>phDig(p.phone)==phDig(CP.phone)):[];
+ return d.length?`<div class="bg-amber-50 border border-amber-400 rounded-lg p-3 text-sm mb-3"><b><i class="fa fa-triangle-exclamation mr-1"></i>This phone number is already registered:</b>${d.slice(0,3).map(p=>`<div class="mt-1 cursor-pointer text-blue-700" onclick="go('patient','${p.id}')">${H(p.name)} &middot; Card ${H(p.card)}</div>`).join('')}<div class="text-xs text-gray-600 mt-1">Open the existing file instead of making a second card (family members may share a phone).</div></div>`+h:h};
