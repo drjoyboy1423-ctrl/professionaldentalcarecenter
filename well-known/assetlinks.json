@@ -7,7 +7,8 @@
       "namespace": "android_app",
       "package_name": "app.dentalcare.smartdent",
       "sha256_cert_fingerprints": [
-        "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4E:1B:D2:FF"
+        "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4E:1B:D2:FF",
+        "AD:28:B4:54:F6:99:1D:65:3D:CC:30:77:00:56:DF:C6:C2:99:51:61:B3:E8:9B:39:6A:B0:43:FB:AA:BD:C0:EA"
       ]
     }
   }
