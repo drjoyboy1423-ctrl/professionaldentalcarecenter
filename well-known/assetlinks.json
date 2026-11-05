@@ -1,11 +1,14 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "app.dentalcare.smartdent",
-    "sha256_cert_fingerprints": [
-      "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4F:1B:D2:FF",
-      "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4E:1B:D2:FF"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.dentalcare.smartdent",
+      "sha256_cert_fingerprints": [
+        "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4E:1B:D2:FF"
+      ]
+    }
   }
-}]
+]
