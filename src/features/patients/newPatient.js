@@ -21,4 +21,4 @@ function cpSave(){if(U.role!='reception')return bad('Only Reception can register
  S.patients.push(p);sv();LAST=p.id;CP={};go('card')}
 function newPat(){if(U.role!='reception')return bad('Only Reception can register new patients.');
  form('New Patient',[['card','Card No'],['name','Full name'],['phone','Phone'],['age','Age','number'],['sex','Sex','sel',['Female','Male']],['dob','Date of Birth','date'],['branch','Branch']],{branch:C.name,sex:'Female',card:nextCard()},v=>{if(!v.name)return bad('Name required');const cn=v.card||nextCard();if(S.patients.some(p=>p.card==cn))return bad('Card number already exists.');S.patients.push({id:Date.now(),...v,card:cn,cardNo:cn,doc:'',doctor:'',date:Date.now(),arr:Date.now(),st:'new',fin:false,d:{}});sv();go('recent')})}
-function delPat(id){if(!canDel())return;if(confirm('Delete this patient?')){S.patients=S.patients.filter(p=>p.id!=id);sv();go('recent')}}
+function delPat(id){if(!canDelPat())return alert('Only the manager or administrator can delete a patient file.');if(confirm('Delete this patient? A safe copy is kept for the manager and administrator.')){S.patients=S.patients.filter(p=>p.id!=id);sv();go('recent')}}
