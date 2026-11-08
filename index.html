@@ -18,8 +18,10 @@
     <div id="lb" class="mb-4"></div>
     <h1 class="text-3xl font-bold" style="color:var(--cd)">Professional Dental Care Center</h1>
     <p id="lwel" class="mt-2" style="color:var(--c)">Welcome back! Please sign in to your account.</p></div>
-   <label class="font-medium text-sm" style="color:var(--cd)">Clinic</label>
-    <select id="lc" onchange="selC()" class="inp mt-1 mb-2" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)"></select>
+   <label class="font-medium text-sm" style="color:var(--cd)">Clinic code</label>
+    <input id="lcode" autocomplete="organization" enterkeyhint="next" class="inp mt-1 mb-1" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)" placeholder="Your clinic code" autocapitalize="none" autocorrect="off" onchange="lcResolve().catch(function(){})">
+    <p class="text-[11px] text-gray-500 mb-2">Your clinic gave you this code. Administrator: type ADMIN.</p>
+    <select id="lc" style="display:none" class="inp mt-1 mb-2" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)"></select>
     <div id="lchips" class="flex flex-wrap gap-2 mb-2" style="display:none"></div>
     <div class="flex items-center justify-between text-xs mb-4 gap-2 flex-wrap" style="color:var(--cd)"><label class="flex items-center gap-1"><input type="checkbox" id="lr" checked> Remember this clinic</label><label class="flex items-center gap-1"><input type="checkbox" id="lru" checked> Remember my username</label><button id="lnc" onclick="newClinicLogin()" class="underline" style="display:none">+ Create clinic</button></div>
     <label class="font-medium text-sm" style="color:var(--cd)">Username</label>
@@ -28,7 +30,7 @@
    <div class="relative mt-1 mb-6"><input id="lw" type="password" autocomplete="current-password" enterkeyhint="go" class="inp" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)" placeholder="Enter your password" onkeydown="if(event.key=='Enter')login()">
     <i class="fa fa-eye absolute right-3 top-3 cursor-pointer" style="color:var(--c)" onclick="lw.type=lw.type=='password'?'text':'password'"></i></div>
    <button id="lbtn" onclick="login()" class="lg w-full text-white font-semibold py-3 rounded-xl shadow"><i class="fa fa-right-to-bracket mr-2"></i>Sign In</button>
-   <p class="text-xs text-center mt-3 text-gray-500"><button type="button" class="underline" style="color:var(--cd)" onclick="forgotPw()">Forgot your password? Send a reset link to my email</button></p><p class="text-xs text-center mt-2"><button type="button" id="lmore" class="underline text-gray-500" onclick="const c=$('lchips'),o=c.style.display=='none';c.style.display=o?'':'none';this.textContent=o?'Hide other sign-in options':'Other sign-in options (clinic / administrator)'">Other sign-in options (clinic / administrator)</button></p><p class="text-xs text-center mt-3"><a href="/privacy" target="_blank" rel="noopener" class="underline text-gray-500">Privacy policy</a></p><p id="le" class="text-sm text-center mt-3 hidden" style="color:var(--c)">Invalid username or password.</p>
+   <p class="text-xs text-center mt-3 text-gray-500"><button type="button" class="underline" style="color:var(--cd)" onclick="forgotPw()">Forgot your password? Send a reset link to my email</button></p><p class="text-xs text-center mt-3"><a href="/privacy" target="_blank" rel="noopener" class="underline text-gray-500">Privacy policy</a></p><p id="le" class="text-sm text-center mt-3 hidden" style="color:var(--c)">Invalid username or password.</p>
   </div>
   <div class="hidden md:flex w-1/2 items-center justify-center text-center p-10" style="background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,white))">
    <div><div class="text-5xl font-bold" style="color:#ffffff">Professional Dental</div><div class="text-3xl font-light mt-1" style="color:#ffffff">Care Center</div></div></div>

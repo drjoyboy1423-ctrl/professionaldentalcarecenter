@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     if (password.length < 8) return json({ error: "Password must be at least 8 characters." }, 400);
 
     const id = (clinicName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 12) || "clinic") + Math.random().toString(36).slice(2, 6);
-    const { error: ce } = await sb.from("clinics").insert({ id, name: clinicName, type: "private", color: "#0284c7", icon: "tooth", phone: String(body.phone || "").trim() || null });
+    const { error: ce } = await sb.from("clinics").insert({ id, name: clinicName, type: "private", color: "#0284c7", icon: "tooth", code: (clinicName.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12) || "main"), phone: String(body.phone || "").trim() || null });
     if (ce) return json({ error: ce.message }, 500);
     const { data: created, error: ue } = await sb.auth.admin.createUser({ email: `${username.toLowerCase()}@dental.app`, password, email_confirm: true });
     if (ue || !created.user) { await sb.from("clinics").delete().eq("id", id); return json({ error: ue?.message || "Could not create the owner account." }, 500); }

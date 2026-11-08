@@ -9,7 +9,7 @@ function offState(on,saved){OFFL=on?1:0;if(saved!==undefined)OFFSV=saved;let b=$
  if(!b){b=document.createElement('div');b.id='offb';b.setAttribute('role','status');b.style.cssText='position:fixed;left:0;right:0;top:0;z-index:70;padding:6px 12px;font-size:13px;text-align:center;color:#fff;background:#b45309';document.body.appendChild(b)}
  b.style.display='block';b.textContent=OFFL?'You are offline. You can keep working: changes are saved on this device and upload automatically when the internet is back.':'Uploading changes made offline...'}
 /* cached copies so the app can open and show the last loaded data with no internet */
-const _clin0=DB.clinics;DB.clinics=async function(){try{const r=await _clin0.apply(DB,arguments);IDB.set('clinics',r);return r}catch(e){if(isNet(e)){const c=await IDB.get('clinics');if(c&&c.length){offState(1);return c}}throw e}};
+const _clin0=DB.clinics;DB.clinics=async function(){try{const r=await _clin0.apply(DB,arguments);if(r&&r.length)IDB.set('clinics',r);return r}catch(e){if(isNet(e)){const c=await IDB.get('clinics');if(c&&c.length){offState(1);return c}}throw e}};
 const _prof0=DB.profile;DB.profile=async function(){try{const p=await _prof0.apply(DB,arguments);if(p)IDB.set('profile',p);return p}catch(e){if(isNet(e)){const c=await IDB.get('profile'),t=await DB.token().catch(()=>null);if(c&&t){offState(1);return c}}throw e}};
 const _load0=DB.loadClinicData;DB.loadClinicData=async function(cid,startup){try{const d=await _load0.apply(DB,arguments);if(startup)IDB.set('cache:'+cid,{...d,fin:undefined});return d}catch(e){if(startup&&isNet(e)){const c=await IDB.get('cache:'+cid);if(c){offState(1);return c}}throw e}};
 /* sync: when the internet is down the working copy is kept on the device ("dirty") and retried */
