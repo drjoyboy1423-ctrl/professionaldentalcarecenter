@@ -165,3 +165,5 @@ html.cf .bg-red-600,html.cf .bg-red-500{background-image:linear-gradient(135deg,
 html.cf .seg.on{background-image:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#a855f7))}
 html.cf tr:hover td{background:color-mix(in srgb,var(--c) 6%,transparent)}
 .acsw{width:38px;height:38px;border-radius:999px;border:3px solid transparent;box-shadow:0 0 0 1px #0003;cursor:pointer}.acsw.on{border-color:#fff;box-shadow:0 0 0 3px var(--c)}
+
+.rc-b{padding:4px 9px!important;gap:5px!important;font-size:12px!important;border-radius:8px!important}.rc-b i{font-size:13px!important}
