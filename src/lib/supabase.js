@@ -21,6 +21,9 @@ const DB=(()=>{
    if(ins.length){const r=await sb.from('patients').insert(ins.map(p=>({id:p.id,clinic:cid,data:p,updated_at:now})));if(r.error){if(/duplicate|23505/i.test((r.error.message||'')+(r.error.code||''))){await Promise.all(ins.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))))}else ck(r)}}
    await Promise.all(upd.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))));
    if(del.length)ck(await sb.from('patients').delete().in('id',del.map(Number)))},
+  async requestClinic(o){ck(await sb.from('clinic_requests').insert(o))},
+  async clinicReqs(){return ck(await sb.from('clinic_requests').select('*').eq('status','pending').order('created_at'))},
+  async clinicReqDel(id){ck(await sb.from('clinic_requests').delete().eq('id',id))},
   async payStmts(){return ck(await sb.from('pay_statements').select('*').order('month',{ascending:false}))},
   async payStmtSave(rows){ck(await sb.from('pay_statements').upsert(rows))},
   async saveList(cid,kind,data){ck(await sb.from('clinic_lists').upsert({clinic:cid,kind,data,updated_at:new Date().toISOString()}))},

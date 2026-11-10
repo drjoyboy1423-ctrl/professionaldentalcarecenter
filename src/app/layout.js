@@ -1,7 +1,7 @@
 const login_=$('login');
 function tgl(){const s=$('sb');if(innerWidth>=1024){s.classList.toggle('lg:hidden');return}s.classList.toggle('-translate-x-full');$('ov').classList.toggle('hidden',s.classList.contains('-translate-x-full'))}
 function go(v,id){if(v!='patient'&&!(RN[U.role]||RN.reception).includes(v))v='dash';V=v;if(id){PID=id;SK='rec';MENU=0}
- $('nav').innerHTML=NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0])).map(n=>`<div class="nv ${V==n[0]?'on':''}" onclick="go('${n[0]}')"><i class="fa ${n[2]} w-5"></i>${n[1]}</div>`).join('');
+ navDraw();
  if(innerWidth<1024){$('sb').classList.add('-translate-x-full');$('ov').classList.add('hidden')}
  const f={dash,appt,recent,dir:dirPage,drd:drdPage,done:donePage,plans:planPage,ortho:orthoPage,ord:ordersPage,mat:matPage,rep:repPage,earn:earnPage,prules:prulesPage,ptrack:ptrackPage,mypay:mypayPage,perm:permPage,pay:payPage,ster:sterPage,tra:ordTracker,card:cardv,ran:analytics,rinv:invMgr,rpr:printCenter,fin:finance,lab,proc,users,clinics,cash:cashClose,activity:activityPage,crep:clinicsReport,dis,profile,settings:settingsPage,patient}[v];$('v').innerHTML=f();}
 const card=(h,b)=>`<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-4">${h}${b}</div>`;

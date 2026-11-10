@@ -1,0 +1,11 @@
+/* ---------- Side menu: each person can move menu items up and down (saved on this device for that user) ---------- */
+let NAVED=0;
+const navKey=()=>'dental_navord:'+(U?U.id:'');
+const navOrd=()=>{try{return JSON.parse(localStorage.getItem(navKey())||'[]')}catch(e){return[]}};
+function navList(){const L=NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0])),o=navOrd();return L.slice().sort((a,b)=>{const x=o.indexOf(a[0]),y=o.indexOf(b[0]);return (x<0?1e3+L.indexOf(a):x)-(y<0?1e3+L.indexOf(b):y)})}
+function navDraw(){const L=navList(),mv=(id,d,on,ic)=>`<button type="button" ${on?'':'disabled'} onclick="event.stopPropagation();navMove('${id}',${d})" style="width:34px;min-height:34px;height:34px;border-radius:8px;border:1px solid rgba(148,163,184,.5);background:rgba(148,163,184,.15);color:inherit;opacity:${on?1:.3}"><i class="fa ${ic}"></i></button>`;
+ $('nav').innerHTML=L.map((n,i)=>`<div class="nv ${V==n[0]?'on':''}" onclick="${NAVED?'':"go('"+n[0]+"')"}"><i class="fa ${n[2]} w-5"></i><span style="flex:1">${n[1]}</span>${NAVED?`<span style="display:flex;gap:6px">${mv(n[0],-1,i>0,'fa-chevron-up')}${mv(n[0],1,i<L.length-1,'fa-chevron-down')}</span>`:''}</div>`).join('')+
+ `<div style="display:flex;gap:8px;justify-content:center;margin:10px 8px 4px"><button type="button" onclick="navEdit()" style="font-size:12px;min-height:34px;padding:4px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:${NAVED?'#16a34a':'transparent'};color:${NAVED?'#fff':'inherit'}"><i class="fa ${NAVED?'fa-check':'fa-arrows-up-down'}" style="margin-right:6px"></i>${NAVED?'Done':'Arrange menu'}</button>${NAVED?`<button type="button" onclick="navReset()" style="font-size:12px;min-height:34px;padding:4px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:transparent;color:inherit">Reset order</button>`:''}</div>`}
+function navEdit(){NAVED=NAVED?0:1;navDraw()}
+function navMove(id,d){const ids=navList().map(n=>n[0]),i=ids.indexOf(id),j=i+d;if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{localStorage.setItem(navKey(),JSON.stringify(ids))}catch(e){}navDraw()}
+function navReset(){try{localStorage.removeItem(navKey())}catch(e){}navDraw()}

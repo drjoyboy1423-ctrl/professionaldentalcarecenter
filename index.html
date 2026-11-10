@@ -13,7 +13,7 @@
 <div id="boot" style="position:fixed;inset:0;z-index:90;background:#fff;display:flex;align-items:center;justify-content:center;color:#555;font-size:15px">Loading...</div>
 <div id="login" class="min-h-screen flex items-center justify-center p-4" style="background:var(--cl)">
  <div class="bg-white rounded-3xl shadow-2xl overflow-hidden flex w-full max-w-5xl">
-  <div class="w-full md:w-1/2 p-8 md:p-12">
+  <div class="w-full md:w-1/2 p-8 md:p-12 relative"><button type="button" onclick="clReqOpen()" title="Create a new clinic (needs approval)" aria-label="Create a new clinic" class="absolute top-3 right-3 flex items-center gap-1 text-xs rounded-full border px-2 py-1" style="color:var(--cd);border-color:color-mix(in srgb,var(--c) 30%,white);background:color-mix(in srgb,var(--c) 6%,white)"><i class="fa fa-circle-plus"></i><span>New clinic</span></button>
    <div class="text-center mb-8">
     <div id="lb" class="mb-4"></div>
     <h1 class="text-3xl font-bold" style="color:var(--cd)">Professional Dental Care Center</h1>
@@ -68,7 +68,9 @@
 <script src="src/features/auth/session.js"></script>
 <script src="src/features/auth/setup.js"></script>
 <script src="src/features/clinics/clinics.js"></script>
+<script src="src/features/clinics/clinicRequests.js"></script>
 <script src="src/app/layout.js"></script>
+<script src="src/app/menuOrder.js"></script>
 <script src="src/app/mobile.js"></script>
 <script src="src/app/offline.js"></script>
 <script src="src/features/finance/cashClose.js"></script>
