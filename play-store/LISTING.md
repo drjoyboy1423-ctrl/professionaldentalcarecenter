@@ -37,6 +37,13 @@ FOR MANAGERS
 - Reports dashboard with monthly and yearly registrations, revenue, procedures, lab and X-ray volume and materials used
 - Print an official A4 report or export CSV
 
+FOR THE CLINIC OWNER AND MANAGERS
+- Ortho follow-up: fee package, monthly fee, visits and a colour sign for who is paid, paying or behind
+- Doctor earnings: normal, Sunday and night percent after lab fees
+- Pay rules and tracking: part-time pay for nurses and reception, shareholder shares, monthly payroll and tax form
+- Each staff member sees only their own pay statement
+- Sign in with a clinic code - no public clinic list
+
 MORE
 - Languages: English, Amharic (አማርኛ), Afaan Oromoo, Soomaali
 - Ethiopian and Gregorian calendars
@@ -47,19 +54,11 @@ MORE
 
 SmartDent is for clinic staff. Accounts are created by your clinic administrator.
 
-## Graphics to prepare
-- App icon 512x512 PNG (use icon-512.png from the repo)
-- Feature graphic 1024x500 PNG (clinic colour background + tooth logo + "SmartDent")
-- Phone screenshots (at least 2, ideally 6-8), take from a phone in English with the SAMPLE data loaded
-  (Reports > Load 6-month sample data), in this order:
-  1. Login screen
-  2. Doctor "My Patients" dashboard
-  3. Patient file with tooth chart
-  4. Place Order window
-  5. Orders Inbox
-  6. Dental Materials (red out-of-stock + Order Now)
-  7. Reports Dashboard
-  8. Reception desk (computer screen) or Appointments
+## Graphics (ready in this folder)
+- App icon 512x512: play-store/brand/icon-512.png
+- Feature graphic 1024x500: play-store/brand/feature-1024x500.png
+- Phone screenshots (1080x1920, English, sample data): play-store/screenshots/phone-01 ... phone-08 (login, dashboard, patients, dental records, orders inbox, ortho follow-up, reports, pay tracking). Upload them in this order.
+- Promo video (30 s, 1080p): play-store/promo-video-1080p.mp4 - upload to YouTube (public or unlisted) and paste the link in Play Console > Store listing > Video.
 
 ## Content rating questionnaire (IARC)
 Category "Utility / Productivity". No violence, sexual content, gambling, user-generated public content or location sharing. Expected rating: Everyone.
@@ -80,10 +79,11 @@ Choose: the app is **not** a medical device and gives no diagnosis or treatment 
 - Optional data: none. Data is not used for ads or analytics.
 
 ## Review access (IMPORTANT - Google needs a working login)
-In Play Console > App content > App access, choose "All or some functionality is restricted" and give:
-- Clinic: (create a clinic named "Demo Clinic" with sample data)
-- Username / password for a reviewer account with role Manager (create it in Users). Use a throw-away password and delete the account after approval.
-- Note: "Staff-only app. Choose the Demo clinic, sign in with these details."
+Play Console > App content > App access > "All or some functionality is restricted". Give:
+- Clinic code: demo
+- Username: demo.manager   Password: DemoReview#2026   (also demo.doctor and demo.reception, same password)
+- Note: "Staff-only app. On the sign-in screen type clinic code demo, then the username and password. The Demo clinic contains sample patients only."
+After approval you may archive the Demo clinic or change its passwords.
 
 ## Release steps
 1. Create app > Setup tasks (above) > Testing > Closed testing: upload the .aab from PWABuilder, add 12+ testers (needed for new personal accounts), keep testing for 14 days.
