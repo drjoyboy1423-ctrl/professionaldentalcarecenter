@@ -21,6 +21,8 @@ const DB=(()=>{
    if(ins.length){const r=await sb.from('patients').insert(ins.map(p=>({id:p.id,clinic:cid,data:p,updated_at:now})));if(r.error){if(/duplicate|23505/i.test((r.error.message||'')+(r.error.code||''))){await Promise.all(ins.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))))}else ck(r)}}
    await Promise.all(upd.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))));
    if(del.length)ck(await sb.from('patients').delete().in('id',del.map(Number)))},
+  async payStmts(){return ck(await sb.from('pay_statements').select('*').order('month',{ascending:false}))},
+  async payStmtSave(rows){ck(await sb.from('pay_statements').upsert(rows))},
   async saveList(cid,kind,data){ck(await sb.from('clinic_lists').upsert({clinic:cid,kind,data,updated_at:new Date().toISOString()}))},
   async backupNow(){const {data}=await sb.auth.getSession();if(!data.session)throw new Error('Please sign in again.');const r=await fetch(SB_URL+'/functions/v1/weekly-backup',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+data.session.access_token},body:JSON.stringify({force:true})});const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw new Error(j.error||'Backup failed.');return j},
   async audit(o){let q=sb.from('audit_log').select('*').order('at',{ascending:false}).limit(o.n||200);if(o.clinic)q=q.eq('clinic',o.clinic);if(o.tbl)q=q.eq('tbl',o.tbl);if(o.days)q=q.gte('at',new Date(Date.now()-o.days*864e5).toISOString());return ck(await q)},
