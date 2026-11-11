@@ -8,7 +8,9 @@
       "package_name": "app.dentalcare.smartdent",
       "sha256_cert_fingerprints": [
         "BE:84:7A:37:5D:57:8D:E5:7B:AC:EE:89:1E:FD:7B:7E:3B:7C:FC:DA:7E:5F:01:7E:BF:5C:8F:0D:4E:1B:D2:FF",
-        "AD:28:B4:54:F6:99:1D:65:3D:CC:30:77:00:56:DF:C6:C2:99:51:61:B3:E8:9B:39:6A:B0:43:FB:AA:BD:C0:EA"
+        "AD:28:B4:54:F6:99:1D:65:3D:CC:30:77:00:56:DF:C6:C2:99:51:61:B3:E8:9B:39:6A:B0:43:FB:AA:BD:C0:EA",
+        "62:4E:1A:B0:B7:D0:5F:5B:08:02:6A:9A:A4:C0:04:61:13:C6:C8:5E:39:11:8C:66:A3:BD:4C:32:C5:F3:1F:E8",
+        "F9:A7:D6:B0:AB:5A:C1:C2:4A:D7:E4:95:79:BA:C4:29:32:02:C4:9E:D2:6D:FB:DB:A6:70:C2:5F:1B:03:E1:39"
       ]
     }
   }
