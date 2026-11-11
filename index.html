@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><script>try{var t=localStorage.getItem("dental_theme");if(t=="dark"||(t!="light"&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#dc2626"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="format-detection" content="telephone=no">
-<title>Professional Dental Care Center</title>
+<title>ProDental Records</title>
 <meta name="description" content="Dental clinic management: patients, appointments, invoices and records.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -13,10 +13,10 @@
 <div id="boot" style="position:fixed;inset:0;z-index:90;background:#fff;display:flex;align-items:center;justify-content:center;color:#555;font-size:15px">Loading...</div>
 <div id="login" class="min-h-screen flex items-center justify-center p-4" style="background:var(--cl)">
  <div class="bg-white rounded-3xl shadow-2xl overflow-hidden flex w-full max-w-5xl">
-  <div class="w-full md:w-1/2 p-8 md:p-12 relative"><button type="button" onclick="clReqOpen()" title="Create a new clinic (needs approval)" aria-label="Create a new clinic" class="absolute top-3 right-3 flex items-center gap-1 text-xs rounded-full border px-2 py-1" style="color:var(--cd);border-color:color-mix(in srgb,var(--c) 30%,white);background:color-mix(in srgb,var(--c) 6%,white)"><i class="fa fa-circle-plus"></i><span>New clinic</span></button>
+  <div class="w-full md:w-1/2 p-8 md:p-12 relative"><button type="button" onclick="clReqOpen()" title="Create a new clinic (7-day free trial)" aria-label="Create a new clinic" class="absolute top-3 right-3 flex items-center gap-1 text-xs rounded-full border px-2 py-1" style="color:var(--cd);border-color:color-mix(in srgb,var(--c) 30%,white);background:color-mix(in srgb,var(--c) 6%,white)"><i class="fa fa-circle-plus"></i><span>New clinic</span></button>
    <div class="text-center mb-8">
     <div id="lb" class="mb-4"></div>
-    <h1 class="text-3xl font-bold" style="color:var(--cd)">Professional Dental Care Center</h1>
+    <h1 class="text-3xl font-bold" style="color:var(--cd)">ProDental Records</h1>
     <p id="lwel" class="mt-2" style="color:var(--c)">Welcome back! Please sign in to your account.</p></div>
    <label class="font-medium text-sm" style="color:var(--cd)">Clinic code</label>
     <input id="lcode" autocomplete="organization" enterkeyhint="next" class="inp mt-1 mb-1" style="background:color-mix(in srgb,var(--c) 6%,white);border-color:color-mix(in srgb,var(--c) 28%,white)" placeholder="Your clinic code" autocapitalize="none" autocorrect="off" onchange="lcResolve().catch(function(){})">
@@ -68,7 +68,6 @@
 <script src="src/features/auth/session.js"></script>
 <script src="src/features/auth/setup.js"></script>
 <script src="src/features/clinics/clinics.js"></script>
-<script src="src/features/clinics/clinicRequests.js"></script>
 <script src="src/app/layout.js"></script>
 <script src="src/app/menuOrder.js"></script>
 <script src="src/app/mobile.js"></script>
@@ -133,5 +132,6 @@
 <script src="src/features/records/ortho.js"></script>
 <script src="src/features/patients/phoneSearch.js"></script>
 <script src="src/features/admin/support.js"></script>
+<script src="src/features/clinics/clinicRequests.js"></script>
 <script>start();</script>
 </body></html>

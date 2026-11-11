@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
         const r = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ from: Deno.env.get("MAIL_FROM") || "Professional Dental Care Center <onboarding@resend.dev>", to: [addr], subject: `Weekly backup ${day}: ${rows.length} clinic${rows.length == 1 ? "" : "s"}`, html }),
+          body: JSON.stringify({ from: Deno.env.get("MAIL_FROM") || "ProDental Records <onboarding@resend.dev>", to: [addr], subject: `Weekly backup ${day}: ${rows.length} clinic${rows.length == 1 ? "" : "s"}`, html }),
         });
         if (r.ok) emailed++;
         else { const t = await r.text(); console.log("backup email failed", addr, r.status, t); mailError = `${addr}: ${t.slice(0, 160)}`; }

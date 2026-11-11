@@ -1,6 +1,6 @@
 {
-  "name": "Professional Dental Care Center",
-  "short_name": "SmartDent",
+  "name": "ProDental Records",
+  "short_name": "ProDental",
   "description": "Dental clinic management: patients, appointments, invoices and records.",
   "start_url": "./",
   "scope": "./",

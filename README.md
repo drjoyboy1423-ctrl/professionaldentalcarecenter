@@ -1,4 +1,4 @@
-# Professional Dental Care Center (SmartDent)
+# ProDental Records
 
 Clinic management web app: patients, appointments, invoices and payments (Telebirr, CBE Birr, CBE, eBirr, cash),
 Ethiopian calendar, X-ray viewer, 15% VAT, analytics, printing, and a manager/admin-only **Finance** section

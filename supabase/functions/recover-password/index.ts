@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: Deno.env.get("MAIL_FROM") || "Professional Dental Care Center <onboarding@resend.dev>",
+        from: Deno.env.get("MAIL_FROM") || "ProDental Records <onboarding@resend.dev>",
         to: [to],
         subject: "Reset your password",
         html: `<p>Hello ${esc(p.name || username)},</p><p>We received a request to reset the password for <b>${esc(username)}</b>.</p><p><a href="${link}" style="background:#1e3a8a;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Choose a new password</a></p><p>This link works once and expires soon. If you did not ask for this, ignore this email.</p>`,

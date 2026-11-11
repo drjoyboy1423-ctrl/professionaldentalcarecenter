@@ -1,7 +1,7 @@
-# SmartDent - Google Play listing pack (English)
+# ProDental Records - Google Play listing pack (English)
 
 ## Basics
-- **App name (max 30):** SmartDent - Dental Clinic
+- **App name (max 30):** ProDental Records - Dental Clinic
 - **Package:** app.dentalcare.smartdent
 - **Category:** Medical  (or Business)  | **Type:** App | **Price:** Free
 - **Privacy policy URL:** https://professionaldentalcarecenter-nine.vercel.app/privacy
@@ -13,7 +13,7 @@
 Run your dental clinic: patients, appointments, records, orders and billing.
 
 ## Full description (max 4000)
-SmartDent is a complete management app for dental clinics. Reception, doctors, nurses and managers each get the tools they need, on a phone, tablet or computer.
+ProDental Records is a complete management app for dental clinics. Reception, doctors, nurses and managers each get the tools they need, on a phone, tablet or computer.
 
 FOR RECEPTION
 - Register patients and print patient cards with a barcode
@@ -52,7 +52,7 @@ MORE
 - Notifications for new orders, assigned patients and ready results
 - Role-based access, activity log and optional two-step sign-in
 
-SmartDent is for clinic staff. Accounts are created by your clinic administrator.
+ProDental Records is for clinic staff. Accounts are created by your clinic administrator.
 
 ## Graphics (ready in this folder)
 - App icon 512x512: play-store/brand/icon-512.png

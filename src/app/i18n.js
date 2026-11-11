@@ -485,7 +485,7 @@ Powered by|በ የሚሰራ|Kan hojjetu|Waxaa awooda
 Press Load to see the whole year, month by month.|ሙሉ ዓመቱን በወር ለማየት «ጫን» ይጫኑ።|Waggaa guutuu ji'aan arguuf "Fe'i" tuqi.|Taabo "Rar" si aad u aragto sannadka oo dhan bil bil.
 Print blank prescription|ባዶ ማዘዣ አትም|Qajeelfama qoricha duwwaa maxxansi|Daabac warqadda dawada madhan
 Private Dental Clinic Center|የግል የጥርስ ክሊኒክ ማዕከል|Giddugala Kilinikii Ilkaanii Dhuunfaa|Xarunta Kiliinikka Ilkaha Gaarka ah
-Professional Dental Care Center|ፕሮፌሽናል የጥርስ እንክብካቤ ማዕከል|Giddugala Kunuunsa Ilkaanii Ogummaa|Xarunta Daryeelka Ilkaha ee Xirfadlaha
+ProDental Records|ProDental Records|ProDental Records|ProDental Records
 Records|መዝገቦች|Galmeewwan|Diiwaannada
 Recently issued cards|በቅርቡ የተሰጡ ካርዶች|Kaardonni dhiyeenya kennaman|Kaadhadhka dhawaan la bixiyay
 Received by|የተቀበለው|Kan fudhate|Waxaa qaatay

@@ -1,4 +1,4 @@
-# Google Play checklist - SmartDent (app.dentalcare.smartdent)
+# Google Play checklist - ProDental Records (app.dentalcare.smartdent)
 
 Status: [x] done by Claude   [ ] you must do
 

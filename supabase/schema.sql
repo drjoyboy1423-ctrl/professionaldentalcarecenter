@@ -1,4 +1,4 @@
--- SmartDent / Professional Dental Care Center: database schema (reference copy of the LIVE project).
+-- ProDental Records: database schema (reference copy of the LIVE project).
 -- Row-level security is per clinic and per role. Do NOT replace it with "using (true)" policies.
 -- Live project: qorufqosjdhefnafwfzh. Only run this on a NEW, empty Supabase project.
 

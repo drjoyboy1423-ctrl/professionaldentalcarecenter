@@ -2,7 +2,7 @@
   "name": "dentalclinic-app",
   "private": true,
   "version": "1.0.0",
-  "description": "Professional Dental Care Center - clinic management (Supabase + static page + Vercel finance API)",
+  "description": "ProDental Records - clinic management (Supabase + static page + Vercel finance API)",
   "scripts": {
     "dev": "npx --yes serve . -l 5173",
     "build": "node build.mjs",
