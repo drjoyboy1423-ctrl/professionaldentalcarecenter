@@ -12,6 +12,8 @@ const cors = {
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const BUCKET = "backups", KEEP = 8;
+// only public https addresses (no localhost, private ranges or raw IPs) so this cannot be used to reach internal services
+const publicHttps = (u: string) => { try { const x = new URL(u); const h = x.hostname.toLowerCase(); return x.protocol === "https:" && !/^(localhost|.*\.(local|internal|lan))$/.test(h) && !/^[\d.]+$/.test(h) && !h.includes(":") && h.includes("."); } catch { return false; } };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -43,6 +45,7 @@ Deno.serve(async (req) => {
     }
 
     const day = new Date().toISOString().slice(0, 10);
+    let site = 0, siteError = "";
     const rows: { name: string; patients: number; kb: number; url: string; file: string }[] = [];
     for (const c of clinics) {
       const patients: unknown[] = [];
@@ -53,7 +56,15 @@ Deno.serve(async (req) => {
       }
       const { data: lists } = await sb.from("clinic_lists").select("kind,data").eq("clinic", c.id);
       const { data: staff } = await sb.from("profiles").select("username,role,name,phone,email,title").eq("clinic", c.id);
-      const file = JSON.stringify({ format: "prodental-clinic-backup", version: 1, created: new Date().toISOString(), clinic: c, patients, lists: lists ?? [], staff: staff ?? [] });
+      const file = JSON.stringify({ format: "prodental-clinic-backup", version: 1, created: new Date().toISOString(), clinic: c, patients, lists: (lists ?? []).map((l) => l.kind === "fin" && l.data?.bk ? { ...l, data: { ...l.data, bk: { ...l.data.bk, token: "" } } } : l), staff: staff ?? [] });
+      // Optional per-clinic copy to the clinic's own website/server (Settings > Where backups are kept)
+      const bk = (lists ?? []).find((l) => l.kind === "fin")?.data?.bk;
+      if (bk?.cloud && bk.token && publicHttps(String(bk.url || ""))) {
+        try {
+          const sr = await fetch(String(bk.url), { method: "POST", headers: { "Content-Type": "application/json", "X-Backup-Token": String(bk.token), "X-Backup-Name": `backup-${String(c.name).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-${day}.json` }, body: file, signal: AbortSignal.timeout(60000) });
+          if (sr.ok) site++; else siteError = `${c.name}: server answered ${sr.status}`;
+        } catch (e) { siteError = `${c.name}: ${(e as Error).message}`; }
+      }
       const path = `${c.id}/${day}.json`;
       const up = await sb.storage.from(BUCKET).upload(path, new Blob([file], { type: "application/json" }), { upsert: true, contentType: "application/json" });
       if (up.error) return json({ error: `Could not save ${c.name}: ${up.error.message}` }, 500);
@@ -101,7 +112,7 @@ Deno.serve(async (req) => {
         else { const t = await r.text(); console.log("backup email failed", addr, r.status, t); mailError = `${addr}: ${t.slice(0, 160)}`; }
       }
     }
-    return json({ ok: true, clinics: rows.length, emailed, mailError, drive, driveError, driveOn: !!(hook && dtok), day });
+    return json({ ok: true, clinics: rows.length, site, siteError, emailed, mailError, drive, driveError, driveOn: !!(hook && dtok), day });
   } catch (e) {
     return json({ error: (e as Error).message || "Backup failed." }, 500);
   }
