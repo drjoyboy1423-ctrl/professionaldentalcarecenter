@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       }
       const { data: lists } = await sb.from("clinic_lists").select("kind,data").eq("clinic", c.id);
       const { data: staff } = await sb.from("profiles").select("username,role,name,phone,email,title").eq("clinic", c.id);
-      const file = JSON.stringify({ format: "smartdent-clinic-backup", version: 1, created: new Date().toISOString(), clinic: c, patients, lists: lists ?? [], staff: staff ?? [] });
+      const file = JSON.stringify({ format: "prodental-clinic-backup", version: 1, created: new Date().toISOString(), clinic: c, patients, lists: lists ?? [], staff: staff ?? [] });
       const path = `${c.id}/${day}.json`;
       const up = await sb.storage.from(BUCKET).upload(path, new Blob([file], { type: "application/json" }), { upsert: true, contentType: "application/json" });
       if (up.error) return json({ error: `Could not save ${c.name}: ${up.error.message}` }, 500);

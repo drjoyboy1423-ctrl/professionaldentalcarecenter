@@ -2,8 +2,8 @@
 <rect width="1024" height="500" fill="url(#b)"/>
 <circle cx="900" cy="60" r="190" fill="#fff" fill-opacity=".07"/><circle cx="980" cy="470" r="150" fill="#fff" fill-opacity=".07"/><circle cx="60" cy="480" r="110" fill="#fff" fill-opacity=".06"/>
 <g transform="translate(50 140) scale(.42)"><circle cx="256" cy="256" r="250" fill="#fff"/><circle cx="256" cy="256" r="228" fill="url(#g)"/><g transform="translate(256 262) scale(.72) translate(-256 -262)"><g id="mark"><path d="M256 96c-62-30-146 8-136 108 6 62 36 104 46 172 8 56 26 90 48 90 26 0 22-82 42-82s16 82 42 82c22 0 40-34 48-90 10-68 40-110 46-172 10-100-74-138-136-108z" fill="#fff" transform="translate(0 -10)"/><path d="M452 58Q460.28 95.72 498 104Q460.28 112.28 452 150Q443.72 112.28 406 104Q443.72 95.72 452 58Z" fill="#ffffff"/><path d="M478 172Q482.32 191.68 502 196Q482.32 200.32 478 220Q473.68 200.32 454 196Q473.68 191.68 478 172Z" fill="#fb7185"/><path d="M66 146Q71.4 170.6 96 176Q71.4 181.4 66 206Q60.6 181.4 36 176Q60.6 170.6 66 146Z" fill="#ffffff"/></g></g></g>
-<text x="285" y="205" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="46" font-weight="700" fill="#fff">Professional</text>
-<text x="285" y="262" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="46" font-weight="700" fill="#fff">Dental Care Center</text>
+<text x="285" y="205" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="46" font-weight="700" fill="#fff">ProDental</text>
+<text x="285" y="262" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="46" font-weight="700" fill="#fff">Records</text>
 <rect x="285" y="282" width="110" height="8" rx="4" fill="#e11d48"/>
 <text x="285" y="332" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="22" fill="#e0f2fe">Patients  •  Appointments  •  Records</text>
 <text x="285" y="364" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="22" fill="#e0f2fe">Orders  •  Materials  •  Billing  •  Reports</text>
