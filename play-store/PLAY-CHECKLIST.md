@@ -9,15 +9,18 @@ Status: [x] done by Claude   [ ] you must do
 ## App build
 - [x] Web app live: https://professionaldentalcarecenter-nine.vercel.app (auto-deploys from GitHub main)
 - [x] manifest.webmanifest, icons 192/512, service worker, HTTPS
-- [x] Digital Asset Links file (/.well-known/assetlinks.json) with the PWABuilder fingerprints
-- [ ] Build the .aab with PWABuilder (package app.dentalcare.smartdent, same keystore as before, new version code each upload)
+- [x] Digital Asset Links file (/.well-known/assetlinks.json) with all four package-key fingerprints (incl. the two new ones of 11 Nov 2026)
+- [x] App renamed ProDental Records everywhere; theme colour and icons updated (blue tooth)
+- [x] Package built with PWABuilder on 11 Nov 2026 (.apk tested on a phone; .aab in the same zip)
+- [ ] Save signing.keystore + signing-key-info.txt (Drive + email): needed for every update
+- [ ] Upload the .aab to Play Console (closed testing first)
 - [ ] After the first upload copy the Play App Signing SHA-256 (Play Console > Setup > App signing) and send it to Claude to add to assetlinks.json
 
 ## Store listing
 - [x] Title, short and full description (play-store/LISTING.md)
 - [x] App icon 512x512, feature graphic 1024x500
 - [x] 8 phone screenshots 1080x1920 (play-store/screenshots)
-- [x] 30 s promo video file (upload to YouTube, paste the link)
+- [x] 30 s promo video file with the new name (upload to YouTube, paste the link)
 - [ ] Optional: 7-inch and 10-inch tablet screenshots (only if you want tablet listing)
 - [ ] Choose category Medical (or Business) and add the contact details
 

@@ -3,7 +3,7 @@
 ## Basics
 - **App name (max 30):** ProDental Records - Dental Clinic
 - **Package:** app.dentalcare.smartdent
-- **Category:** Medical  (or Business)  | **Type:** App | **Price:** Free
+- **Category:** Medical  (or Business)  | **Type:** App | **Price:** Free (the clinic is free for one year; donations are optional and made outside the app by bank or eBirr transfer)
 - **Privacy policy URL:** https://professionaldentalcarecenter-nine.vercel.app/privacy
 - **Contact email:** professionaldentalcarecenter@gmail.com (also dr.joyboy1423@gmail.com)
 - **Contact phone:** +251 915 018 709 (Play Console asks for a phone number with country code: +251915018709)
@@ -52,7 +52,7 @@ MORE
 - Notifications for new orders, assigned patients and ready results
 - Role-based access, activity log and optional two-step sign-in
 
-ProDental Records is for clinic staff. Accounts are created by your clinic administrator.
+ProDental Records is for clinic staff. A clinic owner can create the clinic from the sign-in screen; it is free for one year, with optional donations to support development. Staff accounts are created by your clinic manager.
 
 ## Graphics (ready in this folder)
 - App icon 512x512: play-store/brand/icon-512.png
@@ -86,6 +86,9 @@ Play Console > App content > App access > "All or some functionality is restrict
 After approval you may archive the Demo clinic or change its passwords.
 
 ## Release steps
-1. Create app > Setup tasks (above) > Testing > Closed testing: upload the .aab from PWABuilder, add 12+ testers (needed for new personal accounts), keep testing for 14 days.
-2. Setup > App signing: copy the SHA-256 of the "App signing key certificate" and add it to well-known/assetlinks.json (next to the PWABuilder one), then deploy. This removes the browser address bar.
-3. Apply for production access > Production > create release > send for review.
+1. Build: PWABuilder > https://professionaldentalcarecenter-nine.vercel.app > Package for stores > Android. Package ID app.dentalcare.smartdent, app name ProDental Records, launcher name ProDental, theme colour #0284c7, Meta Quest off, fallback Custom Tabs. Use the SAME keystore for every update and raise the version code each time. Keep signing.keystore and signing-key-info.txt in Drive and email.
+2. Create the app > Setup tasks (above) > Testing > Closed testing: upload the .aab, add 12+ testers (needed for new personal accounts), keep testing for 14 days.
+3. Setup > App signing: copy the SHA-256 of the "App signing key certificate" and send it to Claude (or add it to well-known/assetlinks.json next to the existing ones), then deploy. This removes the browser address bar. The two keys of the 11 Nov 2026 packages are already listed.
+4. Apply for production access > Production > create release > send for review.
+
+Note: the in-app donation note only shows bank and eBirr account numbers. Play requires its own billing only for digital goods sold in the app; donations to the developer made outside the app are not in-app purchases, but if Google asks, describe them as optional voluntary support.
