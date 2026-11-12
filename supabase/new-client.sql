@@ -291,7 +291,7 @@ create policy ps_write on public.pay_statements for all using (
   with check (
   (select private.my_role())='admin'
   or ((select private.my_role())='manager' and clinic=(select private.my_clinic())));
--- Self-service clinics start immediately as a 7-day trial; after that the administrator must approve them.
+-- Self-service clinics start immediately as a one-free-year period; after that the administrator must approve them.
 alter table public.clinics add column if not exists approved boolean not null default true;
 alter table public.clinics add column if not exists trial_until timestamptz;
 -- A clinic whose trial has ended without approval loses access to its data (admin is unaffected).

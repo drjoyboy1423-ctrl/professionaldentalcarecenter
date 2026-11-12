@@ -1,7 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 // Self-service clinic sign-up from the sign-in page. The clinic and its manager account are created at once as a
-// 7-day trial (approved=false). The administrator must approve the clinic before the trial ends, otherwise it is locked.
+// one-year free period (approved=false). The administrator must approve the clinic before the free year ends, otherwise it is locked.
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     if (ex) return json({ error: "That clinic code is already taken. Choose another." }, 409);
 
     clinicId = "c" + Date.now();
-    const trialUntil = new Date(Date.now() + 7 * 864e5).toISOString();
+    const trialUntil = new Date(Date.now() + 365 * 864e5).toISOString();
     const { error: ce } = await sb.from("clinics").insert({ id: clinicId, name, code, type: "private", color: "#0284c7", icon: "tooth", phone: phone || null, approved: false, trial_until: trialUntil });
     if (ce) return json({ error: /duplicate|clinics_code_key/i.test(ce.message) ? "That clinic code is already taken. Choose another." : ce.message }, 500);
     const { data: u, error: ue } = await sb.auth.admin.createUser({ email: `${username}@${clinicId}.dental.app`, password, email_confirm: true });
