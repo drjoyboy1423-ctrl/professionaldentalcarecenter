@@ -6,7 +6,7 @@
 const prBox=(t,b,open)=>`<details class="bg-white rounded-xl shadow mb-4" ${open===false?'':'open'}><summary class="cursor-pointer select-none font-bold p-4 flex justify-between items-center"><span>${t}</span><i class="fa fa-chevron-down text-xs text-gray-400"></i></summary><div class="px-4 pb-4">${b}</div></details>`;
 const prMgr=()=>!!U&&['manager','admin'].includes(U.role);
 const LABD=[{k:'Zirconia',w:'zircon',fee:5000},{k:'PFM',w:'pfm,porcelain',fee:1200},{k:'Chrome',w:'chrome,cobalt,copalt,metal',fee:800}];
-const prLab=()=>(S.fin&&S.fin.lab)||LABD;
+const prLab=()=>(S.fin&&S.fin.lab)||AS.v('lab.def')||LABD;
 /* lab fee for one invoice item: the first lab type whose keyword appears in the item name / description, times the quantity (units) */
 const prNorm=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function labFee(x){if(x.labOv!=null&&x.labOv!=='')return +x.labOv||0;const t=prNorm((x.item||'')+' '+(x.desc||''));for(const r of prLab())if(String(r.w||'').split(',').some(w=>prNorm(w)&&t.includes(prNorm(w))))return (+r.fee||0)*(+x.qty||1);return 0}

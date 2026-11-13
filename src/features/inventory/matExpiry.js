@@ -1,7 +1,6 @@
 /* ---------- Dental materials: expiry dates, warnings and reorder suggestions ---------- */
-const EXPD=60; /* warn this many days before a material expires */
 const expDays=m=>{if(!m.exp||!/^\d{4}-\d{2}-\d{2}/.test(m.exp))return null;return Math.floor((new Date(m.exp.slice(0,10)+'T23:59:59').getTime()-NOW())/DAY)};
-const expState=m=>{if(m.q<=0)return '';const d=expDays(m);return d==null?'':d<0?'exp':d<=EXPD?'soon':''};
+const expState=m=>{if(m.q<=0)return '';const d=expDays(m);return d==null?'':d<0?'exp':d<=AS.v('exp.days')?'soon':''};
 const expLabel=m=>{const d=expDays(m);if(d==null)return '';const s=expState(m),t='Expires '+fdate(m.exp.slice(0,10));return `<span class="${s=='exp'?'text-red-600 font-semibold':s=='soon'?'text-amber-700 font-semibold':'text-gray-500'}">${t}${s=='exp'?' (EXPIRED)':s=='soon'?' ('+d+' day'+(d==1?'':'s')+' left)':''}</span> &middot; `};
 const expList=()=>stockInit().items.filter(m=>expState(m));
 const sugQty=m=>Math.max(m.min*2-m.q,m.min,1);

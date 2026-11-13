@@ -3,8 +3,8 @@ const canPay=()=>!!U&&['manager','admin'].includes(U.role);
 let PM=null;
 const pr2=n=>Math.round((+n||0)*100)/100;
 /* Ethiopian employment income tax (monthly): 0-2000 0%, to 4000 15%, to 7000 20%, to 10000 25%, to 14000 30%, above 35% */
-function payTax(g){g=Math.max(0,+g||0);const B=[[2000,0,0],[4000,.15,300],[7000,.2,500],[10000,.25,850],[14000,.3,1350],[1e15,.35,2050]];for(const[m,r,d]of B)if(g<=m)return pr2(Math.max(0,g*r-d));return 0}
-function payCalc(r){const d=Math.max(0,Math.min(+r.days||0,30)),b=pr2((+r.basic||0)*d/30),gross=pr2(b+(+r.ot||0)+(+r.pos||0)+(+r.shift||0)+(+r.svc||0)),tax=r.taxx===null||r.taxx===undefined||r.taxx===''?payTax(gross):pr2(r.taxx),pen=pr2(b*.07),emp=pr2(b*.11),ded=pr2(tax+pen+(+r.debt||0)+(+r.food||0)+(+r.oth||0));return{d,b,gross,tax,pen,emp,ded,net:pr2(gross-ded)}}
+function payTax(g){g=Math.max(0,+g||0);const B=AS.brackets();for(const[m,r,d]of B)if(g<=m)return pr2(Math.max(0,g*r-d));return 0}
+function payCalc(r){const d=Math.max(0,Math.min(+r.days||0,30)),b=pr2((+r.basic||0)*d/30),gross=pr2(b+(+r.ot||0)+(+r.pos||0)+(+r.shift||0)+(+r.svc||0)),tax=r.taxx===null||r.taxx===undefined||r.taxx===''?payTax(gross):pr2(r.taxx),pen=pr2(b*AS.v('pay.pen')/100),emp=pr2(b*AS.v('pay.emp')/100),ded=pr2(tax+pen+(+r.debt||0)+(+r.food||0)+(+r.oth||0));return{d,b,gross,tax,pen,emp,ded,net:pr2(gross-ded)}}
 function payData(){S.fin=S.fin||{sal:[],exp:[]};S.fin.pay=S.fin.pay||{};return S.fin.pay}
 function payStart(mk){const P=payData(),prev=Object.keys(P).filter(k=>k<mk).sort().pop();P[mk]={rows:prev?P[prev].rows.map(r=>({id:r.id,name:r.name,tin:r.tin||'',hire:r.hire||'',days:30,basic:r.basic,ot:0,pos:r.pos||0,shift:r.shift||0,svc:0,debt:0,food:0,oth:0,taxx:null})):[],ts:Date.now()};return P[mk]}
 function payRows(mk){const P=payData();if(!P[mk]&&mk==monthKey(Date.now())&&Object.keys(P).some(k=>k<mk)){payStart(mk);sv()}return (P[mk]||{rows:[]}).rows}

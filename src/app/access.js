@@ -1,12 +1,14 @@
 /* ---------- Who may change a patient file ----------
    Everyone can READ every patient file. Clinical records, orders, invoices and proformas can be
-   changed only by the doctor the patient is assigned to (the administrator can always step in).
+   changed by doctors and (by default) nurses; the administrator can restrict this in System settings.
    Reception keeps appointments and credit; payments are still taken by reception/manager. */
 const ptDoc=p=>p&&p.doc?p.doc:'';
-function ptW(p,k){p=p||(typeof gp=='function'?gp():null);if(!p||!U)return false;if(U.role=='admin')return true;if(U.role=='doctor')return !!p.doc&&p.doc==U.name;if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred';return false}
-const ptMsg=p=>ptDoc(p)?'Only the assigned doctor ('+ptDoc(p)+') can do this for this patient.':'This patient has no doctor yet. Reception must assign a doctor first.';
+function ptW(p,k){p=p||(typeof gp=='function'?gp():null);if(!p||!U)return false;if(U.role=='admin')return true;if(U.role=='doctor')return (AS.v('acc.anyDoctor')!==false)||(!!p.doc&&p.doc==U.name);
+ if(U.role=='nurse'){if(k=='inv')return AS.v('acc.nurseInv')!==false;return AS.v('acc.nurseRec')!==false&&!['presc','consent','plan'].includes(k)}if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred';return false}
+const ptMsg=p=>ptDoc(p)?'You do not have permission to change this for this patient.':'You do not have permission to change this for this patient.';
 function wrapW(n,kf){const o=window[n];if(typeof o!='function')return;window[n]=function(){const p=gp();if(p&&!ptW(p,kf?kf.apply(null,arguments):SK)){alert(ptMsg(p));return}return o.apply(this,arguments)}}
 ['addI','editI','delI'].forEach(n=>wrapW(n,k=>k));
+{const _dI=delI;delI=function(k){if(U&&U.role=='nurse'){alert('Nurses can add and edit, but only a doctor, manager or administrator can delete.');return}return _dI.apply(this,arguments)}}
 ['recNew','recEdit','recDel','fin','toothAdd','toothDel'].forEach(n=>wrapW(n,()=>'rec'));
 wrapW('toInv',()=>'inv');wrapW('sp',()=>'presc');wrapW('svC',()=>'consent');
 const _mkI=mkItem;mkItem=function(k,v,p){if(p&&!ptW(p,k)){alert(ptMsg(p));return null}return _mkI.apply(this,arguments)};

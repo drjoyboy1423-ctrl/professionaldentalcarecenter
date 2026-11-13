@@ -10,13 +10,15 @@ const cors = {
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const CODE = /^[a-z0-9]{2,20}$/;
 const USER = /^[a-z0-9._]{3,30}$/;
-const MAX_PER_DAY = 25;
+let MAX_PER_DAY = 25, TRIAL_DAYS = 365, PW_MIN = 8;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
   let created: string | null = null, clinicId: string | null = null;
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
+  MAX_PER_DAY = 25; TRIAL_DAYS = 365; PW_MIN = 8;
+  { const { data: st } = await sb.from("app_settings").select("key,value").in("key", ["signup.enabled", "signup.days", "signup.perDay", "pw.min"]); const g = (k: string) => st?.find((r) => r.key === k)?.value; if (g("signup.enabled") === false) return json({ error: "New clinic sign-up is closed right now. Please contact the administrator." }, 403); if (Number(g("signup.perDay")) > 0) MAX_PER_DAY = Number(g("signup.perDay")); if (Number(g("signup.days")) > 0) TRIAL_DAYS = Number(g("signup.days")); if (Number(g("pw.min")) > 8) PW_MIN = Number(g("pw.min")); }
   try {
     const b = await req.json();
     if (b.website) return json({ ok: true }); // honeypot
@@ -28,7 +30,7 @@ Deno.serve(async (req) => {
     if (email && !/^\S+@\S+\.\S+$/.test(email)) return json({ error: "That email does not look right." }, 400);
     if (!CODE.test(code) || ["admin", "administrator"].includes(code)) return json({ error: "Clinic code: 2 to 20 letters or numbers (not \"admin\")." }, 400);
     if (!USER.test(username)) return json({ error: "Username: 3 to 30 letters, numbers, dot or underscore." }, 400);
-    if (password.length < 8) return json({ error: "Password must be at least 8 characters." }, 400);
+    if (password.length < PW_MIN) return json({ error: `Password must be at least ${PW_MIN} characters.` }, 400);
 
     const since = new Date(Date.now() - 864e5).toISOString();
     const { count } = await sb.from("clinics").select("id", { count: "exact", head: true }).eq("approved", false).gte("created_at", since);
@@ -37,7 +39,7 @@ Deno.serve(async (req) => {
     if (ex) return json({ error: "That clinic code is already taken. Choose another." }, 409);
 
     clinicId = "c" + Date.now();
-    const trialUntil = new Date(Date.now() + 365 * 864e5).toISOString();
+    const trialUntil = new Date(Date.now() + TRIAL_DAYS * 864e5).toISOString();
     const { error: ce } = await sb.from("clinics").insert({ id: clinicId, name, code, type: "private", color: "#0284c7", icon: "tooth", phone: phone || null, approved: false, trial_until: trialUntil });
     if (ce) return json({ error: /duplicate|clinics_code_key/i.test(ce.message) ? "That clinic code is already taken. Choose another." : ce.message }, 500);
     const { data: u, error: ue } = await sb.auth.admin.createUser({ email: `${username}@${clinicId}.dental.app`, password, email_confirm: true });

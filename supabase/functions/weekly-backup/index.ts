@@ -11,7 +11,7 @@ const cors = {
 };
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
-const BUCKET = "backups", KEEP = 8;
+const BUCKET = "backups"; let KEEP = 8, MIN_DAYS = 6;
 // only public https addresses (no localhost, private ranges or raw IPs) so this cannot be used to reach internal services
 const publicHttps = (u: string) => { try { const x = new URL(u); const h = x.hostname.toLowerCase(); return x.protocol === "https:" && !/^(localhost|.*\.(local|internal|lan))$/.test(h) && !/^[\d.]+$/.test(h) && !h.includes(":") && h.includes("."); } catch { return false; } };
 
@@ -22,6 +22,8 @@ Deno.serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* cron sends {} */ }
 
+    KEEP = 8; MIN_DAYS = 6;
+    { const { data: st } = await sb.from("app_settings").select("key,value").in("key", ["backup.keep", "backup.minDays"]); const g = (k: string) => st?.find((r) => r.key === k)?.value; if (Number(g("backup.keep")) > 0) KEEP = Number(g("backup.keep")); if (g("backup.minDays") !== undefined && Number(g("backup.minDays")) >= 0) MIN_DAYS = Number(g("backup.minDays")); }
     let forced = false;
     if (body.force) {
       const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
@@ -41,7 +43,7 @@ Deno.serve(async (req) => {
     if (!forced) {
       const { data: last } = await sb.storage.from(BUCKET).list(clinics[0].id, { limit: 1, sortBy: { column: "created_at", order: "desc" } });
       const t = last?.[0]?.created_at ? Date.parse(last[0].created_at) : 0;
-      if (t && Date.now() - t < 6 * 864e5) return json({ ok: true, skipped: "A backup was made less than 6 days ago." });
+      if (t && Date.now() - t < MIN_DAYS * 864e5) return json({ ok: true, skipped: `A backup was made less than ${MIN_DAYS} days ago.` });
     }
 
     const day = new Date().toISOString().slice(0, 10);
