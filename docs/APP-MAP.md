@@ -121,3 +121,4 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 
 ## My data (every role)
 - `src/features/backup/myData.js`, page `mydata`, edge function `email-my-data` (emails the file only to the email on the user's own profile). Staff: what they created; manager: whole clinic; administrator: all clinics. Save to device or send to email.
+- Offline: with no internet, "Save to device" uses the copy already on the device (manager: open clinic; administrator: open clinic only, marked offlineCopy). "Send to my email" is kept in IndexedDB (`mdq`) and sent automatically when the internet returns.
