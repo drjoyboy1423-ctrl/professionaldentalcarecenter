@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.clinic-signup]
 verify_jwt = false
+
+[functions.email-my-data]
+verify_jwt = false

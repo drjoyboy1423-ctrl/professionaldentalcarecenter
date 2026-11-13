@@ -118,3 +118,6 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 - `src/features/admin/sysSettings.js`: object `AS` (defaults = original behaviour), page `sys`, table `app_settings` (migration `20261113_app_settings.sql`; admin writes, signed-in users read, anonymous read only for `public` keys).
 - Editable: new-clinic sign-up on/off, free-period days, sign-ups per day, minimum password length, auto sign-out, who can edit patient files (any doctor / nurse records / nurse invoices), income-tax brackets, pension %, default lab fees, sterilization tests, material-expiry warning days, backups kept and interval, donation note and accounts.
 - Edge functions `clinic-signup` and `weekly-backup` read `app_settings` with the old values as fallbacks.
+
+## My data (every role)
+- `src/features/backup/myData.js`, page `mydata`, edge function `email-my-data` (emails the file only to the email on the user's own profile). Staff: what they created; manager: whole clinic; administrator: all clinics. Save to device or send to email.
