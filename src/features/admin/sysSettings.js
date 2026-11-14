@@ -3,7 +3,7 @@
 const AS=(()=>{
  const D={
   'signup.enabled':true,'signup.days':365,'signup.perDay':25,
-  'acc.anyDoctor':true,'acc.nurseRec':true,'acc.nurseInv':true,'pw.min':6,'session.idleMin':0,
+  'acc.assignedOnly':true,'pw.min':6,'session.idleMin':0,
   'pay.brackets':[[2000,0],[4000,15],[7000,20],[10000,25],[14000,30],[null,35]],'spec.min':40,'spec.max':60,'pay.pen':7,'pay.emp':11,
   'lab.def':[{k:'Zirconia',w:'zircon',fee:5000},{k:'PFM',w:'pfm,porcelain',fee:1200},{k:'Chrome',w:'chrome,cobalt,copalt,metal',fee:800}],
   'ster.tests':[['Chemical indicator (every cycle)',1],['Bowie-Dick (daily)',1],['Biological spore test (weekly)',7]],
@@ -41,8 +41,8 @@ function sysPage(){if(!U||U.role!='admin')return '';const v=AS.v,st=k=>AS.custom
   asIn('sper','New clinics allowed per day',v('signup.perDay'),'Protects against spam sign-ups.')+
   asIn('pw','Minimum password length',v('pw.min'),'Applies when creating users and changing passwords. Also set the same value in Supabase > Authentication > Password.')+
   asIn('idle','Sign out after minutes without use',v('session.idleMin'),'0 = never sign out automatically.'))+
- sec('fa-user-pen','Who can edit patient files','Reading is always open to clinic staff. These switches decide who can change records and invoices.',
-  `<label class="flex items-center gap-2 text-sm mb-2"><input type="checkbox" id="as_adoc" ${v('acc.anyDoctor')!==false?'checked':''}> Any doctor can edit any patient's records (off = only the assigned doctor)</label><label class="flex items-center gap-2 text-sm mb-2"><input type="checkbox" id="as_nrec" ${v('acc.nurseRec')!==false?'checked':''}> Nurses can add and edit clinical records (not prescriptions, consent or treatment plans)</label><label class="flex items-center gap-2 text-sm mb-2"><input type="checkbox" id="as_ninv" ${v('acc.nurseInv')!==false?'checked':''}> Nurses can create and edit invoices / add charges for work done (payments and refunds stay with reception, manager and doctor)</label>`)+
+ sec('fa-user-pen','Who can edit patient files','Everyone in the clinic can always READ every patient. This decides who can CHANGE a patient file.',
+  `<label class="flex items-start gap-2 text-sm mb-2"><input type="checkbox" id="as_asg" class="mt-1" ${v('acc.assignedOnly')!==false?'checked':''}> <span><b>Only staff the patient is assigned to can edit</b> (recommended).<br><span class="text-xs text-gray-500">Reception assigns the doctor. A doctor or reception can also add the nurse, dental therapist, or another doctor / visiting specialist who works with them. Doctors can then edit everything for that patient; nurses and therapists can add and edit records, invoices and prescriptions (not consent forms or treatment plans). Turn this off to let every doctor and nurse edit every patient.</span></span></label>`)+
  sec('fa-money-bill-wave','Payroll rules','Income tax and pension used when monthly payroll is calculated.',
   asTa('brk','Income tax brackets (monthly gross)',asLines(v('pay.brackets').map(r=>[r[0]==null?'':r[0],r[1]])),'One per line: <b>up to amount | tax %</b>. Leave the amount empty on the last line (everything above). Example: 2000 | 0',7)+
   asIn('smin','Visiting specialist share: lowest % allowed',v('spec.min'),'The manager agrees a percent with each visiting specialist within this range.')+asIn('smax','Visiting specialist share: highest % allowed',v('spec.max'))+asIn('pen','Employee pension (% of basic salary)',v('pay.pen'))+asIn('emp','Employer pension (% of basic salary)',v('pay.emp')))+
@@ -61,7 +61,7 @@ const asRows=(id,cols)=>($('as_'+id).value||'').split('\n').map(l=>l.split('|').
 async function asSave(){if(!U||U.role!='admin')return;
  try{const o={};
   o['signup.enabled']=$('as_signup').checked;o['signup.days']=asN('sdays',1,3650,'Free period');o['signup.perDay']=asN('sper',1,1000,'Sign-ups per day');
-  o['acc.anyDoctor']=$('as_adoc').checked;o['acc.nurseRec']=$('as_nrec').checked;o['acc.nurseInv']=$('as_ninv').checked;o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
+  o['acc.assignedOnly']=$('as_asg').checked;o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
   const br=asRows('brk').map(r=>[r[0]===''||r[0]==null?null:+r[0],+r[1]]);if(!br.length||br.some((r,i)=>(r[0]!==null&&!isFinite(r[0]))||!isFinite(r[1])||r[1]<0||r[1]>100||(r[0]===null&&i<br.length-1)||(i&&r[0]!==null&&br[i-1][0]!==null&&r[0]<=br[i-1][0])))throw new Error('Tax brackets: use "amount | percent", amounts increasing, only the last line may have no amount.');
   o['pay.brackets']=br;o['spec.min']=asN('smin',0,100,'Specialist lowest %');o['spec.max']=asN('smax',0,100,'Specialist highest %');if(o['spec.min']>o['spec.max'])throw new Error('Specialist lowest % cannot be above the highest.');o['pay.pen']=asN('pen',0,50,'Employee pension');o['pay.emp']=asN('emp',0,50,'Employer pension');
   const lab=asRows('lab').map(r=>({k:r[0],w:r[1]||'',fee:+r[2]}));if(!lab.length||lab.some(r=>!r.k||!isFinite(r.fee)||r.fee<0))throw new Error('Lab types: use "name | keywords | fee".');o['lab.def']=lab;

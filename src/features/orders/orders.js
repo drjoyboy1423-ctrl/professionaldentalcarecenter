@@ -34,7 +34,7 @@ function ordDone(pid,id){if(!canDone())return;const p=S.patients.find(x=>x.id==p
 function ordUndo(pid,id){if(!canDone())return;const p=S.patients.find(x=>x.id==pid),o=p&&(p.d.ord||[]).find(x=>x.id==id);if(!o||!confirm('Mark this order as pending again?'))return;o.st='pending';delete o.doneAt;delete o.doneBy;(p.d.lab||[]).forEach(x=>{if(x.ord==id)x.done='No'});sv();go(V)}
 
 /* --- assign doctor / finish --- */
-async function assignDoc(pid){if(U.role!='reception')return;const p=S.patients.find(x=>x.id==pid);if(!p)return;const docs=await docEnsure();if(!docs.length)return alert('No doctors found for this clinic. Add a doctor in Users first.');
+async function assignDoc(pid){if(!['reception','manager','admin'].includes(U.role))return;const p=S.patients.find(x=>x.id==pid);if(!p)return;const docs=await docEnsure();if(!docs.length)return alert('No doctors found for this clinic. Add a doctor in Users first.');
  form('Assign Doctor',[['doctor','Doctor for '+p.name,'sel',docs]],{doctor:p.doc},v=>{p.doc=v.doctor;p.doctor=v.doctor;sv();go(V)})}
 function ordFin(pid){const p=S.patients.find(x=>x.id==pid);if(!p||!ptW(p,'rec'))return;
  if(!p.fin&&!confirm('Mark '+p.name+' as finished / inactive? The patient moves to the Finished list.'))return;p.fin=!p.fin;sv();go(V)}
