@@ -22,3 +22,28 @@ async function mdFlush(){try{if(!U||!navigator.onLine)return;const q=await IDB.g
 addEventListener('online',()=>setTimeout(mdFlush,3000));
 const _bootMd=boot;boot=function(){const r=_bootMd.apply(this,arguments);setTimeout(mdFlush,6000);return r};
 function myDataPage(){return hd('My data')+card('<h3 class="font-bold mb-1"><i class="fa fa-file-export mr-2"></i>Keep a copy of your data</h3>',`<p class="text-sm text-gray-600 mb-1"><b>What is included:</b> ${H(mdScope())}.</p><p class="text-sm text-gray-500 mb-3">The file may contain patient information: keep it private.</p><div class="flex flex-wrap gap-2"><button onclick="mdDevice()" class="px-4 py-2 rounded-md text-white text-sm font-semibold" style="background:var(--c)"><i class="fa fa-download mr-1"></i>Save to this device</button><button onclick="mdEmail()" class="px-4 py-2 rounded-md bg-gray-200 text-sm font-semibold"><i class="fa fa-envelope mr-1"></i>Send to my email${U.email?' ('+H(U.email)+')':''}</button></div>${U.email?'':'<p class="text-xs text-amber-700 mt-2">No email saved on your profile yet. Add it in Profile > Edit to use email.</p>'}<div id="mdmsg" class="text-sm mt-3"></div>`)}
+
+/* ---------- Automatic copy on the manager's / administrator's own computer (backup folder), built into the app ----------
+   Once a folder is chosen the app saves a fresh copy there about once a day when it is open; if the browser needs a tap to
+   allow writing, a notice on the dashboard shows one button. Phones without folder support get a weekly "download a copy" reminder. */
+const BKF_OK=()=>!!window.showDirectoryPicker;
+const bkfLast=()=>+(localStorage.getItem('bkf_last_'+(C&&C.id))||0);
+const bkfMark=()=>{try{localStorage.setItem('bkf_last_'+C.id,Date.now())}catch(e){}};
+async function bkfState(){if(!bkdOk())return 'off';let h=null;try{h=await bkdIdb('get','dir')}catch(e){}
+ if(h){let p='prompt';try{p=await h.queryPermission({mode:'readwrite'})}catch(e){}return p=='granted'?'ready':'ask'}
+ return BKF_OK()?'none':'nofs'}
+/* write a fresh copy (works offline too: uses the copy on this device) */
+async function bkfSave(){const b=await mdBuild(),n=await bkdWriteFolder(b);bkfMark();return n}
+const _bkdFolder=bkdFolder;bkdFolder=async function(){await _bkdFolder.apply(this,arguments);try{if(await bkdIdb('get','dir')){bkdCfg().auto=true;bkfMark();await bkfSave().catch(()=>{});syncNow().catch(()=>{});toast('Backup folder set: a copy is saved there automatically')}}catch(e){}};
+bkdAuto=async function(){try{if(!bkdOk())return;const st=await bkfState();if(st=='ready'&&Date.now()-bkfLast()>864e5){await bkfSave();toast('Backup copy saved to your folder')}
+ const b=bkdCfg();if(b.auto&&b.url&&Date.now()-(+(localStorage.getItem('bkd_last_'+C.id)||0))>6*864e5){try{await bkdPost(await mdBuild());localStorage.setItem('bkd_last_'+C.id,Date.now())}catch(e){}}}catch(e){}};
+async function bkfNow(){try{await bkfSave();toast('Backup copy saved');go('dash')}catch(e){alert(e.message||'Could not save the backup.')}}
+function bkfLater(){try{localStorage.setItem('bkf_dis_'+C.id,Date.now())}catch(e){}go('dash')}
+async function bkfBanner(){const e=$('bkfban');if(e)e.remove();if(V!='dash'||!bkdOk())return;const st=await bkfState(),old=Date.now()-bkfLast(),dis=Date.now()-(+(localStorage.getItem('bkf_dis_'+C.id)||0))<3*864e5;let m='',btn='';
+ if(st=='none'&&!dis){m='<b>Protect your data.</b> Keep an automatic copy on this computer so nothing is lost even if the internet or the server fails.';btn=`<button onclick="bkdFolder()" class="px-3 py-1.5 rounded-md text-white text-sm" style="background:var(--c)">Choose backup folder</button><button onclick="bkfLater()" class="px-3 py-1.5 rounded-md bg-white border text-sm">Later</button>`}
+ else if(st=='ask'&&old>864e5){m='<b>Backup folder:</b> tap to let the app save today\'s copy.';btn=`<button onclick="bkfNow()" class="px-3 py-1.5 rounded-md text-white text-sm" style="background:var(--c)">Save backup now</button>`}
+ else if(st=='nofs'&&old>7*864e5&&!dis){m='<b>Weekly backup:</b> save a copy of '+(U.role=='admin'?'all clinics':'your clinic')+' to this device.';btn=`<button onclick="mdDevice().then(bkfMark).then(()=>go('dash'))" class="px-3 py-1.5 rounded-md text-white text-sm" style="background:var(--c)">Save a copy</button><button onclick="bkfLater()" class="px-3 py-1.5 rounded-md bg-white border text-sm">Later</button>`}
+ if(!m)return;const v=$('v');if(!v||V!='dash')return;v.insertAdjacentHTML('afterbegin',`<div id="bkfban" class="bg-sky-50 border border-sky-300 rounded-xl p-3 mb-4 text-sm flex flex-wrap items-center gap-2 justify-between"><span>${m}</span><span class="flex gap-2">${btn}</span></div>`)}
+{const _g=go;go=function(v){const r=_g.apply(this,arguments);setTimeout(bkfBanner,150);return r}}
+/* My data page also offers the folder */
+{const _p=myDataPage;myDataPage=function(){let h=_p.apply(this,arguments);if(bkdOk())h+=card('<h3 class="font-bold mb-1"><i class="fa fa-folder-open mr-2"></i>Automatic copy on this computer</h3>',`<p class="text-sm text-gray-500 mb-3">${BKF_OK()?'Choose a folder once. The app then saves a fresh copy there about once a day while it is open.':'This phone/browser cannot write to a folder. Use "Save to this device" above; the app reminds you weekly.'}</p>${BKF_OK()?`<div class="flex flex-wrap gap-2"><button class="px-3 py-2 rounded-md bg-gray-200 text-sm" onclick="bkdFolder()">Choose a folder</button><button class="px-3 py-2 rounded-md bg-gray-200 text-sm" onclick="bkfNow().catch(()=>{})">Save to folder now</button></div><div class="text-xs text-gray-500 mt-2">Folder: <span id="bkd_fold">none chosen</span></div>`:''}`);setTimeout(bkdFill,0);return h}}

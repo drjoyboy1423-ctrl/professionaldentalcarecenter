@@ -122,3 +122,9 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 ## My data (every role)
 - `src/features/backup/myData.js`, page `mydata`, edge function `email-my-data` (emails the file only to the email on the user's own profile). Staff: what they created; manager: whole clinic; administrator: all clinics. Save to device or send to email.
 - Offline: with no internet, "Save to device" uses the copy already on the device (manager: open clinic; administrator: open clinic only, marked offlineCopy). "Send to my email" is kept in IndexedDB (`mdq`) and sent automatically when the internet returns.
+
+## Staff types and assignments
+- Table `profiles.stype` (bds / specialist for doctors, therapist for nurses; migration `20261114_staff_type.sql`). Same sign-in permissions as doctor/nurse; own labels (`roleLabel`, `STYPES` in `users.js`).
+- Visiting specialist: works only on patients assigned to them or where invited (`p.spec`); paid by percent in Doctor Earnings / Pay rules, limited to the range in System settings (default 40-60%).
+- `src/features/patients/assignStaff.js`: reception, doctor, manager or admin assigns a nurse or dental therapist (`p.nurses`) who can then edit that patient's invoices, records and prescriptions, and invites a specialist (`p.spec`). Edge function `manage-users` has new action `staff`.
+- Backup folder: `myData.js` also saves a daily copy to the chosen folder and shows a dashboard reminder.

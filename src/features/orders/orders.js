@@ -43,7 +43,7 @@ function ordFin(pid){const p=S.patients.find(x=>x.id==pid);if(!p||!ptW(p,'rec'))
 const ordTile=(l,v,c,i)=>`<div class="bg-white rounded-xl shadow p-3 border-l-4 ${c}"><div class="text-xs text-gray-500"><i class="fa ${i} mr-1"></i>${l}</div><div class="text-2xl font-bold">${v}</div></div>`;
 function ordStats(){const L=ordList(),pend=L.filter(r=>r.o.st=='pending').length,t0=sod(NOW()),dn=L.filter(r=>r.o.st=='done'&&r.o.doneAt>=t0).length;
  return `<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">${ordTile('Total New Orders',pend,'border-amber-400','fa-clipboard-list')}${ordTile('Completed today',dn,'border-green-500','fa-check')}${ordTile('Active patients',S.patients.filter(p=>!p.fin).length,'border-sky-400','fa-user-injured')}${ordTile('Not assigned to a doctor',S.patients.filter(p=>!p.fin&&!p.doc).length,'border-red-400','fa-user-slash')}</div>`}
-function docDash(){const me=U.name,mine=S.patients.filter(p=>p.doc==me),act=mine.filter(p=>!p.fin),fn=mine.filter(p=>p.fin),mo=ordList().filter(r=>r.o.by==me),pend=mo.filter(r=>r.o.st=='pending').length,dn=mo.length-pend;
+function docDash(){const me=U.name,mine=S.patients.filter(p=>p.doc==me||(p.spec||[]).includes(me)),act=mine.filter(p=>!p.fin),fn=mine.filter(p=>p.fin),mo=ordList().filter(r=>r.o.by==me),pend=mo.filter(r=>r.o.st=='pending').length,dn=mo.length-pend;
  const L=dsort(DT=='fin'?fn:act,p=>p.arr),N={new:'New',doctor:'Seen by Doctor',nurse:'Seen by Nurse'};
  const T=[['act','My Active Patients ('+act.length+')'],['fin','My Finished Patients ('+fn.length+')']];
  return quick()+`<h2 class="text-2xl font-bold">My Patients</h2><p class="text-gray-600 mb-4">Only patients assigned to you by reception are shown here.</p>

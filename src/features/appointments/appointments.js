@@ -2,8 +2,8 @@
 let AF='upcoming';
 let AD='';
 const adoc=x=>x&&x.doc&&x.doc!='Any doctor'?x.doc:'';
-let DOCL={c:'',l:[]};
-async function docEnsure(){if(DOCL.c==C.id&&DOCL.l.length)return DOCL.l;try{const d=await DB.doctors(C.id);DOCL={c:C.id,l:d.map(x=>x.name)}}catch(e){const s=new Set();S.patients.forEach(p=>{if(p.doc)s.add(p.doc)});DOCL={c:C.id,l:[...s]}}return DOCL.l}
+let DOCL={c:'',l:[],t:{}};
+async function docEnsure(){if(DOCL.c==C.id&&DOCL.l.length)return DOCL.l;try{const d=await DB.doctors(C.id);DOCL={c:C.id,l:d.map(x=>x.name),t:Object.fromEntries(d.map(x=>[x.name,x.stype||'']))}}catch(e){const s=new Set();S.patients.forEach(p=>{if(p.doc)s.add(p.doc)});DOCL={c:C.id,l:[...s],t:{}}}return DOCL.l}
 function appt(){if(DOCL.c!=C.id)docEnsure();const t0=sod(NOW()),dr=U.role=='doctor',A=allAppts().filter(a=>{const d=adoc(a.x);return dr?(!d||d==U.name):(!AD||(AD=='__none'?!d:d==AD))}).map(a=>({...a,day:isNaN(a.ts)?NaN:sod(a.ts)}));
  const F={today:a=>a.day==t0,upcoming:a=>!(a.day<t0),past:a=>a.day<t0,all:()=>true},L=dsort(A.filter(F[AF]),a=>isNaN(a.ts)?0:a.ts);
  const tabs=[['today',"Today ("+A.filter(F.today).length+')'],['upcoming','Upcoming ('+A.filter(F.upcoming).length+')'],['past','Past ('+A.filter(F.past).length+')'],['all','All ('+A.length+')']];

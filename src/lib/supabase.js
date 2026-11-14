@@ -45,6 +45,7 @@ const DB=(()=>{
   async fn(action,payload){const {data}=await sb.auth.getSession();if(!data.session)throw new Error('Please sign in again.');
    let r;try{r=await fetch(SB_URL+'/functions/v1/manage-users',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token,apikey:SB_KEY},body:JSON.stringify({action,...payload})})}catch(e){throw new Error('Could not reach the server. Check your internet connection.')}
    const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw new Error(j.error||'Request failed');return j},
+  async staff(clinic){const j=await this.fn('staff',{clinic});return j.staff||[]},
   async doctors(clinic){const j=await this.fn('doctors',{clinic});return j.doctors||[]},
   async updateProfile(id,f){const allowed=['name','phone','email','title','exp','idcode','blood','expiry','avatar','branch'],o={};allowed.forEach(k=>{if(f[k]!==undefined)o[k]=f[k]});ck(await sb.from('profiles').update(o).eq('id',id))},
   async changePassword(username,oldPw,newPw){const cu=(await sb.auth.getUser()).data.user;const r=await sb.auth.signInWithPassword({email:cu&&cu.email?cu.email:email(username),password:oldPw});if(r.error)throw new Error('Current password is wrong.');const u=await sb.auth.updateUser({password:newPw});if(u.error)throw new Error(u.error.message)}

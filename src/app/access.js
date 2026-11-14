@@ -3,9 +3,9 @@
    changed by doctors and (by default) nurses; the administrator can restrict this in System settings.
    Reception keeps appointments and credit; payments are still taken by reception/manager. */
 const ptDoc=p=>p&&p.doc?p.doc:'';
-function ptW(p,k){p=p||(typeof gp=='function'?gp():null);if(!p||!U)return false;if(U.role=='admin')return true;if(U.role=='doctor')return (AS.v('acc.anyDoctor')!==false)||(!!p.doc&&p.doc==U.name);
- if(U.role=='nurse'){if(k=='inv')return AS.v('acc.nurseInv')!==false;return AS.v('acc.nurseRec')!==false&&!['presc','consent','plan'].includes(k)}if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred';return false}
-const ptMsg=p=>ptDoc(p)?'You do not have permission to change this for this patient.':'You do not have permission to change this for this patient.';
+function ptW(p,k){p=p||(typeof gp=='function'?gp():null);if(!p||!U)return false;if(U.role=='admin')return true;if(U.role=='doctor'){const mine=(!!p.doc&&p.doc==U.name)||(p.spec||[]).includes(U.name);if(U.stype=='specialist')return mine;return mine||AS.v('acc.anyDoctor')!==false}
+ if(U.role=='nurse'){if((p.nurses||[]).includes(U.name))return true;if(k=='inv')return AS.v('acc.nurseInv')!==false;return AS.v('acc.nurseRec')!==false&&!['presc','consent','plan'].includes(k)}if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred';return false}
+const ptMsg=p=>U&&U.stype=='specialist'?'You can change this patient only after the clinic invites you to this patient (reception, the doctor or the manager does that).':U&&U.role=='nurse'?'You can change this only when the patient is assigned to you by reception or the doctor.':'You do not have permission to change this for this patient.';
 function wrapW(n,kf){const o=window[n];if(typeof o!='function')return;window[n]=function(){const p=gp();if(p&&!ptW(p,kf?kf.apply(null,arguments):SK)){alert(ptMsg(p));return}return o.apply(this,arguments)}}
 ['addI','editI','delI'].forEach(n=>wrapW(n,k=>k));
 {const _dI=delI;delI=function(k){if(U&&U.role=='nurse'){alert('Nurses can add and edit, but only a doctor, manager or administrator can delete.');return}return _dI.apply(this,arguments)}}

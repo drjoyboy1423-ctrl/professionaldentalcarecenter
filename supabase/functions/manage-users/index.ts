@@ -13,6 +13,8 @@ const ROLES = ["admin", "manager", "doctor", "nurse", "reception"];
 // Usernames are unique PER CLINIC: clinic staff sign in as <username>@<clinic>.dental.app, admins as <username>@dental.app.
 const emailOf = (u: string, clinic: string) => (!clinic || clinic === "all") ? `${u.toLowerCase()}@dental.app` : `${u.toLowerCase()}@${clinic.toLowerCase()}.dental.app`;
 const USERNAME = /^[a-zA-Z0-9_.-]{3,30}$/;
+// Staff type: BDS / visiting specialist are doctors, dental therapist is a nurse.
+const stypeOf = (role: string, s: unknown) => { const v = String(s ?? ""); return (role === "doctor" && (v === "bds" || v === "specialist")) || (role === "nurse" && v === "therapist") ? v : null; };
 const EDITABLE = ["name", "phone", "email", "title", "exp", "idcode", "blood", "expiry"];
 
 function tempPassword() {
@@ -37,8 +39,14 @@ Deno.serve(async (req) => {
     // Any signed-in staff member may list the doctors of their own clinic (names only), e.g. reception booking an appointment.
     if (me && action === "doctors") {
       const clinic = me.role === "admin" ? String(body.clinic || "") : me.clinic;
-      const { data: ds } = await sb.from("profiles").select("id,name,username").eq("clinic", clinic).eq("role", "doctor").order("name");
-      return json({ ok: true, doctors: (ds ?? []).map((d) => ({ id: d.id, name: d.name || d.username })) });
+      const { data: ds } = await sb.from("profiles").select("id,name,username,stype").eq("clinic", clinic).eq("role", "doctor").order("name");
+      return json({ ok: true, doctors: (ds ?? []).map((d) => ({ id: d.id, name: d.name || d.username, stype: d.stype || "" })) });
+    }
+    // Names of doctors and nurses of the clinic (for assigning a patient to a nurse / therapist or inviting a specialist).
+    if (me && action === "staff") {
+      const clinic = me.role === "admin" ? String(body.clinic || "") : me.clinic;
+      const { data: ds } = await sb.from("profiles").select("id,name,username,role,stype").eq("clinic", clinic).in("role", ["doctor", "nurse"]).order("name");
+      return json({ ok: true, staff: (ds ?? []).map((d) => ({ id: d.id, name: d.name || d.username, role: d.role, stype: d.stype || "" })) });
     }
     if (!me || !["admin", "manager"].includes(me.role)) return fail("You do not have permission to manage users.", 403);
     const isAdmin = me.role === "admin";
@@ -87,6 +95,7 @@ Deno.serve(async (req) => {
         id: created.user.id, username, role, clinic, branch: cname, name: String(body.name || username),
       };
       for (const k of EDITABLE) if (k !== "name" && body[k] != null) row[k] = String(body[k]);
+      row.stype = stypeOf(role, body.stype);
       const { error: pe } = await sb.from("profiles").insert(row);
       if (pe) {
         await sb.auth.admin.deleteUser(created.user.id);
@@ -113,6 +122,7 @@ Deno.serve(async (req) => {
       const cname = await clinicName(clinic);
       if (!cname) return fail("Choose a valid clinic.");
       patch.role = role; patch.clinic = clinic; patch.branch = cname;
+      patch.stype = stypeOf(role, body.stype !== undefined ? body.stype : (role === t.role ? t.stype : null));
       {
         const nu = body.username ? String(body.username).trim() : t.username;
         if (nu !== t.username && !USERNAME.test(nu)) return fail("Username must be 3-30 letters, numbers, dots, dashes or underscores.");
