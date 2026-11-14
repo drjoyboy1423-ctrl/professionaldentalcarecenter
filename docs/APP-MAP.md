@@ -135,3 +135,10 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 - `src/features/dashboard/presence.js` + table `presence` (migration `20261114_presence.sql`): every signed-in user sends a heartbeat each minute; reception/manager/admin see a green (online) or grey (offline) dot in "Staff in the clinic today"; signing out marks offline at once; no internet = offline after about 3 minutes. Online staff are also treated as in the clinic in assign lists.
 - Backup location choice (`bkfChoose` in `myData.js`): folder on a computer (automatic, daily), phone share menu (Files, Drive, WhatsApp, email; weekly reminder), or the Downloads folder. Offered from the dashboard reminder, My data and Backup & Storage.
 - `src/features/admin/devNotes.js` + table `dev_notes` (migration `20261114_dev_notes.sql`): managers send a question, problem or idea to the developer (administrator), who reads, replies and marks done; the administrator sees a dashboard notice for new notes.
+
+## Roles from the specification (phase 1)
+- Role names are editable by the administrator (System settings > Role names, key `role.names`): Manager, Reception, Doctor, BDS, Dental therapist, Nurse, Visiting specialist, Lab staff, Support staff.
+- New database roles `lab` and `support` (migrations `20261114_rbac_phase1.sql`, `20261114_rbac_support_role.sql`): no access to patient records or clinic lists. Lab staff use functions `lab_orders()` and `lab_set_status()` that return only case number, initials, age, sex, prescribing doctor, order and notes (`src/features/lab/labStaff.js`); support staff see only their pay and profile.
+- Visiting specialist access window: `profiles.valid_from` / `valid_until` (set in the user form), enforced by `private.my_clinic()` on the server.
+- Optional auto sign-out for doctors and nurses (System settings > Sign-up and access, `lock.sec`).
+- Not built yet: append-only audit log, 24-hour lock with addendums, nurse draft signing, manager broadcasts, staff chat rooms, lab instrument registry, external lab partners, payroll for all staff types, government export packets.

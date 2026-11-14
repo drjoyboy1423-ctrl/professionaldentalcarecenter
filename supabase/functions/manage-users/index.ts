@@ -9,7 +9,9 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const fail = (m: string, s = 400) => json({ error: m }, s);
 
-const ROLES = ["admin", "manager", "doctor", "nurse", "reception"];
+const ROLES = ["admin", "manager", "doctor", "nurse", "reception", "lab", "support"];
+// Access window for visiting specialists (Ethiopia time): empty = no limit.
+const winOf = (v: unknown, end: boolean) => { const d = String(v ?? "").trim(); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? `${d}T${end ? "23:59:59" : "00:00:00"}+03:00` : null; };
 // Usernames are unique PER CLINIC: clinic staff sign in as <username>@<clinic>.dental.app, admins as <username>@dental.app.
 const emailOf = (u: string, clinic: string) => (!clinic || clinic === "all") ? `${u.toLowerCase()}@dental.app` : `${u.toLowerCase()}@${clinic.toLowerCase()}.dental.app`;
 const USERNAME = /^[a-zA-Z0-9_.-]{3,30}$/;
@@ -96,6 +98,8 @@ Deno.serve(async (req) => {
       };
       for (const k of EDITABLE) if (k !== "name" && body[k] != null) row[k] = String(body[k]);
       row.stype = stypeOf(role, body.stype);
+      if (body.valid_from !== undefined) row.valid_from = winOf(body.valid_from, false);
+      if (body.valid_until !== undefined) row.valid_until = winOf(body.valid_until, true);
       const { error: pe } = await sb.from("profiles").insert(row);
       if (pe) {
         await sb.auth.admin.deleteUser(created.user.id);
@@ -123,6 +127,8 @@ Deno.serve(async (req) => {
       if (!cname) return fail("Choose a valid clinic.");
       patch.role = role; patch.clinic = clinic; patch.branch = cname;
       patch.stype = stypeOf(role, body.stype !== undefined ? body.stype : (role === t.role ? t.stype : null));
+      if (body.valid_from !== undefined) patch.valid_from = winOf(body.valid_from, false);
+      if (body.valid_until !== undefined) patch.valid_until = winOf(body.valid_until, true);
       {
         const nu = body.username ? String(body.username).trim() : t.username;
         if (nu !== t.username && !USERNAME.test(nu)) return fail("Username must be 3-30 letters, numbers, dots, dashes or underscores.");

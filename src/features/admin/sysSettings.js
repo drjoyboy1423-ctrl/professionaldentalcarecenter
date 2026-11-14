@@ -3,7 +3,7 @@
 const AS=(()=>{
  const D={
   'signup.enabled':true,'signup.days':365,'signup.perDay':25,
-  'acc.assignedOnly':true,'pw.min':6,'session.idleMin':0,
+  'acc.assignedOnly':true,'role.names':null,'lock.sec':0,'pw.min':6,'session.idleMin':0,
   'pay.brackets':[[2000,0],[4000,15],[7000,20],[10000,25],[14000,30],[null,35]],'spec.min':40,'spec.max':60,'pay.pen':7,'pay.emp':11,
   'lab.def':[{k:'Zirconia',w:'zircon',fee:5000},{k:'PFM',w:'pfm,porcelain',fee:1200},{k:'Chrome',w:'chrome,cobalt,copalt,metal',fee:800}],
   'ster.tests':[['Chemical indicator (every cycle)',1],['Bowie-Dick (daily)',1],['Biological spore test (weekly)',7]],
@@ -26,9 +26,11 @@ const AS=(()=>{
 function asApply(){const b=document.querySelector('button[onclick="clReqOpen()"]');if(b)b.style.display=AS.v('signup.enabled')===false?'none':'';asIdle()}
 /* automatic sign-out after the chosen minutes without use (0 = never) */
 let AS_T=0,AS_ON=0;
-function asIdle(){clearTimeout(AS_T);const m=+AS.v('session.idleMin')||0;if(!m||!U)return;const arm=()=>{clearTimeout(AS_T);AS_T=setTimeout(()=>{if(U&&(+AS.v('session.idleMin')||0)){toast('Signed out: no activity');logout()}},m*60000)};arm();if(!AS_ON){AS_ON=1;['click','keydown','touchstart','mousemove'].forEach(e=>addEventListener(e,()=>{if(U&&+AS.v('session.idleMin'))arm()},{passive:true}))}}
+const asIdleMs=()=>{const l=['doctor','nurse'].includes(U&&U.role)?(+AS.v('lock.sec')||0):0;return l?l*1000:(+AS.v('session.idleMin')||0)*60000};
+function asIdle(){clearTimeout(AS_T);const m=U?asIdleMs():0;if(!m)return;const arm=()=>{clearTimeout(AS_T);AS_T=setTimeout(()=>{if(U&&asIdleMs()){toast('Signed out: no activity');logout()}},asIdleMs()||m)};arm();if(!AS_ON){AS_ON=1;['click','keydown','touchstart','mousemove'].forEach(e=>addEventListener(e,()=>{if(U&&asIdleMs())arm()},{passive:true}))}}
 const _goSys=go;go=function(v){if(v=='sys'&&(!U||U.role!='admin'))v='dash';return _goSys.apply(this,arguments)};
 /* ----- page ----- */
+const RNAMES_DEF=()=>({manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff'});
 const asLines=a=>a.map(r=>r.join(' | ')).join('\n');
 const asIn=(id,l,v,h,t)=>`<label class="block text-sm mb-3"><span class="font-medium">${l}</span><input id="as_${id}" type="${t||'number'}" value="${H(v)}" class="w-full border rounded-md px-3 py-2 mt-1">${h?`<span class="text-xs text-gray-500">${h}</span>`:''}</label>`;
 const asTa=(id,l,v,h,r)=>`<label class="block text-sm mb-3"><span class="font-medium">${l}</span><textarea id="as_${id}" rows="${r||4}" class="w-full border rounded-md px-3 py-2 mt-1 font-mono text-xs">${H(v)}</textarea><span class="text-xs text-gray-500">${h}</span></label>`;
@@ -40,7 +42,8 @@ function sysPage(){if(!U||U.role!='admin')return '';const v=AS.v,st=k=>AS.custom
   asIn('sdays','Free period for a new clinic (days)',v('signup.days'),'After this the clinic is locked until you approve it.')+
   asIn('sper','New clinics allowed per day',v('signup.perDay'),'Protects against spam sign-ups.')+
   asIn('pw','Minimum password length',v('pw.min'),'Applies when creating users and changing passwords. Also set the same value in Supabase > Authentication > Password.')+
-  asIn('idle','Sign out after minutes without use',v('session.idleMin'),'0 = never sign out automatically.'))+
+  asIn('idle','Sign out after minutes without use',v('session.idleMin'),'0 = never sign out automatically.')+asIn('lock','Doctors and nurses: sign out after seconds without use',v('lock.sec'),'0 = off. The specification suggests 180 (3 minutes) for shared clinic computers and tablets.'))+
+ sec('fa-id-badge','Role names','The names shown in the app for each kind of staff. Change them to match your clinic. Each name must be different.',['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support'].map(k=>asIn('rn_'+k,{manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff'}[k]+' is called',RNAMES()[k],'', 'text')).join(''))+
  sec('fa-user-pen','Who can edit patient files','Everyone in the clinic can always READ every patient. This decides who can CHANGE a patient file.',
   `<label class="flex items-start gap-2 text-sm mb-2"><input type="checkbox" id="as_asg" class="mt-1" ${v('acc.assignedOnly')!==false?'checked':''}> <span><b>Only staff the patient is assigned to can edit</b> (recommended).<br><span class="text-xs text-gray-500">Reception assigns the doctor. A doctor or reception can also add the nurse, dental therapist, or another doctor / visiting specialist who works with them. Doctors can then edit everything for that patient; nurses and therapists can add and edit records, invoices and prescriptions (not consent forms or treatment plans). Turn this off to let every doctor and nurse edit every patient.</span></span></label>`)+
  sec('fa-money-bill-wave','Payroll rules','Income tax and pension used when monthly payroll is calculated.',
@@ -61,13 +64,13 @@ const asRows=(id,cols)=>($('as_'+id).value||'').split('\n').map(l=>l.split('|').
 async function asSave(){if(!U||U.role!='admin')return;
  try{const o={};
   o['signup.enabled']=$('as_signup').checked;o['signup.days']=asN('sdays',1,3650,'Free period');o['signup.perDay']=asN('sper',1,1000,'Sign-ups per day');
-  o['acc.assignedOnly']=$('as_asg').checked;o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
+  o['acc.assignedOnly']=$('as_asg').checked;const rk=['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support'],rn={};rk.forEach(k=>{rn[k]=($('as_rn_'+k).value||'').trim().slice(0,30)});if(rk.some(k=>!rn[k])||new Set(Object.values(rn).map(x=>x.toLowerCase())).size<rk.length)throw new Error('Role names: every name is needed and each must be different.');o['role.names']=JSON.stringify(rn)==JSON.stringify(RNAMES_DEF())?null:rn;o['lock.sec']=asN('lock',0,3600,'Lock seconds');o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
   const br=asRows('brk').map(r=>[r[0]===''||r[0]==null?null:+r[0],+r[1]]);if(!br.length||br.some((r,i)=>(r[0]!==null&&!isFinite(r[0]))||!isFinite(r[1])||r[1]<0||r[1]>100||(r[0]===null&&i<br.length-1)||(i&&r[0]!==null&&br[i-1][0]!==null&&r[0]<=br[i-1][0])))throw new Error('Tax brackets: use "amount | percent", amounts increasing, only the last line may have no amount.');
   o['pay.brackets']=br;o['spec.min']=asN('smin',0,100,'Specialist lowest %');o['spec.max']=asN('smax',0,100,'Specialist highest %');if(o['spec.min']>o['spec.max'])throw new Error('Specialist lowest % cannot be above the highest.');o['pay.pen']=asN('pen',0,50,'Employee pension');o['pay.emp']=asN('emp',0,50,'Employer pension');
   const lab=asRows('lab').map(r=>({k:r[0],w:r[1]||'',fee:+r[2]}));if(!lab.length||lab.some(r=>!r.k||!isFinite(r.fee)||r.fee<0))throw new Error('Lab types: use "name | keywords | fee".');o['lab.def']=lab;
   const stt=asRows('ster').map(r=>[r[0],Math.round(+r[1])]);if(!stt.length||stt.some(r=>!r[0]||!(r[1]>=1)))throw new Error('Sterilization tests: use "name | days" (1 or more).');o['ster.tests']=stt;
   o['exp.days']=asN('exp',0,3650,'Expiry warning');o['backup.keep']=asN('keep',1,100,'Backups kept');o['backup.minDays']=asN('bmin',0,60,'Backup interval');
   o['donate.text']=$('as_dtx').value.trim();const ac=asRows('dac').filter(r=>r[0]&&r[1]).map(r=>[r[0],r[1]]);o['donate.acc']=ac;
-  for(const k of Object.keys(o)){if(JSON.stringify(o[k])!==JSON.stringify(AS.D[k])||AS.custom(k))await AS.save(k,o[k])}
+  for(const k of Object.keys(o)){if(o[k]===null&&AS.custom(k)){await AS.reset(k);continue}if(o[k]===null)continue;if(JSON.stringify(o[k])!==JSON.stringify(AS.D[k])||AS.custom(k))await AS.save(k,o[k])}
   asApply();toast('Settings saved');go('sys')}catch(e){alert(e.message||'Could not save.')}}
 async function asResetAll(){if(!U||U.role!='admin'||!confirm('Restore every system setting to its original value?'))return;try{for(const k of Object.keys(AS.D))if(AS.custom(k))await AS.reset(k);asApply();toast('Restored');go('sys')}catch(e){alert(e.message||'Failed.')}}

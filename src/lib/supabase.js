@@ -51,6 +51,8 @@ const DB=(()=>{
   async noteSend(o){ck(await sb.from('dev_notes').insert(o))},
   async noteUpd(id,patch){ck(await sb.from('dev_notes').update(patch).eq('id',id))},
   async noteDel(id){ck(await sb.from('dev_notes').delete().eq('id',id))},
+  async labOrders(){const r=await sb.rpc('lab_orders');if(r.error)throw new Error(r.error.message);return r.data||[]},
+  async labSet(pid,idx,st){const r=await sb.rpc('lab_set_status',{p_id:String(pid),p_idx:idx,p_status:st});if(r.error)throw new Error(r.error.message)},
   async staff(clinic){const j=await this.fn('staff',{clinic});return j.staff||[]},
   async doctors(clinic){const j=await this.fn('doctors',{clinic});return j.doctors||[]},
   async updateProfile(id,f){const allowed=['name','phone','email','title','exp','idcode','blood','expiry','avatar','branch'],o={};allowed.forEach(k=>{if(f[k]!==undefined)o[k]=f[k]});ck(await sb.from('profiles').update(o).eq('id',id))},
