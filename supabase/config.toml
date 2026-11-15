@@ -15,3 +15,6 @@ verify_jwt = false
 
 [functions.email-my-data]
 verify_jwt = false
+
+[functions.inspector-view]
+verify_jwt = false

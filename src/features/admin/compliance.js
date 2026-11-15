@@ -1,0 +1,45 @@
+/* ---------- Compliance exports (manager and administrator) ----------
+   Health Ministry packet: anonymised procedure and diagnosis counts, sterilization log, staff licence register.
+   Tax / fiscal packet: sequential invoice ledger, monthly totals, refunds and deleted items.
+   On-site inspector link: a read-only page for sterilization and equipment checks that stops working after a few hours.
+   Every download is written to the audit log. */
+const cpOk=()=>!!U&&(U.role=='manager'||U.role=='admin');
+let CPX={m:'all',links:null,fresh:null};
+const cpIn=ts=>CPX.m=='all'||monthKey(ts)==CPX.m;
+const cpAge=a=>{a=+a;return !(a>=0)?'Unknown':a<15?'0-14':a<30?'15-29':a<45?'30-44':a<60?'45-59':'60+'};
+function cpStats(){const M={};const add=(mo,type,name,sex,age)=>{const k=[mo,type,name,sex||'Unknown',cpAge(age)].join('\u0001');M[k]=(M[k]||0)+1};
+ S.patients.forEach(p=>{(p.d.inv||[]).forEach(x=>{const ts=tsOf(x,p);if(cpIn(ts)&&x.item)for(let i=0;i<Math.max(1,+x.qty||1);i++)add(monthKey(ts),'Procedure',String(x.item).trim(),p.sex,p.age)});
+  (p.d.rec||[]).forEach(x=>{const ts=tsOf(x,p),d=(x.finding||'').trim();if(cpIn(ts)&&d)add(monthKey(ts),'Diagnosis',d,p.sex,p.age)})});
+ return Object.keys(M).sort().map(k=>{const a=k.split('\u0001');return [...a,M[k]]})}
+function cpStatsCsv(){csvDl('ministry-procedure-diagnosis-statistics-'+CPX.m,['Month','Type','Name','Sex','Age group','Count'],cpStats())}
+function cpSterCsv(){const L=(typeof sterList=='function'?sterList():[]).filter(x=>cpIn(x.t)).sort((a,b)=>a.t-b.t);csvDl('sterilization-log-'+CPX.m,['Date','Time','Machine','Test','Result','By','Note'],L.map(x=>[isoD(x.t),ft(x.t),x.machine,x.type,x.res,x.by||'',x.note||'']))}
+async function cpStaffCsv(){let u;try{u=await DB.users()}catch(e){return alert(isNet(e)?'No internet.':(e.message||'Could not load staff'))}
+ u=u.filter(x=>x.clinic==C.id&&x.role!='admin');csvDl('staff-licence-register',['Name','Role','Staff ID / licence no.','Licence expiry','Access from','Access until','Phone','Email'],u.map(x=>[x.name||x.username,roleLabel(x),x.idcode||'',x.expiry||'',(x.valid_from||'').slice(0,10),(x.valid_until||'').slice(0,10),x.phone||'',x.email||'']))}
+function cpLedger(){return allInv().filter(r=>cpIn(r.ts)).sort((a,b)=>a.ts-b.ts)}
+function cpLedgerCsv(){csvDl('invoice-ledger-'+CPX.m,['Invoice no.','Date','Patient card no.','Item','Qty','Unit price','Discount','Total','Paid','Balance','Status'],cpLedger().map(r=>[r.no,isoD(r.ts),r.p.card,r.x.item||'',r.x.qty||1,r.x.price||0,r.x.disc||0,r.t,r.paid,r.bal,r.st]))}
+function cpTaxCsv(){const M={};allInv().forEach(r=>{const k=monthKey(r.ts);if(!cpIn(r.ts))return;const m=M[k]||(M[k]={n:0,b:0,p:0,rf:0});m.n++;m.b+=r.t});
+ S.patients.forEach(p=>(p.d.inv||[]).forEach(x=>(x.pays||[]).forEach(y=>{const k=monthKey(y.ts);if(!cpIn(y.ts))return;const m=M[k]||(M[k]={n:0,b:0,p:0,rf:0});if(y.refund||(+y.amt||0)<0)m.rf+=Math.abs(+y.amt||0);else m.p+=+y.amt||0})));
+ csvDl('tax-summary-'+CPX.m,['Month','Invoices issued','Total billed (ETB)','Money collected (ETB)','Refunded (ETB)','Net collected (ETB)'],Object.keys(M).sort().map(k=>[k,M[k].n,pr2(M[k].b),pr2(M[k].p),pr2(M[k].rf),pr2(M[k].p-M[k].rf)]))}
+async function cpVoidCsv(){const R=[];allInv().forEach(r=>(r.x.pays||[]).forEach(y=>{if((y.refund||(+y.amt||0)<0)&&cpIn(y.ts))R.push([isoD(y.ts),ft(y.ts),'Refund',r.no,'Card '+r.p.card,Math.abs(+y.amt||0),y.method||'',y.reason||'',y.by||''])}));
+ try{(await DB.auditEvents({clinic:C.id,days:0,n:2000})).filter(e=>e.action=='DELETE'||e.action=='VOID').forEach(e=>{const t=new Date(e.at).getTime();if(cpIn(t))R.push([isoD(t),ft(t),e.action=='VOID'?'Void':'Deleted',e.resource||'','','','','',e.user_name||''])})}catch(e){}
+ R.sort((a,b)=>(a[0]+a[1]).localeCompare(b[0]+b[1]));csvDl('refunds-and-deleted-items-'+CPX.m,['Date','Time','Type','Invoice / item','Patient','Amount (ETB)','Method','Reason','By'],R)}
+/* inspector links */
+const cpB64=b=>btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const cpHash=async t=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t))),b=>b.toString(16).padStart(2,'0')).join('');
+async function cpLinks(){try{CPX.links=await DB.inspList()}catch(e){CPX.links=CPX.links||[]}if(V=='comply')go('comply')}
+async function cpMake(){const hrs=+$('cp_h').value||4,lab=($('cp_l').value||'').trim().slice(0,100);const tok=cpB64(crypto.getRandomValues(new Uint8Array(24)));
+ try{await DB.inspAdd({clinic:C.id,token_hash:await cpHash(tok),label:lab||null,created_name:U.name,expires_at:new Date(Date.now()+hrs*36e5).toISOString()});AUD.log('EXPORT','inspector link',{note:hrs+' hours'});CPX.fresh={url:location.origin+'/inspect#'+tok,hrs};CPX.links=null;go('comply')}catch(e){alert(isNet(e)?'No internet. Try again when you are online.':(e.message||'Could not create the link'))}}
+async function cpRevoke(id){if(!confirm('Cancel this link now?'))return;try{await DB.inspRevoke(id);CPX.links=null;go('comply')}catch(e){alert(e.message||'Failed')}}
+function cpCopy(){const u=CPX.fresh&&CPX.fresh.url;if(!u)return;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Link copied')).catch(()=>prompt('Copy this link:',u))}
+function cpPage(){if(!cpOk())return '';if(CPX.links===null)cpLinks();
+ const months=[...new Set(allInv().map(r=>monthKey(r.ts)).concat([monthKey(Date.now())]))].sort().reverse(),btn=(t,a,ic)=>`<button class="border bg-white px-3 py-2 rounded-md text-sm mr-2 mb-2" onclick="${a}"><i class="fa ${ic} mr-1"></i>${t}</button>`;
+ const L=(CPX.links||[]).map(l=>{const exp=new Date(l.expires_at).getTime(),st=l.revoked?'Cancelled':exp<Date.now()?'Expired':'Active until '+fdate(exp)+' '+ft(exp);return `<div class="flex justify-between gap-2 border-b py-2 text-sm"><div>${H(l.label||'Inspector link')} <span class="text-xs text-gray-500">by ${H(l.created_name||'')}</span><div class="text-xs ${st.startsWith('Active')?'text-green-700':'text-gray-500'}">${H(st)}</div></div>${st.startsWith('Active')?`<button class="text-xs text-red-600" onclick="cpRevoke('${l.id}')">Cancel</button>`:''}</div>`}).join('');
+ return hd('Compliance exports')+`<p class="text-sm text-gray-500 mb-3">For the Ministry of Health, the tax authority and on-site inspectors. Patient names and phone numbers are never included. Every download is recorded in the Activity log.</p>
+ <div class="bg-white rounded-lg p-3 mb-4 flex items-center gap-3 flex-wrap"><label class="text-sm font-medium">Period</label><select class="inp" style="width:auto" onchange="CPX.m=this.value;go('comply')"><option value="all">All time</option>${months.map(m=>`<option value="${m}" ${m==CPX.m?'selected':''}>${monthLabel(m)}</option>`).join('')}</select></div>`+
+ card('<h3 class="font-bold mb-2"><i class="fa fa-hospital mr-2"></i>Health Ministry packet</h3>',`<p class="text-xs text-gray-500 mb-2">Counts only, by month, sex and age group.</p>${btn('Procedure and diagnosis statistics','cpStatsCsv()','fa-chart-column')}${btn('Sterilization log','cpSterCsv()','fa-temperature-high')}${btn('Staff licence register','cpStaffCsv()','fa-id-badge')}`)+
+ card('<h3 class="font-bold mb-2"><i class="fa fa-file-invoice-dollar mr-2"></i>Tax / fiscal packet</h3>',`${btn('Invoice ledger (in order)','cpLedgerCsv()','fa-list-ol')}${btn('Monthly tax summary','cpTaxCsv()','fa-calculator')}${btn('Refunds and deleted items','cpVoidCsv()','fa-rotate-left')}`)+
+ card('<h3 class="font-bold mb-2"><i class="fa fa-clipboard-check mr-2"></i>On-site inspector link</h3>',`<p class="text-xs text-gray-500 mb-2">Gives a read-only page with the sterilization log and equipment checks only. No account, no patient information. It stops working after the time you choose, and you can cancel it at any time.</p>
+ <div class="flex gap-2 flex-wrap items-end mb-2"><label class="text-sm">Valid for <select id="cp_h" class="inp"><option value="1">1 hour</option><option value="2">2 hours</option><option value="4" selected>4 hours</option><option value="8">8 hours</option><option value="24">24 hours</option></select></label><label class="text-sm flex-1">Inspector / note <input id="cp_l" class="inp" placeholder="For example: Ministry visit"></label><button class="px-4 py-2 rounded text-white text-sm" style="background:var(--c)" onclick="cpMake()">Create link</button></div>
+ ${CPX.fresh?`<div class="rounded border border-green-500 bg-green-50 p-2 text-sm mb-2"><b>Link created (${CPX.fresh.hrs} h).</b> It is shown only now - copy it and give it to the inspector.<div class="break-all text-xs my-1">${H(CPX.fresh.url)}</div><button class="px-3 py-1 rounded bg-green-600 text-white text-xs" onclick="cpCopy()">Copy link</button></div>`:''}${L||'<p class="text-sm text-gray-500">No links yet.</p>'}`)}
+Object.keys(RN).forEach(r=>{if((r=='manager'||r=='admin')&&!RN[r].includes('comply'))RN[r].push('comply')});
+{const _g=go;go=function(v){if(v=='comply'&&!cpOk())v='dash';if(v!='comply')CPX.fresh=v=='comply'?CPX.fresh:null;return _g.apply(this,arguments)}}

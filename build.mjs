@@ -41,4 +41,9 @@ mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
 for (const f of ['favicon.svg', 'robots.txt', 'manifest.webmanifest', 'sw.js', 'icon-192.png', 'icon-512.png', 'privacy.html']) if (existsSync(f)) copyFileSync(f, 'dist/' + f);
 console.log('dist/index.html', Buffer.byteLength(html), 'bytes');
+if (existsSync('inspect.html')) { // on-site inspector page: gets the same Supabase address and public key as the app
+  const m = /SB_URL=(?:'([^']*)'|"([^"]*)"),SB_KEY=(?:'([^']*)'|"([^"]*)")/.exec(html);
+  if (!m) throw new Error('SB_URL not found for inspect.html');
+  writeFileSync('dist/inspect.html', read('inspect.html').replace('%%SB_URL%%', (m[1] ?? m[2])).replace('%%SB_KEY%%', (m[3] ?? m[4])));
+}
 if (existsSync('well-known/assetlinks.json')) { mkdirSync('dist/.well-known', { recursive: true }); copyFileSync('well-known/assetlinks.json', 'dist/.well-known/assetlinks.json'); }

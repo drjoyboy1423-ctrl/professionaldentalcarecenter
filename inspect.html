@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Inspector view - ProDental Records</title>
+<style>body{font-family:Roboto,Arial,sans-serif;color:#1f2937;margin:0;background:#f3f4f6}main{max-width:960px;margin:0 auto;padding:16px}h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:22px 0 8px}.m{color:#6b7280;font-size:13px}.box{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 3px #0002;overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top}.f{color:#b91c1c;font-weight:700}.e{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;border-radius:10px;padding:16px}button{padding:8px 14px;border-radius:8px;border:0;background:#b91c1c;color:#fff;cursor:pointer}@media print{button{display:none}body{background:#fff}}</style></head><body><main>
+<h1>Inspector view</h1><div class="m">Read-only. Sterilization and equipment-check logs only. No patient information is shown.</div>
+<div id="o"><p class="m">Loading...</p></div></main>
+<script>
+const SB_URL='%%SB_URL%%',SB_KEY='%%SB_KEY%%';
+const H=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const T=t=>{const d=new Date(+t||t);return isNaN(d)?'':d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})};
+const K={pm:'Preventive maintenance',calibration:'Calibration',waterline:'Waterline disinfection',electrical:'Electrical safety test',other:'Other check'};
+(async()=>{const o=document.getElementById('o'),tk=location.hash.replace(/^#/,'');history.replaceState(null,'',location.pathname);
+ if(!tk){o.innerHTML='<div class="e">This link is incomplete. Ask the clinic manager for the full link.</div>';return}
+ try{const r=await fetch(SB_URL+'/functions/v1/inspector-view',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify({token:tk})}),j=await r.json();
+  if(!r.ok||!j.ok){o.innerHTML='<div class="e">'+H(j.error||'This link is not valid.')+'</div>';return}
+  o.innerHTML='<h2 style="margin-top:12px">'+H(j.clinic)+'</h2><div class="m">This link works until '+H(T(j.expires_at))+'. Shown at '+H(T(Date.now()))+'. <button onclick="print()" style="margin-left:8px">Print</button></div>'+
+  '<h2>Sterilization log ('+j.ster.length+')</h2><div class="box">'+(j.ster.length?'<table><tr><th>When</th><th>Machine</th><th>Test</th><th>Result</th><th>By</th><th>Note</th></tr>'+j.ster.map(x=>'<tr><td>'+H(T(x.t))+'</td><td>'+H(x.machine)+'</td><td>'+H(x.type)+'</td><td class="'+(x.res=='Fail'?'f':'')+'">'+H(x.res)+'</td><td>'+H(x.by)+'</td><td>'+H(x.note)+'</td></tr>').join('')+'</table>':'<span class="m">No entries.</span>')+'</div>'+
+  '<h2>Equipment checks and calibration ('+j.checks.length+')</h2><div class="box">'+(j.checks.length?'<table><tr><th>Date</th><th>Equipment</th><th>Type</th><th>Details</th><th>Status</th><th>By</th><th>Next due</th></tr>'+j.checks.map(x=>'<tr><td>'+H(T(x.created_at))+'</td><td>'+H(x.equipment)+'</td><td>'+H(K[x.kind]||x.kind)+'</td><td>'+H(x.title)+(x.note?'<br><span class="m">'+H(x.note)+'</span>':'')+'</td><td>'+H(x.status=='DONE'?'Done':x.status=='IN_PROGRESS'?'In progress':'Open')+'</td><td>'+H(x.assigned_name||x.created_name)+'</td><td>'+H(x.due||'')+'</td></tr>').join('')+'</table>':'<span class="m">No entries.</span>')+'</div>'}
+ catch(e){o.innerHTML='<div class="e">Could not load. Check the internet connection and open the link again.</div>'}})();
+</script></body></html>

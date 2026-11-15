@@ -166,3 +166,7 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 
 ## Payroll for every staff type
 - `src/features/finance/payroll.js`: **Add all staff** puts every staff account of the clinic (doctors, BDS, specialists, therapists, nurses, reception, manager, lab, support, biomedical) on the month's payroll with salary 0, no duplicates. **Add doctor commission** copies each doctor's commission due this month (from Doctor Earnings) into the Service charge column so tax and pension are calculated with it.
+
+## Compliance exports and on-site inspector link
+- **`src/features/admin/compliance.js`** (page "Compliance exports", manager and administrator): *Health Ministry packet* (counts of procedures and diagnoses by month, sex and age group with no names; sterilization log; staff licence register) and *Tax / fiscal packet* (invoice ledger in order, monthly tax summary, refunds and deleted items). Downloads are CSV and are written to the audit log. A period filter limits them to one month.
+- **Inspector link**: the manager creates a link valid for 1 to 24 hours (`inspector_tokens`, migration `20261115_inspector.sql`; only a hash of the token is stored; the link is shown once). It opens `/inspect` (`inspect.html`, copied to `dist` by `build.mjs` with the project address and public key), which calls the edge function `inspector-view` and shows only the sterilization log and equipment checks of that clinic (no patient data, no account). Every view is written to the audit log (action INSPECT). The manager can cancel a link at any time.
