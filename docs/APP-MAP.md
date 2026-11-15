@@ -156,3 +156,6 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 
 ## Staff chat (roles phase 2, part 3)
 - **`src/features/admin/chat.js`**, table `chat_msgs` + function `chat_react` (migration `20261115_chat.sql`): rooms `# general` (everyone incl. lab and support staff), `# clinical-floor` (doctors, nurses, manager), `# front-desk` (reception, manager). Room access is enforced by the database. Messages cannot be edited or deleted. Tap the smile icon on a message to react (👍 ✅ ⚠️ 🦷 🕒 ❤️). The list refreshes every 6 seconds while the page is open.
+
+## Quick search and keyboard shortcuts
+- **`src/app/omnibox.js`**: `Ctrl+K` / `Cmd+K` opens a search window (patient name, phone, card number, or any page); Up / Down / Enter / Esc work as expected. `Ctrl+Shift+A` opens appointments. `Alt+N` (and `Ctrl+N` in the installed app) starts a new patient for reception. `Esc` closes any window. The camera barcode scanner already existed (`src/lib/barcode.js`).
