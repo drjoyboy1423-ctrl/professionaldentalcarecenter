@@ -546,6 +546,42 @@ Other sign-in options (clinic / administrator)|ሌሎች የመግቢያ አማ�
 Hide other sign-in options|ሌሎች የመግቢያ አማራጮችን ደብቅ|Filannoowwan seensaa biroo dhoksi|Qari doorashooyinka kale ee gelitaanka
 Privacy policy|የግላዊነት ፖሊሲ|Imaammata iccitii|Siyaasadda khaasnimada
 Count on the shelf|በመደርደሪያ ላይ የተቆጠረ|Kan shelfii irra lakkaa'ame|Tirada khayraadka
+System settings|የስርዓት ቅንብሮች|Qindaa'ina Sirnaa|Dejinta Nidaamka
+My data|የእኔ መረጃ|Odeeffannoo Koo|Xogtayda
+Message to developer|ለገንቢው መልዕክት|Ergaa Gaggeessaaf|Fariin u socota horumariyaha
+Announcements|ማስታወቂያዎች|Beeksisawwan|Ogeysiisyo
+Announcements from the manager|ከሥራ አስኪያጁ የተላለፉ ማስታወቂያዎች|Beeksisawwan Bulchaa irraa|Ogeysiisyada maamulaha
+New announcement|አዲስ ማስታወቂያ|Beeksisa Haaraa|Ogeysiis cusub
+Send to all staff|ለሁሉም ሠራተኞች ላክ|Hojjettoota hundaaf ergi|U dir dhammaan shaqaalaha
+I have read this|አንብቤዋለሁ|Dubbiseera|Waan akhriyay
+You have read this|አንብበውታል|Dubbiftee jirta|Waad akhriyay
+Urgent (shown in red)|አስቸኳይ (በቀይ ይታያል)|Ariifachiisaa (diimaan mul'ata)|Degdeg ah (casaan ayuu u muuqdaa)
+Staff chat|የሠራተኞች ውይይት|Haasaa Hojjettootaa|Sheekada Shaqaalaha
+Chairs & equipment|ወንበሮችና መሣሪያዎች|Teessoo fi Meeshaalee|Kuraasta iyo qalabka
+Report fault|ብልሽት ሪፖርት አድርግ|Dogoggora gabaasi|Soo sheeg khalad
+Record check|ፍተሻ መዝግብ|Sakatta'iinsa galmeessi|Diiwaangeli hubin
+Mark done|ተጠናቋል|Xumurameera|Waa dhammaaday
+Start|ጀምር|Jalqabi|Bilow
+Reopen|እንደገና ክፈት|Irra deebi'ii bani|Dib u fur
+Add note|ማስታወሻ ጨምር|Yaada dabali|Ku dar xusuus
+Compliance exports|የተገዢነት ሪፖርቶች|Gabaasa Hordoffii Seeraa|Warbixinnada u hoggaansanaanta
+Health Ministry packet|የጤና ሚኒስቴር ጥቅል|Paakeetii Ministeera Fayyaa|Xirmada Wasaaradda Caafimaadka
+Tax / fiscal packet|የግብር ጥቅል|Paakeetii Gibiraa|Xirmada Canshuurta
+On-site inspector link|የቦታው ተቆጣጣሪ ሊንክ|Liinkii Hordoftuu Bakkaa|Xiriirka kormeeraha goobta
+Create link|ሊንክ ፍጠር|Liinkii uumi|Samee xiriir
+Signed in|ገብቷል|Seenee|Gashay
+Not signed yet|ገና አልተፈረመም|Ammaaf hin mallatteeffamne|Weli lama saxiixin
+Sign|ፈርም|Mallatteessi|Saxiix
+Add addendum|ተጨማሪ ማስታወሻ ጨምር|Dabalata dabali|Ku dar lifaaq
+Addendum|ተጨማሪ ማስታወሻ|Dabalata|Lifaaq
+Locked|ተቆልፏል|Cufameera|Waa xidhan
+Add all staff|ሁሉንም ሠራተኞች ጨምር|Hojjettoota hundaa dabali|Ku dar dhammaan shaqaalaha
+Add doctor commission|የሐኪም ኮሚሽን ጨምር|Kaffaltii doktaraa dabali|Ku dar komishanka dhakhtarka
+Staff in the clinic today|ዛሬ በክሊኒኩ ያሉ ሠራተኞች|Hojjettoonni har'a kiliniikii keessa jiran|Shaqaalaha ku jira rugta maanta
+Sent to reception|ወደ መቀበያ የተላከ|Gara simannaatti ergame|La diray soo dhaweynta
+Activity log|የእንቅስቃሴ መዝገብ|Galmee Sochii|Diiwaanka dhaqdhaqaaqa
+Payroll|የደመወዝ ክፍያ|Kaffaltii Mindaa|Mushaharka
+Search|ፈልግ|Barbaadi|Raadi
 `.trim().split('\n').forEach(l=>{const a=l.split('|');if(a.length==4){T.am[a[0]]=a[1];T.om[a[0]]=a[2];T.so[a[0]]=a[3]}});return T})();
 let LG=(()=>{const v=lsGet('dental_lang');return LANGS.some(l=>l[0]==v)?v:'en'})();
 /* look up one piece of text; also handles "Label (3)", "Label:" and "3 Label" style variants */
