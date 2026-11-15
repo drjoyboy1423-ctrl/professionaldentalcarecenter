@@ -7,7 +7,7 @@ const AS=(()=>{
   'pay.brackets':[[2000,0],[4000,15],[7000,20],[10000,25],[14000,30],[null,35]],'spec.min':40,'spec.max':60,'pay.pen':7,'pay.emp':11,
   'lab.def':[{k:'Zirconia',w:'zircon',fee:5000},{k:'PFM',w:'pfm,porcelain',fee:1200},{k:'Chrome',w:'chrome,cobalt,copalt,metal',fee:800}],
   'ster.tests':[['Chemical indicator (every cycle)',1],['Bowie-Dick (daily)',1],['Biological spore test (weekly)',7]],
-  'exp.days':60,'backup.keep':8,'backup.minDays':6,
+  'exp.days':60,'chairs.n':6,'backup.keep':8,'backup.minDays':6,
   'donate.text':'ProDental Records is free for one year. If it helps your clinic, you are welcome to support its development with a donation of any amount. Donating is your choice and nothing is locked or changed if you do not. To donate, send to any account below (account name: Dr. EBSA TOFIK ABDULKARIM).',
   'donate.acc':[['eBirr','0915018709'],['CBO (Cooperative Bank of Oromia)','1046400112421'],['CBE (Commercial Bank of Ethiopia)','1000153677064']]};
  const PUB=['signup.enabled','pw.min'];
@@ -30,7 +30,7 @@ const asIdleMs=()=>{const l=['doctor','nurse'].includes(U&&U.role)?(+AS.v('lock.
 function asIdle(){clearTimeout(AS_T);const m=U?asIdleMs():0;if(!m)return;const arm=()=>{clearTimeout(AS_T);AS_T=setTimeout(()=>{if(U&&asIdleMs()){toast('Signed out: no activity');logout()}},asIdleMs()||m)};arm();if(!AS_ON){AS_ON=1;['click','keydown','touchstart','mousemove'].forEach(e=>addEventListener(e,()=>{if(U&&asIdleMs())arm()},{passive:true}))}}
 const _goSys=go;go=function(v){if(v=='sys'&&(!U||U.role!='admin'))v='dash';return _goSys.apply(this,arguments)};
 /* ----- page ----- */
-const RNAMES_DEF=()=>({manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff'});
+const RNAMES_DEF=()=>({manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff',biomed:'Biomedical staff'});
 const asLines=a=>a.map(r=>r.join(' | ')).join('\n');
 const asIn=(id,l,v,h,t)=>`<label class="block text-sm mb-3"><span class="font-medium">${l}</span><input id="as_${id}" type="${t||'number'}" value="${H(v)}" class="w-full border rounded-md px-3 py-2 mt-1">${h?`<span class="text-xs text-gray-500">${h}</span>`:''}</label>`;
 const asTa=(id,l,v,h,r)=>`<label class="block text-sm mb-3"><span class="font-medium">${l}</span><textarea id="as_${id}" rows="${r||4}" class="w-full border rounded-md px-3 py-2 mt-1 font-mono text-xs">${H(v)}</textarea><span class="text-xs text-gray-500">${h}</span></label>`;
@@ -43,7 +43,7 @@ function sysPage(){if(!U||U.role!='admin')return '';const v=AS.v,st=k=>AS.custom
   asIn('sper','New clinics allowed per day',v('signup.perDay'),'Protects against spam sign-ups.')+
   asIn('pw','Minimum password length',v('pw.min'),'Applies when creating users and changing passwords. Also set the same value in Supabase > Authentication > Password.')+
   asIn('idle','Sign out after minutes without use',v('session.idleMin'),'0 = never sign out automatically.')+asIn('lock','Doctors and nurses: sign out after seconds without use',v('lock.sec'),'0 = off. The specification suggests 180 (3 minutes) for shared clinic computers and tablets.'))+
- sec('fa-id-badge','Role names','The names shown in the app for each kind of staff. Change them to match your clinic. Each name must be different.',['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support'].map(k=>asIn('rn_'+k,{manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff'}[k]+' is called',RNAMES()[k],'', 'text')).join(''))+
+ sec('fa-id-badge','Role names','The names shown in the app for each kind of staff. Change them to match your clinic. Each name must be different.',['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support','biomed'].map(k=>asIn('rn_'+k,{manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff',biomed:'Biomedical staff'}[k]+' is called',RNAMES()[k],'', 'text')).join(''))+
  sec('fa-user-pen','Who can edit patient files','Everyone in the clinic can always READ every patient. This decides who can CHANGE a patient file.',
   `<label class="flex items-start gap-2 text-sm mb-2"><input type="checkbox" id="as_asg" class="mt-1" ${v('acc.assignedOnly')!==false?'checked':''}> <span><b>Only staff the patient is assigned to can edit</b> (recommended).<br><span class="text-xs text-gray-500">Reception assigns the doctor. A doctor or reception can also add the nurse, dental therapist, or another doctor / visiting specialist who works with them. Doctors can then edit everything for that patient; nurses and therapists can add and edit records, invoices and prescriptions (not consent forms or treatment plans). Turn this off to let every doctor and nurse edit every patient.</span></span></label>`)+
  sec('fa-money-bill-wave','Payroll rules','Income tax and pension used when monthly payroll is calculated.',
@@ -53,7 +53,7 @@ function sysPage(){if(!U||U.role!='admin')return '';const v=AS.v,st=k=>AS.custom
   asTa('lab','Lab types',v('lab.def').map(r=>[r.k,r.w,r.fee].join(' | ')).join('\n'),'One per line: <b>name | keywords (comma separated) | fee per unit</b>',4))+
  sec('fa-hand-sparkles','Clinic routine','Sterilization tests and material warnings.',
   asTa('ster','Sterilization tests',asLines(v('ster.tests')),'One per line: <b>test name | repeat every N days</b>. Names of tests already recorded should not be changed.',4)+
-  asIn('exp','Warn about materials expiring within (days)',v('exp.days')))+
+  asIn('exp','Warn about materials expiring within (days)',v('exp.days'))+asIn('chairs','Number of dental chairs',v('chairs.n')))+
  sec('fa-cloud-arrow-up','Backups','Weekly automatic backup of every clinic.',
   asIn('keep','Backups kept per clinic',v('backup.keep'),'Older ones are deleted automatically.')+asIn('bmin','Minimum days between automatic backups',v('backup.minDays')))+
  sec('fa-heart','Donation note','Shown to managers and administrators in Settings.',
@@ -64,12 +64,12 @@ const asRows=(id,cols)=>($('as_'+id).value||'').split('\n').map(l=>l.split('|').
 async function asSave(){if(!U||U.role!='admin')return;
  try{const o={};
   o['signup.enabled']=$('as_signup').checked;o['signup.days']=asN('sdays',1,3650,'Free period');o['signup.perDay']=asN('sper',1,1000,'Sign-ups per day');
-  o['acc.assignedOnly']=$('as_asg').checked;const rk=['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support'],rn={};rk.forEach(k=>{rn[k]=($('as_rn_'+k).value||'').trim().slice(0,30)});if(rk.some(k=>!rn[k])||new Set(Object.values(rn).map(x=>x.toLowerCase())).size<rk.length)throw new Error('Role names: every name is needed and each must be different.');o['role.names']=JSON.stringify(rn)==JSON.stringify(RNAMES_DEF())?null:rn;o['lock.sec']=asN('lock',0,3600,'Lock seconds');o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
+  o['acc.assignedOnly']=$('as_asg').checked;const rk=['manager','reception','doctor','bds','therapist','nurse','specialist','lab','support','biomed'],rn={};rk.forEach(k=>{rn[k]=($('as_rn_'+k).value||'').trim().slice(0,30)});if(rk.some(k=>!rn[k])||new Set(Object.values(rn).map(x=>x.toLowerCase())).size<rk.length)throw new Error('Role names: every name is needed and each must be different.');o['role.names']=JSON.stringify(rn)==JSON.stringify(RNAMES_DEF())?null:rn;o['lock.sec']=asN('lock',0,3600,'Lock seconds');o['pw.min']=asN('pw',6,64,'Password length');o['session.idleMin']=asN('idle',0,1440,'Idle minutes');
   const br=asRows('brk').map(r=>[r[0]===''||r[0]==null?null:+r[0],+r[1]]);if(!br.length||br.some((r,i)=>(r[0]!==null&&!isFinite(r[0]))||!isFinite(r[1])||r[1]<0||r[1]>100||(r[0]===null&&i<br.length-1)||(i&&r[0]!==null&&br[i-1][0]!==null&&r[0]<=br[i-1][0])))throw new Error('Tax brackets: use "amount | percent", amounts increasing, only the last line may have no amount.');
   o['pay.brackets']=br;o['spec.min']=asN('smin',0,100,'Specialist lowest %');o['spec.max']=asN('smax',0,100,'Specialist highest %');if(o['spec.min']>o['spec.max'])throw new Error('Specialist lowest % cannot be above the highest.');o['pay.pen']=asN('pen',0,50,'Employee pension');o['pay.emp']=asN('emp',0,50,'Employer pension');
   const lab=asRows('lab').map(r=>({k:r[0],w:r[1]||'',fee:+r[2]}));if(!lab.length||lab.some(r=>!r.k||!isFinite(r.fee)||r.fee<0))throw new Error('Lab types: use "name | keywords | fee".');o['lab.def']=lab;
   const stt=asRows('ster').map(r=>[r[0],Math.round(+r[1])]);if(!stt.length||stt.some(r=>!r[0]||!(r[1]>=1)))throw new Error('Sterilization tests: use "name | days" (1 or more).');o['ster.tests']=stt;
-  o['exp.days']=asN('exp',0,3650,'Expiry warning');o['backup.keep']=asN('keep',1,100,'Backups kept');o['backup.minDays']=asN('bmin',0,60,'Backup interval');
+  o['exp.days']=asN('exp',0,3650,'Expiry warning');o['chairs.n']=asN('chairs',1,40,'Number of chairs');o['backup.keep']=asN('keep',1,100,'Backups kept');o['backup.minDays']=asN('bmin',0,60,'Backup interval');
   o['donate.text']=$('as_dtx').value.trim();const ac=asRows('dac').filter(r=>r[0]&&r[1]).map(r=>[r[0],r[1]]);o['donate.acc']=ac;
   for(const k of Object.keys(o)){if(o[k]===null&&AS.custom(k)){await AS.reset(k);continue}if(o[k]===null)continue;if(JSON.stringify(o[k])!==JSON.stringify(AS.D[k])||AS.custom(k))await AS.save(k,o[k])}
   asApply();toast('Settings saved');go('sys')}catch(e){alert(e.message||'Could not save.')}}
