@@ -1,0 +1,27 @@
+/* ---------- Lab messages ----------
+   Case thread: doctor / BDS / specialist <-> lab staff, attached to one lab order (clinical questions: margins, shade, bite).
+   Manager thread: manager <-> lab staff (delays, remakes, monthly billing). Lab staff also submit their invoices here, to the manager only.
+   Lab staff never see patient names, so please do not write them in these messages. */
+let LT={c:null,l:null,host:null};
+const ltFmt=t=>{const d=new Date(t);return fdate(d.getTime())+' '+ft(d.getTime())};
+async function ltFetch(){try{LT.l=await DB.labMsgs(LT.c)}catch(e){LT.l=LT.l||[]}ltPaint()}
+function ltBox(){return LT.host&&document.getElementById(LT.host)}
+function ltPaint(){const b=ltBox();if(!b||!LT.c)return;const c=LT.c,L=LT.l||[],lab=U.role=='lab';
+ const msg=m=>`<div class="mb-2 flex ${m.from_id==U.id?'justify-end':''}"><div class="max-w-[88%] rounded-lg px-3 py-2 text-sm ${m.kind=='invoice'?'bg-amber-50 border border-amber-300':m.from_id==U.id?'bg-sky-100':'bg-gray-100'}"><div class="text-xs text-gray-500">${H(m.from_name||'')} (${H(roleLabel({role:m.role}))}) &middot; ${H(ltFmt(m.created_at))}</div>${m.kind=='invoice'?`<div class="font-bold"><i class="fa fa-file-invoice-dollar mr-1"></i>Lab invoice ${H(m.ref||'')} - ${H(ETB(m.amount))}</div>`:''}<div class="whitespace-pre-wrap break-words">${H(m.body)}</div></div></div>`;
+ b.innerHTML=`<div id="lt_l" class="overflow-y-auto border rounded-lg p-2 mb-2" style="max-height:42vh;min-height:90px">${L.length?L.map(msg).join(''):'<p class="text-gray-500 text-sm">No messages yet.</p>'}</div>
+ <div class="flex gap-2"><textarea id="lt_t" rows="2" class="inp flex-1" placeholder="Write a message"></textarea><button class="px-4 rounded text-white" style="background:var(--c)" onclick="ltSend()"><i class="fa fa-paper-plane"></i></button></div>
+ ${c.kind=='sla'&&lab?`<details class="mt-3"><summary class="cursor-pointer text-sm font-medium"><i class="fa fa-file-invoice-dollar mr-1"></i>Submit a lab invoice to the manager</summary><div class="grid grid-cols-2 gap-2 mt-2"><input id="lt_a" type="number" min="0" step="0.01" class="inp" placeholder="Amount (ETB)"><input id="lt_r" class="inp" placeholder="Invoice no."><textarea id="lt_d" rows="2" class="inp col-span-2" placeholder="What the invoice is for (orders, month)"></textarea><button class="col-span-2 px-3 py-2 rounded text-white text-sm bg-amber-600" onclick="ltInvoice()">Submit invoice</button></div></details>`:''}<div id="lt_m" class="text-sm text-red-600 mt-1"></div>`;
+ const e=document.getElementById('lt_l');if(e)e.scrollTop=e.scrollHeight}
+async function ltSend(){const t=($('lt_t').value||'').trim();if(!t)return;const c=LT.c,o={clinic:C.id,kind:c.kind,body:t.slice(0,2000),from_name:U.name,role:U.role};if(c.kind=='tech'){o.pid=c.pid;o.idx=c.idx}
+ try{await DB.labMsgAdd(o);await ltFetch()}catch(e){const m=$('lt_m');if(m)m.textContent=isNet(e)?'No internet. Not sent.':(e.message||'Could not send')}}
+async function ltInvoice(){const a=parseFloat($('lt_a').value),r=($('lt_r').value||'').trim(),d=($('lt_d').value||'').trim();if(!(a>=0)||$('lt_a').value===''||!d){$('lt_m').textContent='Enter the amount and what it is for.';return}
+ try{await DB.labMsgAdd({clinic:C.id,kind:'invoice',amount:a,ref:r.slice(0,80)||null,body:d.slice(0,2000),from_name:U.name,role:U.role});await ltFetch();toast('Invoice sent to the manager')}catch(e){$('lt_m').textContent=isNet(e)?'No internet.':(e.message||'Could not send')}}
+function ltShow(c,title){LT.c=c;LT.l=null;LT.host='lt_host';$('mb').innerHTML=`<h3 class="font-bold text-lg mb-1"><i class="fa fa-comments mr-2"></i>${H(title)}</h3><p class="text-xs text-gray-500 mb-2">${c.kind=='tech'?'Clinical questions about this order. Please do not write the patient\'s name.':'Delays, remakes and billing between the manager and the lab.'}</p><div id="lt_host"></div><div class="text-right mt-3"><button class="px-3 py-2 border rounded" onclick="cl()">Close</button></div>`;md.classList.replace('hidden','flex');ltPaint();ltFetch()}
+function ltOpen(pid,idx,type){ltShow({kind:'tech',pid:String(pid),idx:+idx},'Case discussion - '+type)}
+function ltSla(){ltShow({kind:'sla'},U.role=='lab'?'Messages with the manager':'Messages with the lab')}
+/* doctors: their lab orders with a Discuss button; manager: the manager thread */
+function labmsgPage(){if(!U)return '';
+ if(U.role=='manager')return hd('Lab messages')+card('<h3 class="font-bold mb-2">Messages and invoices from the lab</h3>',`<button class="px-4 py-2 rounded text-white" style="background:var(--c)" onclick="ltSla()"><i class="fa fa-comments mr-1"></i>Open messages</button>`);
+ const L=ordList().filter(r=>r.o.cat=='pl');
+ return hd('Lab messages')+`<p class="text-sm text-gray-500 mb-3">Talk to the lab about one order. The lab sees only the case number, initials, age and sex.</p>`+(L.length?L.slice(0,60).map(r=>`<div class="bg-white rounded-xl shadow p-3 mb-2 text-sm flex justify-between gap-2 items-center"><div><b>${H(r.o.type||'')}</b> <span class="text-xs text-gray-500">${H(r.p.name)} &middot; ${r.o.st=='done'?'Dispatched':'In progress'}</span></div><button class="px-3 py-1 rounded border text-xs" onclick="ltOpen('${r.p.id}',${r.i},'${H(r.o.type||'')}')"><i class="fa fa-comments mr-1"></i>Discuss</button></div>`).join(''):'<p class="text-gray-500">No lab orders yet.</p>')}
+RN.manager&&!RN.manager.includes('labmsg')&&RN.manager.push('labmsg');RN.doctor&&!RN.doctor.includes('labmsg')&&RN.doctor.push('labmsg');

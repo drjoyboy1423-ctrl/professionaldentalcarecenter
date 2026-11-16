@@ -47,6 +47,8 @@ const DB=(()=>{
   async inspList(){return ck(await sb.from('inspector_tokens').select('id,label,created_name,expires_at,revoked,created_at').order('created_at',{ascending:false}).limit(30))},
   async inspAdd(o){ck(await sb.from('inspector_tokens').insert(o))},
   async inspRevoke(id){ck(await sb.from('inspector_tokens').update({revoked:true}).eq('id',id))},
+  async labMsgs(c){let q=sb.from('lab_msgs').select('*').order('created_at',{ascending:true}).limit(300);q=c.kind=='tech'?q.eq('kind','tech').eq('pid',c.pid).eq('idx',c.idx):q.in('kind',['sla','invoice']);return ck(await q)},
+  async labMsgAdd(o){ck(await sb.from('lab_msgs').insert(o))},
   async auditAdd(rows){ck(await sb.from('audit_events').insert(rows))},
   async auditEvents(o){let q=sb.from('audit_events').select('*').order('at',{ascending:false}).limit(o.n||200);if(o.clinic)q=q.eq('clinic',o.clinic);if(o.days)q=q.gte('at',new Date(Date.now()-o.days*864e5).toISOString());return ck(await q)},
   async setArchived(id,v){ck(await sb.from('clinics').update({archived:!!v}).eq('id',id))},
