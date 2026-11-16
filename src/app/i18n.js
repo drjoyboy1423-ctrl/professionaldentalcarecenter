@@ -586,6 +586,7 @@ Lab messages|የላብ መልዕክቶች|Ergaawwan Laabii|Fariimaha shaybaarka
 Discuss|ተወያይ|Marii'adhu|Ka wada hadal
 Messages / invoices|መልዕክቶች / ደረሰኞች|Ergaawwan / Fandii|Fariimo / Qaansooyin
 Submit invoice|ደረሰኝ አስገባ|Fandii galchi|Gudbi qaansada
+Draft|ረቂቅ|Waraqaa yaadannoo|Qabyo
 `.trim().split('\n').forEach(l=>{const a=l.split('|');if(a.length==4){T.am[a[0]]=a[1];T.om[a[0]]=a[2];T.so[a[0]]=a[3]}});return T})();
 let LG=(()=>{const v=lsGet('dental_lang');return LANGS.some(l=>l[0]==v)?v:'en'})();
 /* look up one piece of text; also handles "Label (3)", "Label:" and "3 Label" style variants */

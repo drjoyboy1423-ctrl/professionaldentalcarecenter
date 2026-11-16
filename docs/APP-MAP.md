@@ -177,3 +177,7 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 
 ## Lab messages (case thread, manager thread, lab invoices)
 - **`src/features/lab/labThreads.js`**, table `lab_msgs` (migration `20261115_lab_threads.sql`): a **case thread** on each lab order between doctors (incl. BDS and specialists) and lab staff (Discuss button on the doctor's "Lab messages" page and on each lab order of the lab queue); a **manager thread** between the manager and lab staff ("Messages / invoices" on the lab queue, "Lab messages" for the manager); lab staff **submit invoices** (amount, number, description) which only the manager can read. Messages cannot be edited or deleted. Read and write rules are enforced by row-level security (nurses, reception and other doctors' roles see nothing of the manager thread; manager cannot read case threads).
+
+## Nurse draft notes
+- `src/features/records/noteLock.js`: a record saved by a nurse (not a dental therapist) is marked **Draft - waiting for a doctor's signature**; a nurse editing an already signed record removes the signature so it must be signed again. A doctor sees a reminder on the dashboard with the number of nurse drafts on their patients; Sign clears the draft.
+- Reception discount / refund limits: already enforced by design. Reception cannot create or edit invoices (the assigned doctor does) and cannot refund (manager, administrator or the owning doctor only); reception only collects payments.
