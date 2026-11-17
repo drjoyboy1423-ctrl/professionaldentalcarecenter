@@ -15,3 +15,9 @@
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# Each clinic has its own address: /<clinic code> opens the app with that clinic selected (real files such as /apply win).
+[[redirects]]
+  from = "/:code"
+  to = "/index.html"
+  status = 200
