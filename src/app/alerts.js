@@ -27,6 +27,8 @@ async function nxCheck(){if(!U||!C||NX.busy||!navigator.onLine)return;NX.busy=1;
   if(role=='manager'||role=='admin'||(role=='support'&&U.stype=='biomed')){try{const l=await DB.mtList(),today=isoD(Date.now()),soon=isoD(Date.now()+3*864e5);
    l.filter(x=>x.status!='DONE').forEach(x=>{if(x.kind=='fault'&&x.priority=='URGENT'&&mark('mt:'+x.id)&&!first&&x.created_name!=U.name)add.push({t:'Urgent equipment fault',m:x.equipment+' - '+x.title,pg:'chairs'});
     if(x.due&&x.due<=soon&&mark('due:'+x.id+':'+x.due+':'+today)&&!first)add.push({t:x.due<today?'Check overdue':'Check due soon',m:x.equipment+' - '+x.title+' (due '+x.due+')',pg:'chairs'})})}catch(e){}}
+  /* new job applications (manager) */
+  if(role=='manager'||role=='admin'){try{(await DB.jobList()).filter(x=>x.clinic==C.id&&x.status=='new').forEach(x=>{if(mark('job:'+x.id)&&!first)add.push({t:'New job application',m:x.name+(x.position?' - '+x.position:''),pg:'jobs'})})}catch(e){}}
   Object.keys(seen).slice(0,-400).forEach(k=>delete seen[k]);
   nxSave({since,lsince:st.lsince,seen});nfPush(add)}
  catch(e){}finally{NX.busy=0}}

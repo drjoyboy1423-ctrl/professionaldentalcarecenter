@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Send your CV</title>
+<style>body{font-family:Roboto,Arial,sans-serif;color:#1f2937;margin:0;background:#f3f4f6}main{max-width:520px;margin:0 auto;padding:16px}h1{font-size:22px;margin:8px 0 2px}.m{color:#6b7280;font-size:13px}.box{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.12);padding:16px;margin-top:14px}label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}input,textarea,select{width:100%;box-sizing:border-box;border:1px solid #d1d5db;border-radius:8px;padding:10px;font:inherit;background:#fff}button,.btn{display:block;width:100%;box-sizing:border-box;text-align:center;border:0;border-radius:8px;padding:12px;font:inherit;font-weight:600;color:#fff;margin-top:14px;cursor:pointer;text-decoration:none}.e{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:8px;padding:10px;margin-top:10px;font-size:14px}.ok{background:#f0fdf4;border:1px solid #86efac;color:#166534;border-radius:8px;padding:14px;font-size:15px}.hp{position:absolute;left:-9999px;height:0;overflow:hidden}</style></head><body><main>
+<h1 id="t">Send your CV</h1><div class="m" id="s">Loading...</div>
+<div id="o"></div>
+<script>
+const SB_URL='%%SB_URL%%',SB_KEY='%%SB_KEY%%';
+const H=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const code=(new URLSearchParams(location.search).get('c')||location.hash.replace(/^#/,'')||'').trim();
+let INFO=null,BUSY=0;
+const call=async b=>{const r=await fetch(SB_URL+'/functions/v1/job-apply',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify(b)});let j={};try{j=await r.json()}catch(e){}return {ok:r.ok&&j.ok,j}};
+const wa=()=>{const p=String(INFO.phone||'').replace(/[^\d+]/g,'').replace(/^\+/,'').replace(/^00/,'').replace(/^0/,'251');return p?'https://wa.me/'+p+'?text='+encodeURIComponent('Hello, I would like to apply for a job at '+INFO.clinic+'. My CV is attached.'):''};
+(async()=>{
+ if(!code){$('s').textContent='';$('o').innerHTML='<div class="e">This link is incomplete. Ask the clinic for the full link.</div>';return}
+ try{const r=await call({action:'info',code});if(!r.ok){$('s').textContent='';$('o').innerHTML='<div class="e">'+H(r.j.error||'Clinic not found.')+'</div>';return}
+  INFO=r.j;document.title='Send your CV - '+INFO.clinic;$('t').textContent='Work with us';$('s').textContent=INFO.clinic;const c=INFO.color;
+  $('o').innerHTML='<div class="box" id="f"><div class="m">Send your CV to '+H(INFO.clinic)+'. Only the clinic manager can see it.</div>'+
+  '<label>Full name *</label><input id="n" maxlength="80" autocomplete="name"><label>Phone number *</label><input id="p" type="tel" maxlength="30" autocomplete="tel"><label>Position you are applying for</label><input id="po" maxlength="80" placeholder="For example: Dental nurse, Receptionist, Lab technician"><label>Short message (optional)</label><textarea id="ms" rows="3" maxlength="1000"></textarea>'+
+  '<label>Your CV * (PDF, Word, JPG or PNG, up to 4 MB)</label><input id="fl" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><div class="hp"><input id="web" tabindex="-1" autocomplete="off"></div>'+
+  '<div id="er"></div><button id="go" style="background:'+H(c)+'" onclick="send()">Send my application</button></div>'+
+  (wa()?'<div class="box"><div class="m">Prefer WhatsApp? Send your CV to the clinic directly.</div><a class="btn" style="background:#16a34a" target="_blank" rel="noopener" href="'+H(wa())+'">Send by WhatsApp</a></div>':'')}
+ catch(e){$('s').textContent='';$('o').innerHTML='<div class="e">Could not load. Check the internet connection and open the link again.</div>'}})();
+const b64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=()=>no(new Error('The file could not be read.'));r.readAsDataURL(f)});
+async function send(){if(BUSY)return;const er=$('er');er.innerHTML='';const bad=m=>{er.innerHTML='<div class="e">'+H(m)+'</div>'};
+ const n=$('n').value.trim(),p=$('p').value.trim(),f=$('fl').files[0];
+ if(n.length<2)return bad('Please write your full name.');if(p.replace(/\D/g,'').length<7)return bad('Please write a phone number we can reach you on.');if(!f)return bad('Please attach your CV.');if(f.size>4*1024*1024)return bad('The file is too big. The limit is 4 MB.');
+ BUSY=1;$('go').disabled=true;$('go').textContent='Sending...';
+ try{const r=await call({code,name:n,phone:p,position:$('po').value,message:$('ms').value,website:$('web').value,file:{name:f.name,b64:await b64(f)}});
+  if(!r.ok){bad(r.j.error||'Could not send. Try again.');return}
+  $('f').innerHTML='<div class="ok"><b>Thank you.</b> Your application was sent to '+H(INFO.clinic)+'. The clinic will contact you on '+H(p)+' if there is a suitable position.</div>'}
+ catch(e){bad('No internet connection, or the file could not be read. Try again.')}finally{BUSY=0;if($('go')){$('go').disabled=false;$('go').textContent='Send my application'}}}
+</script></main></body></html>

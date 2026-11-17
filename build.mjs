@@ -46,4 +46,9 @@ if (existsSync('inspect.html')) { // on-site inspector page: gets the same Supab
   if (!m) throw new Error('SB_URL not found for inspect.html');
   writeFileSync('dist/inspect.html', read('inspect.html').replace('%%SB_URL%%', (m[1] ?? m[2])).replace('%%SB_KEY%%', (m[3] ?? m[4])));
 }
+if (existsSync('apply.html')) { // public "send your CV" page for job applicants
+  const m = /SB_URL=(?:'([^']*)'|"([^"]*)"),SB_KEY=(?:'([^']*)'|"([^"]*)")/.exec(html);
+  if (!m) throw new Error('SB_URL not found for apply.html');
+  writeFileSync('dist/apply.html', read('apply.html').replace('%%SB_URL%%', (m[1] ?? m[2])).replace('%%SB_KEY%%', (m[3] ?? m[4])));
+}
 if (existsSync('well-known/assetlinks.json')) { mkdirSync('dist/.well-known', { recursive: true }); copyFileSync('well-known/assetlinks.json', 'dist/.well-known/assetlinks.json'); }
