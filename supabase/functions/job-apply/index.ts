@@ -31,20 +31,29 @@ Deno.serve(async (req) => {
     if (!code) return json({ error: "This link is incomplete. Ask the clinic for the full link." }, 400);
     const { data: c } = await sb.from("clinics").select("id,name,phone,color,archived").ilike("code", code.replace(/[_%]/g, (x) => "\\" + x)).maybeSingle();
     if (!c || c.archived) return json({ error: "Clinic not found. Check the link with the clinic." }, 404);
-    if (b.action === "info") return json({ ok: true, clinic: c.name, phone: c.phone || "", color: c.color || "#0284c7" });
+    const { data: cfg } = await sb.from("job_config").select("wa,wa_on,note").eq("clinic", c.id).maybeSingle();
+    // The WhatsApp option is shown only when the manager switched it on and wrote a number.
+    if (b.action === "info") return json({ ok: true, clinic: c.name, wa: cfg?.wa_on && cfg?.wa ? cfg.wa : "", note: cfg?.note || "", color: c.color || "#0284c7" });
 
     if (clean(b.website, 50)) return json({ ok: true }); // hidden field that only robots fill in
     const name = clean(b.name, 80), phone = clean(b.phone, 30), position = clean(b.position, 80), message = clean(b.message, 1000);
     if (name.length < 2) return json({ error: "Please write your full name." }, 400);
     if (phone.replace(/\D/g, "").length < 7) return json({ error: "Please write a phone number we can reach you on." }, 400);
-    const f = b.file;
-    if (!f || typeof f.b64 !== "string") return json({ error: "Please attach your CV (PDF, Word or photo)." }, 400);
-    if (f.b64.length > Math.ceil(MAX * 1.4)) return json({ error: "The file is too big. The limit is 4 MB." }, 413);
-    let bytes: Uint8Array;
-    try { bytes = Uint8Array.from(atob(f.b64), (ch) => ch.charCodeAt(0)); } catch { return json({ error: "The file could not be read. Try again." }, 400); }
-    if (bytes.length < 200 || bytes.length > MAX) return json({ error: bytes.length > MAX ? "The file is too big. The limit is 4 MB." : "The file looks empty." }, 400);
-    const kind = KINDS.find((k) => k.magic.every((m, i) => bytes[i] === m));
-    if (!kind) return json({ error: "Only PDF, Word (doc, docx), JPG or PNG files are accepted." }, 415);
+    const list = Array.isArray(b.files) ? b.files : b.file ? [b.file] : [];
+    if (!list.length) return json({ error: "Please attach your CV (PDF, Word or photo)." }, 400);
+    if (list.length > 3) return json({ error: "You can send up to 3 files." }, 400);
+    const parsed: Array<{ bytes: Uint8Array; kind: typeof KINDS[number]; name: string }> = [];
+    for (const f of list) {
+      if (!f || typeof f.b64 !== "string") return json({ error: "A file could not be read. Try again." }, 400);
+      if (f.b64.length > Math.ceil(MAX * 1.4)) return json({ error: "A file is too big. The limit is 4 MB per file." }, 413);
+      let bytes: Uint8Array;
+      try { bytes = Uint8Array.from(atob(f.b64), (ch) => ch.charCodeAt(0)); } catch { return json({ error: "A file could not be read. Try again." }, 400); }
+      if (bytes.length < 200) return json({ error: "A file looks empty." }, 400);
+      if (bytes.length > MAX) return json({ error: "A file is too big. The limit is 4 MB per file." }, 413);
+      const kind = KINDS.find((k) => k.magic.every((m, n) => bytes[n] === m));
+      if (!kind) return json({ error: "Only PDF, Word (doc, docx), JPG or PNG files are accepted." }, 415);
+      parsed.push({ bytes, kind, name: clean(f.name, 100).replace(/[^\w.\- ()]/g, "_") || "file." + kind.ext });
+    }
 
     const ip = (req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown").split(",")[0].trim();
     const ipHash = await sha256(ip + "|" + c.id);
@@ -54,12 +63,15 @@ Deno.serve(async (req) => {
     const { count: all } = await sb.from("job_applications").select("id", { count: "exact", head: true }).eq("clinic", c.id).gt("created_at", day);
     if ((all ?? 0) >= 80) return json({ error: "The clinic is receiving too many applications right now. Please try again tomorrow." }, 429);
 
-    const id = crypto.randomUUID(), path = `${c.id}/${id}.${kind.ext}`;
-    const up = await sb.storage.from("applicant-cvs").upload(path, bytes, { contentType: kind.mime, upsert: false });
-    if (up.error) return json({ error: "The file could not be saved. Try again." }, 500);
-    const fileName = clean(f.name, 100).replace(/[^\w.\- ()]/g, "_") || "cv." + kind.ext;
-    const { error } = await sb.from("job_applications").insert({ id, clinic: c.id, name, phone, position: position || null, message: message || null, file_path: path, file_name: fileName, ip_hash: ipHash });
-    if (error) { await sb.storage.from("applicant-cvs").remove([path]); return json({ error: "Could not send your application. Try again." }, 500); }
+    const id = crypto.randomUUID(), saved: Array<{ path: string; name: string }> = [];
+    for (let n = 0; n < parsed.length; n++) {
+      const path = `${c.id}/${id}-${n + 1}.${parsed[n].kind.ext}`;
+      const up = await sb.storage.from("applicant-cvs").upload(path, parsed[n].bytes, { contentType: parsed[n].kind.mime, upsert: false });
+      if (up.error) { await sb.storage.from("applicant-cvs").remove(saved.map((x) => x.path)); return json({ error: "The file could not be saved. Try again." }, 500); }
+      saved.push({ path, name: parsed[n].name });
+    }
+    const { error } = await sb.from("job_applications").insert({ id, clinic: c.id, name, phone, position: position || null, message: message || null, file_path: saved[0].path, file_name: saved[0].name, files: saved, ip_hash: ipHash });
+    if (error) { await sb.storage.from("applicant-cvs").remove(saved.map((x) => x.path)); return json({ error: "Could not send your application. Try again." }, 500); }
     return json({ ok: true });
   } catch (e) {
     return json({ error: "Something went wrong. Please try again." }, 400);

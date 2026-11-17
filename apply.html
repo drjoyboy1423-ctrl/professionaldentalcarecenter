@@ -9,23 +9,23 @@ const $=id=>document.getElementById(id);
 const code=(new URLSearchParams(location.search).get('c')||location.hash.replace(/^#/,'')||'').trim();
 let INFO=null,BUSY=0;
 const call=async b=>{const r=await fetch(SB_URL+'/functions/v1/job-apply',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify(b)});let j={};try{j=await r.json()}catch(e){}return {ok:r.ok&&j.ok,j}};
-const wa=()=>{const p=String(INFO.phone||'').replace(/[^\d+]/g,'').replace(/^\+/,'').replace(/^00/,'').replace(/^0/,'251');return p?'https://wa.me/'+p+'?text='+encodeURIComponent('Hello, I would like to apply for a job at '+INFO.clinic+'. My CV is attached.'):''};
+const wa=()=>{const p=String(INFO.wa||'').replace(/[^\d+]/g,'').replace(/^\+/,'').replace(/^00/,'').replace(/^0/,'251');return p?'https://wa.me/'+p+'?text='+encodeURIComponent('Hello, I am sending my CV / documents to '+INFO.clinic+'.'):''};
 (async()=>{
  if(!code){$('s').textContent='';$('o').innerHTML='<div class="e">This link is incomplete. Ask the clinic for the full link.</div>';return}
  try{const r=await call({action:'info',code});if(!r.ok){$('s').textContent='';$('o').innerHTML='<div class="e">'+H(r.j.error||'Clinic not found.')+'</div>';return}
   INFO=r.j;document.title='Send your CV - '+INFO.clinic;$('t').textContent='Work with us';$('s').textContent=INFO.clinic;const c=INFO.color;
   $('o').innerHTML='<div class="box" id="f"><div class="m">Send your CV to '+H(INFO.clinic)+'. Only the clinic manager can see it.</div>'+
   '<label>Full name *</label><input id="n" maxlength="80" autocomplete="name"><label>Phone number *</label><input id="p" type="tel" maxlength="30" autocomplete="tel"><label>Position you are applying for</label><input id="po" maxlength="80" placeholder="For example: Dental nurse, Receptionist, Lab technician"><label>Short message (optional)</label><textarea id="ms" rows="3" maxlength="1000"></textarea>'+
-  '<label>Your CV * (PDF, Word, JPG or PNG, up to 4 MB)</label><input id="fl" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><div class="hp"><input id="web" tabindex="-1" autocomplete="off"></div>'+
+  (INFO.note?'<div class="m" style="margin-top:10px"><b>Documents we ask for:</b> '+H(INFO.note)+'</div>':'')+'<label>Your CV and other documents * (up to 3 files: PDF, Word, JPG or PNG, 4 MB each)</label><input id="fl" type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><div class="hp"><input id="web" tabindex="-1" autocomplete="off"></div>'+
   '<div id="er"></div><button id="go" style="background:'+H(c)+'" onclick="send()">Send my application</button></div>'+
-  (wa()?'<div class="box"><div class="m">Prefer WhatsApp? Send your CV to the clinic directly.</div><a class="btn" style="background:#16a34a" target="_blank" rel="noopener" href="'+H(wa())+'">Send by WhatsApp</a></div>':'')}
+  (wa()?'<div class="box"><div class="m">Prefer WhatsApp? Send your CV or documents to the clinic manager directly.</div><a class="btn" style="background:#16a34a" target="_blank" rel="noopener" href="'+H(wa())+'">Send by WhatsApp</a></div>':'')}
  catch(e){$('s').textContent='';$('o').innerHTML='<div class="e">Could not load. Check the internet connection and open the link again.</div>'}})();
 const b64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=()=>no(new Error('The file could not be read.'));r.readAsDataURL(f)});
 async function send(){if(BUSY)return;const er=$('er');er.innerHTML='';const bad=m=>{er.innerHTML='<div class="e">'+H(m)+'</div>'};
- const n=$('n').value.trim(),p=$('p').value.trim(),f=$('fl').files[0];
- if(n.length<2)return bad('Please write your full name.');if(p.replace(/\D/g,'').length<7)return bad('Please write a phone number we can reach you on.');if(!f)return bad('Please attach your CV.');if(f.size>4*1024*1024)return bad('The file is too big. The limit is 4 MB.');
+ const n=$('n').value.trim(),p=$('p').value.trim(),fs=[...$('fl').files];
+ if(n.length<2)return bad('Please write your full name.');if(p.replace(/\D/g,'').length<7)return bad('Please write a phone number we can reach you on.');if(!fs.length)return bad('Please attach your CV.');if(fs.length>3)return bad('You can send up to 3 files.');if(fs.some(f=>f.size>4*1024*1024))return bad('A file is too big. The limit is 4 MB per file.');
  BUSY=1;$('go').disabled=true;$('go').textContent='Sending...';
- try{const r=await call({code,name:n,phone:p,position:$('po').value,message:$('ms').value,website:$('web').value,file:{name:f.name,b64:await b64(f)}});
+ try{const r=await call({code,name:n,phone:p,position:$('po').value,message:$('ms').value,website:$('web').value,files:await Promise.all(fs.map(async f=>({name:f.name,b64:await b64(f)})))});
   if(!r.ok){bad(r.j.error||'Could not send. Try again.');return}
   $('f').innerHTML='<div class="ok"><b>Thank you.</b> Your application was sent to '+H(INFO.clinic)+'. The clinic will contact you on '+H(p)+' if there is a suitable position.</div>'}
  catch(e){bad('No internet connection, or the file could not be read. Try again.')}finally{BUSY=0;if($('go')){$('go').disabled=false;$('go').textContent='Send my application'}}}
