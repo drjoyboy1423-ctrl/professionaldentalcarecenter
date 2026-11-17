@@ -38,6 +38,8 @@ const DB=(()=>{
   async bcRead(id,name,role){ck(await sb.from('broadcast_reads').upsert({broadcast_id:id,user_name:name,role},{onConflict:'broadcast_id,user_id',ignoreDuplicates:true}))},
   async bcDel(id){ck(await sb.from('broadcasts').delete().eq('id',id))},
   async chatList(room){return ck(await sb.from('chat_msgs').select('*').eq('room',room).order('created_at',{ascending:false}).limit(100))},
+  async chatRecent(since){return ck(await sb.from('chat_msgs').select('id,room,from_id,from_name,created_at').gt('created_at',since).order('created_at',{ascending:true}).limit(200))},
+  async labMsgsRecent(since){return ck(await sb.from('lab_msgs').select('id,kind,from_id,from_name,created_at').gt('created_at',since).order('created_at',{ascending:true}).limit(200))},
   async chatSend(o){ck(await sb.from('chat_msgs').insert(o))},
   async chatReact(id,emoji){const r=await sb.rpc('chat_react',{p_id:id,p_emoji:emoji});if(r.error)throw new Error(r.error.message)},
   async mtList(){return ck(await sb.from('maint_items').select('*').order('created_at',{ascending:false}).limit(300))},

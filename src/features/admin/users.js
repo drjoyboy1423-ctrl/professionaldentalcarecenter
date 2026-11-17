@@ -1,9 +1,9 @@
 const STAFF=['doctor','nurse','manager','reception','lab','support'],DEFPW='Dental@123';
 /* staff types: BDS and visiting specialists are doctors, dental therapists are nurses (same sign-in permissions, own labels and rules).
    The names shown are set by the administrator in System settings > Role names. */
-const RNAMES=()=>({admin:'Administrator',manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff',biomed:'Biomedical staff',...((typeof AS!='undefined'&&AS.v('role.names'))||{})});
-const STY=()=>{const n=RNAMES();return {[n.doctor]:['doctor',''],[n.bds]:['doctor','bds'],[n.specialist]:['doctor','specialist'],[n.nurse]:['nurse',''],[n.therapist]:['nurse','therapist'],[n.manager]:['manager',''],[n.reception]:['reception',''],[n.lab]:['lab',''],[n.support]:['support',''],[n.biomed]:['support','biomed']}};
-const roleLabel=u=>{if(!u)return '';const n=RNAMES();return u.stype=='bds'?n.bds:u.stype=='specialist'?n.specialist:u.stype=='therapist'?n.therapist:u.stype=='biomed'?n.biomed:(n[u.role]||(u.role?u.role[0].toUpperCase()+u.role.slice(1):''))};
+const RNAMES=()=>({admin:'Administrator',manager:'Manager',reception:'Reception',doctor:'Doctor',bds:'BDS',therapist:'Dental therapist',nurse:'Nurse',specialist:'Visiting specialist',lab:'Lab staff',support:'Support staff',biomed:'Biomedical staff',prostho:'Lab - Prosthodontic',endo:'Lab - Endodontic',ortho:'Lab - Orthodontic',...((typeof AS!='undefined'&&AS.v('role.names'))||{})});
+const STY=()=>{const n=RNAMES();return {[n.doctor]:['doctor',''],[n.bds]:['doctor','bds'],[n.specialist]:['doctor','specialist'],[n.nurse]:['nurse',''],[n.therapist]:['nurse','therapist'],[n.manager]:['manager',''],[n.reception]:['reception',''],[n.lab]:['lab',''],[n.support]:['support',''],[n.biomed]:['support','biomed'],[n.prostho]:['lab','prostho'],[n.endo]:['lab','endo'],[n.ortho]:['lab','ortho']}};
+const roleLabel=u=>{if(!u)return '';const n=RNAMES();return u.stype=='bds'?n.bds:u.stype=='specialist'?n.specialist:u.stype=='therapist'?n.therapist:u.stype=='biomed'?n.biomed:(u.role=='lab'&&n[u.stype])?n[u.stype]:(n[u.role]||(u.role?u.role[0].toUpperCase()+u.role.slice(1):''))};
 const stLabel=u=>{if(u.role=='admin')return 'admin';const m=STY(),k=Object.keys(m).find(k=>m[k][0]==u.role&&m[k][1]==(u.stype||''));return k||RNAMES().reception};
 const stFields=adm=>[...Object.keys(STY()),...(adm?['admin']:[])];
 const stMap=l=>l=='admin'?['admin','']:(STY()[l]||['reception','']);

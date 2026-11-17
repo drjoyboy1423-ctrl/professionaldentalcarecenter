@@ -1,9 +1,9 @@
 /* ---------- Staff chat rooms: #general (everyone), #clinical-floor (doctors, nurses, manager), #front-desk (reception, manager).
    Messages are kept as a record and cannot be edited or deleted. Tap a message to react with an emoji. Poll every few seconds while open. ---------- */
-const CH_ROOMS=[['general','# general','Everyone in the clinic',['manager','reception','doctor','nurse','lab','support','admin']],['clinical','# clinical-floor','Doctors and nurses',['manager','doctor','nurse','admin']],['front','# front-desk','Reception and manager',['manager','reception','admin']]];
+const CH_ROOMS=[['general','# general','Everyone in the clinic',['manager','reception','doctor','nurse','lab','support','admin']],['clinical','# clinical-floor','Doctors and nurses',['manager','doctor','nurse','admin']],['front','# front-desk','Reception and manager',['manager','reception','admin']],['lab_prostho','Lab: Prosthodontic','Doctors and the prosthodontic lab (crowns, bridges, dentures)',['manager','doctor','lab','admin']],['lab_endo','Lab: Endodontic','Doctors and the endodontic lab (root canal work)',['manager','doctor','lab','admin']],['lab_ortho','Lab: Orthodontic','Doctors and the orthodontic lab (braces, aligners, retainers)',['manager','doctor','lab','admin']],['equip','Equipment & purchases','Biomedical staff, doctors and manager: regular checks and items to buy',['manager','doctor','support','admin']]];
 const CH_EMO=['👍','✅','⚠️','🦷','🕒','❤️'];
 let CH={room:'general',l:[],sig:'',t:0,pick:null,busy:0};
-const chRooms=()=>CH_ROOMS.filter(r=>r[3].includes(U.role));
+const chRooms=()=>CH_ROOMS.filter(r=>r[3].includes(U.role)&&!(U.role=='lab'&&U.stype&&r[0].startsWith('lab_')&&r[0]!='lab_'+U.stype)&&!(U.role=='support'&&r[0]=='equip'&&U.stype!='biomed'));
 async function chLoad(){if(!U||CH.busy)return;CH.busy=1;try{const l=await DB.chatList(CH.room);const sig=l.map(m=>m.id+JSON.stringify(m.reactions||{})).join('|');if(sig!=CH.sig||CH.pick){CH.l=l.slice().reverse();CH.sig=sig;chPaint()}}catch(e){}finally{CH.busy=0}}
 function chPaint(){const e=$('chatl');if(!e)return;const atEnd=e.scrollHeight-e.scrollTop-e.clientHeight<80;e.innerHTML=chList();if(atEnd)e.scrollTop=e.scrollHeight}
 const chTime=t=>{const d=new Date(t);return ft(d.getTime())+(isoD(d.getTime())!=isoD(Date.now())?' '+fdate(d.getTime()):'')};
