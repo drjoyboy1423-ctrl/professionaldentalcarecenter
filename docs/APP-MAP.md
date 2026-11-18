@@ -203,3 +203,8 @@ triggers `guard_patient_update` (clinical sections only for the assigned doctor,
 - Shown to the administrator on each clinic card (tap to copy) and to the manager on the dashboard with **Copy** and **Send to staff** (share menu / WhatsApp).
 - Reserved codes that cannot be used for a clinic: admin, administrator, apply, inspect, privacy, index, api, sw, manifest, favicon, robots, icon.
 - A subdomain per clinic (`kal.example.com`) needs a domain the clinic owner buys and a wildcard record; not set up.
+
+## Simple side menu
+- The side menu now shows only the important pages of each role (`NAV_CORE` in `src/app/menuOrder.js`) plus Settings. Manager: Dashboard, Appointment, Recent Patient, All Patients, Dental Records, Invoice Manager, Finance, Reports, Users, Staff chat, Announcements. Doctor: Dashboard, Appointment, Recent Patient, Dental Records, All Patients, Finished Laboratory, Staff chat. Nurse and Reception similar; Lab and Support staff keep their short menus.
+- **Settings > Side menu and all pages** (`src/app/menuSimple.js`) lists every page the person may open: **Open** goes to the page, the tick adds or removes it from the side menu (saved on this device for that user). Buttons **Simple menu** (back to the default) and **Show all pages**. "Arrange menu" (move up/down) still works on what is shown.
+- Search (Ctrl+K) finds every page, including ones not in the side menu. Dashboard tiles and links still open any page.

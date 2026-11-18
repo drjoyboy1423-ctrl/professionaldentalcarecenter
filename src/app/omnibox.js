@@ -7,7 +7,7 @@ function obItems(){const q=OB.q.trim().toLowerCase(),L=[];if(!U)return L;
  if(!q){(typeof navList=='function'?navList():[]).slice(0,8).forEach(n=>L.push({t:'page',a:n[0],l:n[1],ic:n[2]}));return L}
  const dg=q.replace(/\D/g,'');
  S.patients.filter(p=>(p.name||'').toLowerCase().includes(q)||(String(p.card||'')==q)||(dg.length>=3&&String(p.phone||'').replace(/\D/g,'').includes(dg))).slice(0,8).forEach(p=>L.push({t:'pt',a:p.id,l:p.name,s:'Card '+(p.card||'-')+(p.phone?' · '+p.phone:''),ic:'fa-user'}));
- (typeof navList=='function'?navList():[]).filter(n=>n[1].toLowerCase().includes(q)).slice(0,6).forEach(n=>L.push({t:'page',a:n[0],l:n[1],s:'Go to page',ic:n[2]}));
+ (typeof navAll=='function'?navAll():[]).filter(n=>n[1].toLowerCase().includes(q)).slice(0,6).forEach(n=>L.push({t:'page',a:n[0],l:n[1],s:'Go to page',ic:n[2]}));
  return L}
 function obPaint(){const e=document.getElementById('ob_l');if(!e)return;OB.L=obItems();if(OB.i>=OB.L.length)OB.i=Math.max(0,OB.L.length-1);
  e.innerHTML=OB.L.length?OB.L.map((x,i)=>`<div class="flex items-center gap-3 px-3 py-2 rounded cursor-pointer ${i==OB.i?'bg-sky-100':''}" onmouseenter="OB.i=${i};obPaint()" onclick="obGo(${i})"><i class="fa ${x.ic||'fa-circle'} w-5 text-center text-gray-500"></i><div class="min-w-0"><div class="truncate">${H(x.l)}</div>${x.s?`<div class="text-xs text-gray-500 truncate">${H(x.s)}</div>`:''}</div></div>`).join(''):'<p class="text-gray-500 text-sm p-3">Nothing found.</p>'}

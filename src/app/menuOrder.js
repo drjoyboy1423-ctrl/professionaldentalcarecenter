@@ -2,7 +2,14 @@
 let NAVED=0;
 const navKey=()=>'dental_navord:'+(U?U.id:'');
 const navOrd=()=>{try{return JSON.parse(localStorage.getItem(navKey())||'[]')}catch(e){return[]}};
-function navList(){const L=NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0])),o=navOrd();return L.slice().sort((a,b)=>{const x=o.indexOf(a[0]),y=o.indexOf(b[0]);return (x<0?1e3+L.indexOf(a):x)-(y<0?1e3+L.indexOf(b):y)})}
+/* Simple menu: the side menu shows only the important pages of each role (NAV_CORE) plus Settings. Every other page the person may open is listed in
+   Settings > Side menu, where each page can be added to or removed from the side menu (saved on this device for that user). Search (Ctrl+K) finds every page. */
+const NAV_CORE={admin:['dash','clinics','users','crep','rep','fin','sys','chat','devnote'],manager:['dash','appt','recent','dir','drd','rinv','fin','rep','users','chat','bc'],doctor:['dash','appt','recent','drd','dir','lab','chat'],nurse:['dash','appt','recent','drd','dir','chat'],reception:['dash','appt','recent','dir','card','rinv','cash','chat']};
+const navPinKey=()=>'dental_navpin:'+(U?U.id:'');
+const navPins=()=>{try{const a=JSON.parse(localStorage.getItem(navPinKey())||'null');return Array.isArray(a)?a:null}catch(e){return null}};
+const navAll=()=>NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0]));
+const navShown=id=>{if(id=='settings')return true;const p=navPins();if(p)return p.includes(id);const c=NAV_CORE[U.role];return !c||c.includes(id)};
+function navList(){const L=navAll().filter(n=>navShown(n[0])),o=navOrd();return L.slice().sort((a,b)=>{const x=o.indexOf(a[0]),y=o.indexOf(b[0]);return (x<0?1e3+L.indexOf(a):x)-(y<0?1e3+L.indexOf(b):y)})}
 function navDraw(){const L=navList(),mv=(id,d,on,ic)=>`<button type="button" ${on?'':'disabled'} onclick="event.stopPropagation();navMove('${id}',${d})" style="width:34px;min-height:34px;height:34px;border-radius:8px;border:1px solid rgba(148,163,184,.5);background:rgba(148,163,184,.15);color:inherit;opacity:${on?1:.3}"><i class="fa ${ic}"></i></button>`;
  $('nav').innerHTML=L.map((n,i)=>`<div class="nv ${V==n[0]?'on':''}" onclick="${NAVED?'':"go('"+n[0]+"')"}"><i class="fa ${n[2]} w-5"></i><span style="flex:1">${n[1]}</span>${NAVED?`<span style="display:flex;gap:6px">${mv(n[0],-1,i>0,'fa-chevron-up')}${mv(n[0],1,i<L.length-1,'fa-chevron-down')}</span>`:''}</div>`).join('')+
  `<div style="display:flex;gap:8px;justify-content:center;margin:10px 8px 4px"><button type="button" onclick="navEdit()" style="font-size:12px;min-height:34px;padding:4px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:${NAVED?'#16a34a':'transparent'};color:${NAVED?'#fff':'inherit'}"><i class="fa ${NAVED?'fa-check':'fa-arrows-up-down'}" style="margin-right:6px"></i>${NAVED?'Done':'Arrange menu'}</button>${NAVED?`<button type="button" onclick="navReset()" style="font-size:12px;min-height:34px;padding:4px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:transparent;color:inherit">Reset order</button>`:''}</div>`}
