@@ -17,3 +17,14 @@ function cluCode(){const q=(new URLSearchParams(location.search).get('c')||'').t
 
 /* sign-in page: the small "Jobs / CV" button opens the public applicant page of the clinic whose code is typed (or taken from the clinic address) */
 function jobsOpen(){let k=(($('lcode')||{}).value||'').trim().toLowerCase()||cluCode();if(!/^[a-z0-9]{2,20}$/.test(k)){k=(prompt('Clinic code (ask the clinic for it):')||'').trim().toLowerCase();if(!/^[a-z0-9]{2,20}$/.test(k))return}window.open(siteBase()+'/apply.html?c='+encodeURIComponent(k),'_blank','noopener')}
+/* "We're hiring": when the typed clinic has an active vacancy ad (posted by the manager in Clinic ads), the Jobs / CV button turns green, pulses and says so */
+const JH={t:0,seen:{}};
+function jhPaint(on){const b=document.querySelector('[onclick="jobsOpen()"]');if(!b)return;const s=b.querySelector('span');b.classList.toggle('jh-on',!!on);if(on){b.style.background='#16a34a';b.style.color='#fff';b.style.borderColor='#16a34a';if(s)s.textContent="We're hiring - send CV"}else{b.style.background='';b.style.color='var(--cd)';b.style.borderColor='var(--c)';if(s)s.textContent='Jobs / CV'}}
+async function jhCheck(){const k=((($('lcode')||{}).value||'').trim().toLowerCase())||cluCode();if(!/^[a-z0-9]{2,20}$/.test(k)){jhPaint(false);return}
+ if(k in JH.seen){jhPaint(JH.seen[k]);return}
+ try{const r=await fetch(SB_URL+'/functions/v1/job-apply',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify({action:'info',code:k})}),j=await r.json();JH.seen[k]=!!(r.ok&&j.ok&&(j.ads||[]).length)}catch(e){return}
+ if(k==((($('lcode')||{}).value||'').trim().toLowerCase()||cluCode()))jhPaint(JH.seen[k])}
+function jhSoon(){clearTimeout(JH.t);JH.t=setTimeout(jhCheck,500)}
+{const st=document.createElement('style');st.textContent='@keyframes jhp{0%,100%{box-shadow:0 0 0 0 #16a34a88}50%{box-shadow:0 0 0 7px #16a34a00}}.jh-on{animation:jhp 1.6s infinite}';document.head.appendChild(st);
+ document.addEventListener('input',e=>{if(e.target&&e.target.id=='lcode')jhSoon()});
+ const _l2=lcInit;lcInit=function(){const r=_l2.apply(this,arguments);jhSoon();return r}}
