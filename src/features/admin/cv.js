@@ -28,7 +28,7 @@ function cvPage(){if(CVS.mine===null)cvLoad();const d=(CVS.mine||{}).data||{};
  return hd('My CV')+card('',`<p class="text-sm text-gray-500 mb-3">Keep your CV here. Send it by WhatsApp or print it as a PDF. The clinic manager can open it.</p><div class="font-bold mb-2">${H(U.name||'')}</div>${CVS.mine===null?'<p class="text-gray-500"><i class="fa fa-spinner fa-spin mr-2"></i>Loading...</p>':f}<div class="flex gap-2 flex-wrap mt-2"><button class="px-4 py-2 rounded text-white text-sm" style="background:var(--c)" onclick="cvSave()"><i class="fa fa-floppy-disk mr-1"></i>Save</button><button class="px-4 py-2 rounded text-white text-sm bg-green-600" onclick="cvMyShare()"><i class="fa fa-whatsapp mr-1"></i>Send by WhatsApp</button><button class="px-4 py-2 rounded border text-sm" onclick="cvMyPrint()"><i class="fa fa-print mr-1"></i>Print / PDF</button></div>`)+staff}
 /* ----- job applications ----- */
 const JB_ST={new:'New',shortlisted:'Shortlisted',rejected:'Not selected',hired:'Hired'};
-const jobLink=()=>location.origin+'/apply.html?c='+encodeURIComponent((C&&C.code)||'');
+const jobLink=()=>siteBase()+'/apply.html?c='+encodeURIComponent((C&&C.code)||'');
 async function jobLoad(){try{CVS.jobs=(await DB.jobList()).filter(x=>x.clinic==C.id);CVS.cfg=(await DB.jobCfgGet(C.id))||{wa:'',wa_on:false,note:''}}catch(e){CVS.jobs=CVS.jobs||[];CVS.cfg=CVS.cfg||{wa:'',wa_on:false,note:''}}if(V=='jobs')go('jobs')}
 async function jobCfgSave(){const wa=($('jc_wa').value||'').trim().slice(0,30),on=!!$('jc_on').checked,note=($('jc_note').value||'').trim().slice(0,300);
  if(on&&wa.replace(/\D/g,'').length<7){alert('Write the manager WhatsApp number (with country code, for example 2519...), or switch the WhatsApp option off.');return}

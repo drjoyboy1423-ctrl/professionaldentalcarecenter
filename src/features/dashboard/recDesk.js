@@ -2,7 +2,7 @@
 const rdWide=()=>innerWidth>=1024;
 function rdAssign(pid,name){if(U.role!='reception'||!name)return;const p=S.patients.find(x=>x.id==pid);if(!p)return;p.doc=name;p.doctor=name;sv();go('dash')}
 function rdArrive(pid,i){const p=S.patients.find(x=>x.id==pid),a=p&&(p.d.appt||[])[i];if(!a)return;a.in=Date.now();p.arr=Date.now();p.st='new';p.fin=false;sv();go('dash')}
-function rdDesk(){if(!DOCL.l.length&&!rdDesk.t){rdDesk.t=1;docEnsure().then(()=>{rdDesk.t=0;if(V=='dash')go('dash')},()=>{rdDesk.t=0})}
+function rdDesk(){if(DOCL.c!=C.id&&!rdDesk.t){rdDesk.t=1;docEnsure().then(()=>{rdDesk.t=0;if(DOCL.c==C.id&&V=='dash')go('dash')},()=>{rdDesk.t=0})}
  const t0=sod(NOW()),docs=DOCL.l,wait=dsort(S.patients.filter(p=>!p.fin&&!p.doc),p=>p.arr),ap=allAppts().filter(a=>sod(a.ts)==t0),due=allInv().filter(r=>r.bal>.005).sort((a,b)=>b.bal-a.bal).slice(0,8),rdy=ordList().filter(r=>r.o.st=='done'&&r.o.doneAt>=t0).slice(0,8),pend=ordList().filter(r=>r.o.st=='pending').length,low=(S.stock?S.stock.items.filter(m=>m.q<=m.min&&m.st!='ordered').length:0);
  const col=(t,i,b,n)=>`<div class="bg-white rounded-xl shadow p-3"><h3 class="font-bold mb-2"><i class="fa ${i} text-red-600 mr-1"></i>${t}${n!=null?` <span class="text-xs text-gray-500">(${n})</span>`:''}</h3><div class="max-h-[60vh] overflow-y-auto">${b}</div></div>`;
  const kb=(k,l)=>`<span class="px-2 py-1 rounded bg-gray-100 text-xs"><b>${k}</b> ${l}</span>`;

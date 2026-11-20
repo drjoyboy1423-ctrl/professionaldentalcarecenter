@@ -29,11 +29,16 @@ Deno.serve(async (req) => {
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
     const code = clean(b.code, 40).toLowerCase();
     if (!code) return json({ error: "This link is incomplete. Ask the clinic for the full link." }, 400);
-    const { data: c } = await sb.from("clinics").select("id,name,phone,color,archived").ilike("code", code.replace(/[_%]/g, (x) => "\\" + x)).maybeSingle();
+    const { data: c } = await sb.from("clinics").select("id,name,phone,color,logo,archived").ilike("code", code.replace(/[_%]/g, (x) => "\\" + x)).maybeSingle();
     if (!c || c.archived) return json({ error: "Clinic not found. Check the link with the clinic." }, 404);
     const { data: cfg } = await sb.from("job_config").select("wa,wa_on,note").eq("clinic", c.id).maybeSingle();
     // The WhatsApp option is shown only when the manager switched it on and wrote a number.
-    if (b.action === "info") return json({ ok: true, clinic: c.name, wa: cfg?.wa_on && cfg?.wa ? cfg.wa : "", note: cfg?.note || "", color: c.color || "#0284c7" });
+    if (b.action === "info") {
+      // Vacancy ads the manager posted (picture, title, text) are shown on the applicant page together with the clinic logo.
+      const { data: ads } = await sb.from("clinic_ads").select("id,title,body,image").eq("clinic", c.id).eq("kind", "job").eq("active", true).order("sort").order("created_at", { ascending: false }).limit(6);
+      const logo = typeof c.logo === "string" && c.logo.startsWith("data:image/") && c.logo.length < 200000 ? c.logo : "";
+      return json({ ok: true, clinic: c.name, wa: cfg?.wa_on && cfg?.wa ? cfg.wa : "", note: cfg?.note || "", color: c.color || "#0284c7", logo, ads: ads || [] });
+    }
 
     if (clean(b.website, 50)) return json({ ok: true }); // hidden field that only robots fill in
     const name = clean(b.name, 80), phone = clean(b.phone, 30), position = clean(b.position, 80), message = clean(b.message, 1000);

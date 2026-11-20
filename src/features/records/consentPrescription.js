@@ -3,13 +3,26 @@ function consent(p){const c=p.d.consent||{ck:[],o:'',t:''};
  <label class="font-semibold text-gray-600">Other</label><textarea id="co" rows="4" class="inp mb-4">${H(c.o)}</textarea><label class="font-semibold text-gray-600">Treatment Type</label><textarea id="ct" rows="4" class="inp mb-4">${H(c.t)}</textarea>
  <button onclick="svC()" class="bg-green-500 text-white px-5 py-2 rounded">Submit</button>`}
 function svC(){const p=gp();p.d.consent={ck:[...document.querySelectorAll('.cs:checked')].map(x=>x.value),o:co.value,t:ct.value};sv();alert('Consent saved.')}
-let MED=[];
-function presc(p){const a=p.d.presc||[];
- return `<h2 class="text-2xl font-bold mb-3">Create Prescription</h2><label class="font-semibold">Diagnosis</label><input id="pd" class="inp mb-4" placeholder="e.g., Bacterial infection">
- <label class="font-semibold">Add Medication</label><input id="ps" class="inp mb-2" placeholder="Search medications..." oninput="fm()"><div class="flex gap-2 mb-2"><select id="pm" class="inp"><option value="">Select a medication</option>${MEDS.map(m=>`<option>${m}</option>`).join('')}</select><button onclick="am()" class="bg-red-500 text-white px-4 rounded">Add</button></div>
- <div id="mc" class="flex flex-wrap gap-2 mb-3">${MED.map(m=>`<span class="bg-red-100 text-red-800 text-sm rounded-full px-3 py-1">${m}</span>`).join('')}</div>
- <label class="font-semibold">Prescription Description</label><textarea id="pt" rows="5" class="inp mb-4" placeholder="e.g., Take Amoxicillin 500mg, three times a day for 7 days"></textarea><button onclick="sp()" class="bg-red-500 text-white px-5 py-2 rounded">Submit</button> <button onclick="prescPrint('blank')" class="bg-gray-200 px-5 py-2 rounded"><i class="fa fa-print"></i> Print blank prescription</button>
+let RXM=[];
+const rxChip=(m,i)=>`<span class="bg-red-100 text-red-800 text-sm rounded-full pl-3 pr-2 py-1 inline-flex items-center gap-2">${H(m)}<button type="button" aria-label="Remove ${H(m)}" onclick="rxRm(${i})" class="text-red-700 font-bold">&times;</button></span>`;
+function rxChips(){const m=$('rx_mc');if(m)m.innerHTML=RXM.map(rxChip).join('')}
+function rxRm(i){RXM.splice(i,1);rxChips()}
+function presc(p){const a=p.d.presc||[];RXM=[];if(!RXS.g)RXS.g=(+p.age>0&&+p.age<=14)?'child':'adult';
+ setTimeout(()=>{rxSet('g',RXS.g);rxKg()},0);
+ const gb=(k,t)=>`<button type="button" data-rxg="${k}" onclick="rxSet('g','${k}')" class="px-3 py-1.5 rounded-md text-sm border bg-gray-100">${t}</button>`;
+ return `<h2 class="text-2xl font-bold mb-3">Create Prescription</h2>
+ <div class="bg-gray-50 rounded-xl p-3 mb-4"><div class="flex flex-wrap items-center gap-2 mb-2"><b class="mr-1"><i class="fa fa-list-check text-red-600"></i> Common cases</b>${gb('adult','Adult')}${gb('child','Child')}<select id="rx_sp" class="inp" style="width:auto;margin:0" onchange="rxSet('s',this.value)"><option value="">All specialties</option>${RX_SP.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select>${rxOwn()?'<button type="button" onclick="rxMan()" class="px-3 py-1.5 rounded-md text-sm bg-white border"><i class="fa fa-pen"></i> Add or edit plans</button>':''}</div>
+ <div id="rx_pl" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto"></div>
+ <div id="rx_kgw" class="hidden mt-2 text-sm"><label class="font-semibold">Child's weight (kg)</label> <input id="rx_kg" inputmode="decimal" class="inp" style="width:7rem;display:inline-block;margin:0 .5rem" oninput="rxKg()" placeholder="e.g. 14"><div id="rx_kgh" class="mt-1 text-xs text-gray-700"></div></div>
+ <p class="text-xs text-gray-500 mt-2">Starting points only. Tap one, change what you need, then save. Check allergies, weight, pregnancy and kidney / liver disease first.</p></div>
+ <label class="font-semibold">Diagnosis</label><input id="rx_dx" class="inp mb-4" placeholder="e.g., Bacterial infection">
+ <label class="font-semibold">Add Medication</label><input id="rx_ms" class="inp mb-2" placeholder="Search or type a medicine..." oninput="fm()" onkeydown="if(event.key=='Enter'){event.preventDefault();am()}"><div class="flex gap-2 mb-2"><select id="rx_pm" class="inp"><option value="">Select a medication</option>${MEDS.map(m=>`<option>${H(m)}</option>`).join('')}</select><button type="button" onclick="am()" class="bg-red-500 text-white px-4 rounded">Add</button></div>
+ <div id="rx_mc" class="flex flex-wrap gap-2 mb-3"></div>
+ <label class="font-semibold">Prescription Description</label><textarea id="rx_txt" rows="7" class="inp mb-4" placeholder="e.g., Take Amoxicillin 500mg, three times a day for 7 days"></textarea>
+ <div class="flex flex-wrap gap-2"><button type="button" onclick="sp()" class="bg-red-500 text-white px-5 py-2 rounded"><i class="fa fa-check"></i> Save prescription</button> <button type="button" onclick="prescPrint('blank')" class="bg-gray-200 px-5 py-2 rounded"><i class="fa fa-print"></i> Print blank prescription</button>${rxOwn()?' <button type="button" onclick="rxSaveCur()" class="bg-white border px-4 py-2 rounded"><i class="fa fa-bookmark"></i> Save as a plan</button>':''}</div>
  ${a.length?'<h3 class="font-bold mt-6 mb-2">Previous prescriptions</h3>'+a.map((x,i)=>`<div class="bg-gray-50 rounded p-3 mb-2 text-sm flex justify-between"><div><b>${x.date}</b> — ${H(x.dx)}<br>${H(x.meds.join(', '))}<br>${H(x.txt)}</div><span class="whitespace-nowrap"><i class="fa fa-print text-purple-600 cursor-pointer mr-3" title="Print prescription" onclick="prescPrint(${i})"></i><i class="fa fa-trash text-rose-600 cursor-pointer" onclick="delI('presc',${i})"></i></span></div>`).join(''):''}`}
-function fm(){const q=ps.value.toLowerCase();pm.innerHTML='<option value="">Select a medication</option>'+MEDS.filter(m=>m.toLowerCase().includes(q)).map(m=>`<option>${m}</option>`).join('')}
-function am(){if(pm.value&&!MED.includes(pm.value)){MED.push(pm.value);mc.innerHTML=MED.map(m=>`<span class="bg-red-100 text-red-800 text-sm rounded-full px-3 py-1">${m}</span>`).join('')}}
-function sp(){const p=gp();(p.d.presc=p.d.presc||[]).push({dx:pd.value,meds:MED,txt:pt.value,date:isoD(Date.now()),by:U.name});MED=[];sv();go('patient')}
+function fm(){const q=$('rx_ms').value.toLowerCase(),pm=$('rx_pm');pm.innerHTML='<option value="">Select a medication</option>'+MEDS.filter(m=>m.toLowerCase().includes(q)).map(m=>`<option>${H(m)}</option>`).join('')}
+/* Add: the chosen medicine, or whatever was typed in the search box when it is not in the list */
+function am(){const pm=$('rx_pm'),t=$('rx_ms'),v=(pm.value||t.value||'').trim();if(!v)return;if(!RXM.includes(v)){RXM.push(v);rxChips()}pm.value='';t.value='';fm()}
+function sp(){const p=gp(),dx=$('rx_dx').value.trim(),txt=$('rx_txt').value.trim(),t=$('rx_ms');if(t&&t.value.trim())am();if(!dx&&!RXM.length&&!txt)return alert('Write the diagnosis and add a medicine or instructions first.');
+ const w=$('rx_kg')&&parseFloat($('rx_kg').value);(p.d.presc=p.d.presc||[]).push({dx,meds:RXM.slice(),txt:(w>0&&RXS.g=='child'?'Weight: '+w+' kg\n':'')+txt,date:isoD(Date.now()),by:U.name,...(U.idcode?{lic:U.idcode}:{})});RXM=[];sv();toast('Prescription saved.',1);go('patient')}

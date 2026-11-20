@@ -19,7 +19,7 @@ const DB=(()=>{
   client(){return sb},
   async token(){const {data}=await sb.auth.getSession();return data.session?data.session.access_token:null},
   async signOut(){try{await sb.auth.signOut()}catch(e){}},
-  async loadClinicData(cid){const [p,l]=await Promise.all([sb.from('patients').select('id,data').eq('clinic',cid).limit(5000),sb.from('clinic_lists').select('kind,data').eq('clinic',cid)]);const pr=ck(p),ls=ck(l),o={dis:null,proc:null,fin:null,stock:null};ls.forEach(x=>o[x.kind]=x.data);return {patients:pr.map(r=>r.data),dis:o.dis,proc:o.proc,fin:o.fin,stock:o.stock}},
+  async loadClinicData(cid){const [p,l]=await Promise.all([sb.from('patients').select('id,data').eq('clinic',cid).limit(5000),sb.from('clinic_lists').select('kind,data').eq('clinic',cid)]);const pr=ck(p),ls=ck(l),o={dis:null,proc:null,fin:null,stock:null,rxt:null};ls.forEach(x=>o[x.kind]=x.data);return {patients:pr.map(r=>r.data),dis:o.dis,proc:o.proc,fin:o.fin,stock:o.stock,rxt:o.rxt}},
   async savePatients(cid,ins,upd,del){const now=new Date().toISOString();
    if(ins.length){const r=await sb.from('patients').insert(ins.map(p=>({id:p.id,clinic:cid,data:p,updated_at:now})));if(r.error){if(/duplicate|23505/i.test((r.error.message||'')+(r.error.code||''))){await Promise.all(ins.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))))}else ck(r)}}
    await Promise.all(upd.map(async p=>ck(await sb.from('patients').update({data:p,updated_at:now}).eq('id',p.id))));
@@ -38,6 +38,16 @@ const DB=(()=>{
   async bcRead(id,name,role){ck(await sb.from('broadcast_reads').upsert({broadcast_id:id,user_name:name,role},{onConflict:'broadcast_id,user_id',ignoreDuplicates:true}))},
   async bcDel(id){ck(await sb.from('broadcasts').delete().eq('id',id))},
   async chatList(room){return ck(await sb.from('chat_msgs').select('*').eq('room',room).order('created_at',{ascending:false}).limit(100))},
+  async queueList(day){return ck(await sb.from('queue_tickets').select('*').eq('day',day).order('no',{ascending:true}).limit(500))},
+  async queueAdd(pid){const r=await sb.rpc('queue_add',{p_pid:pid==null?'':String(pid)});if(r.error)throw new Error(r.error.message);return r.data},
+  async queueUpd(id,o){ck(await sb.from('queue_tickets').update(o).eq('id',id))},
+  async queueDel(id){ck(await sb.from('queue_tickets').delete().eq('id',id))},
+  async adsList(){return ck(await sb.from('clinic_ads').select('*').order('sort',{ascending:true}).order('created_at',{ascending:false}).limit(60))},
+  async adSave(o){if(o.id){const id=o.id;delete o.id;ck(await sb.from('clinic_ads').update(o).eq('id',id))}else ck(await sb.from('clinic_ads').insert(o))},
+  async adDel(id){ck(await sb.from('clinic_ads').delete().eq('id',id))},
+  async pfUp(path,file){const r=await sb.storage.from('patient-files').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});if(r.error)throw new Error(r.error.message)},
+  async pfUrl(path,ttl){const r=await sb.storage.from('patient-files').createSignedUrl(path,ttl||600);if(r.error)throw new Error(r.error.message);return r.data.signedUrl},
+  async pfDel(path){const r=await sb.storage.from('patient-files').remove([path]);if(r.error)throw new Error(r.error.message)},
   async cvGet(){return ck(await sb.from('staff_cv').select('*').eq('user_id',(await sb.auth.getUser()).data.user.id).maybeSingle())},
   async cvSave(o){ck(await sb.from('staff_cv').upsert({...o,updated_at:new Date().toISOString()}))},
   async cvList(){return ck(await sb.from('staff_cv').select('*').order('name'))},

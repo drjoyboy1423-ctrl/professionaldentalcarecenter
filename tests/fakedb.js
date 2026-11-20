@@ -15,7 +15,7 @@ const DB=(()=>{
   async signIn(u,p){const x=st.users.find(y=>y.username==String(u).trim().toLowerCase()&&y.pw==p);if(!x)throw new Error('Invalid username or password.');st.sess=x.id;save();return pub(x)},
   async token(){return "tok"},
   async signOut(){st.sess=null;save()},
-  async loadClinicData(c){need();const l=st.lists[c]||{};return {patients:J(Object.values(st.patients[c]||{})),dis:l.dis?J(l.dis):null,proc:l.proc?J(l.proc):null}},
+  async loadClinicData(c){need();const l=st.lists[c]||{};return {patients:J(Object.values(st.patients[c]||{})),dis:l.dis?J(l.dis):null,proc:l.proc?J(l.proc):null,rxt:l.rxt?J(l.rxt):null}},
   async savePatients(c,ins,upd,del){need();const r=me().role;st.log.push(['save',ins.length,upd.length,del.length]);
    if(ins.length&&!['reception','manager'].includes(r))throw new Error('new row violates row-level security policy for table "patients"');
    st.patients[c]=st.patients[c]||{};ins.concat(upd).forEach(p=>st.patients[c][p.id]=J(p));del.forEach(k=>delete st.patients[c][k]);save()},

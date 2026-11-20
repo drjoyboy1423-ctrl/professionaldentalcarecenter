@@ -4,7 +4,7 @@ const navKey=()=>'dental_navord:'+(U?U.id:'');
 const navOrd=()=>{try{return JSON.parse(localStorage.getItem(navKey())||'[]')}catch(e){return[]}};
 /* Simple menu: the side menu shows only the important pages of each role (NAV_CORE) plus Settings. Every other page the person may open is listed in
    Settings > Side menu, where each page can be added to or removed from the side menu (saved on this device for that user). Search (Ctrl+K) finds every page. */
-const NAV_CORE={admin:['dash','clinics','users','crep','rep','fin','sys','chat','devnote'],manager:['dash','appt','recent','dir','drd','rinv','fin','rep','users','chat','bc'],doctor:['dash','appt','recent','drd','dir','lab','chat'],nurse:['dash','appt','recent','drd','dir','chat'],reception:['dash','appt','recent','dir','card','rinv','cash','chat']};
+const NAV_CORE={admin:['dash','clinics','users','crep','rep','fin','sys','chat','devnote'],manager:['dash','appt','recent','queue','dir','drd','rinv','fin','rep','users','chat','bc'],doctor:['dash','appt','recent','queue','drd','dir','lab','chat'],nurse:['dash','appt','recent','queue','drd','dir','chat'],reception:['dash','appt','recent','queue','dir','card','rinv','cash','chat']};
 const navPinKey=()=>'dental_navpin:'+(U?U.id:'');
 const navPins=()=>{try{const a=JSON.parse(localStorage.getItem(navPinKey())||'null');return Array.isArray(a)?a:null}catch(e){return null}};
 const navAll=()=>NAV.filter(n=>(RN[U.role]||RN.reception).includes(n[0]));
