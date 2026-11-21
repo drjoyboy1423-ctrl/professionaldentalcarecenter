@@ -39,6 +39,7 @@ const DB=(()=>{
   async bcDel(id){ck(await sb.from('broadcasts').delete().eq('id',id))},
   async chatList(room){return ck(await sb.from('chat_msgs').select('*').eq('room',room).order('created_at',{ascending:false}).limit(100))},
   async queueList(day){return ck(await sb.from('queue_tickets').select('*').eq('day',day).order('no',{ascending:true}).limit(500))},
+  async tvKey(reset){const r=await sb.rpc('tv_key_get',{p_reset:!!reset});if(r.error)throw new Error(r.error.message);return r.data},
   async queueAdd(pid,prio,note){const r=await sb.rpc('queue_add',{p_pid:pid==null?'':String(pid),p_prio:prio?1:0,p_note:note||''});if(r.error)throw new Error(r.error.message);return r.data},
   async queueUpd(id,o){ck(await sb.from('queue_tickets').update(o).eq('id',id))},
   async queueDel(id){ck(await sb.from('queue_tickets').delete().eq('id',id))},

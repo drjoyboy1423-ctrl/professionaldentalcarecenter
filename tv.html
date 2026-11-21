@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Waiting-room screen</title>
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Roboto,Arial,sans-serif;background:#f8fafc;color:#1f2937;overflow:hidden}
+#top{display:flex;align-items:center;gap:16px;padding:14px 24px;color:#fff}#lg{width:56px;height:56px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:28px}#lg img{max-width:100%;max-height:100%;object-fit:contain}
+#nm{font-size:28px;font-weight:700;flex:1}#ck{font-size:28px;font-weight:600}
+#wrap{display:flex;flex-wrap:wrap;height:calc(100% - 84px)}#L{flex:1 1 380px;padding:24px;display:flex;flex-direction:column;gap:14px;background:#f8fafc;min-width:0;overflow:hidden}#R{flex:1.3 1 420px;display:flex;flex-direction:column;background:#0f172a;color:#fff;min-width:0}
+.h{font-size:26px;font-weight:700;color:#475569}.now{background:#fff;border-radius:20px;padding:18px 24px;box-shadow:0 2px 12px #0002;display:flex;align-items:center;gap:24px}.big{font-size:clamp(72px,12vw,150px);font-weight:800;line-height:1}.ch{font-size:clamp(28px,4vw,56px);font-weight:700;color:#166534}
+.old{background:#fff;border-radius:14px;padding:10px 20px;display:flex;gap:20px;align-items:baseline;font-size:clamp(24px,3vw,40px);font-weight:700;color:#334155}.old span:first-child{min-width:90px}.old span+span{color:#166534}
+.nx{display:flex;flex-wrap:wrap;gap:10px}.nx span{background:#e2e8f0;border-radius:12px;padding:6px 18px;font-size:clamp(24px,3vw,40px);font-weight:700;color:#334155}.st{color:#d97706}
+.flash{animation:qf .6s ease-in-out 10}@keyframes qf{50%{background:#fde047;color:#111}}
+#ad{flex:1;display:flex;flex-direction:column;min-height:0}#ad img{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}.cap{padding:18px 28px;background:rgba(0,0,0,.6)}.cap b{display:block;font-size:clamp(26px,3.2vw,46px)}.cap div{font-size:clamp(18px,2vw,28px);margin-top:6px;opacity:.9}
+.wel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center}.wel b{font-size:clamp(32px,4vw,60px)}.wel span{font-size:22px;opacity:.8}
+#ctl{position:fixed;right:10px;bottom:10px;display:flex;gap:8px;opacity:.25}#ctl:hover,#ctl:focus-within{opacity:1}#ctl button{background:#0f172a;color:#fff;border:1px solid #fff6;border-radius:8px;padding:8px 14px;font-size:16px;cursor:pointer}
+#off{display:none;position:fixed;left:10px;bottom:10px;background:#fef3c7;color:#92400e;padding:6px 12px;border-radius:8px;font-size:16px}
+#go{position:fixed;inset:0;z-index:9;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}#go button{font-size:26px;padding:16px 36px;border:0;border-radius:14px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer}#go small{opacity:.75;font-size:18px;max-width:560px}
+#er{display:none;position:fixed;inset:0;z-index:10;background:#fff;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:26px;color:#991b1b}
+</style></head><body>
+<div id="top" style="background:#0284c7"><div id="lg">&#129463;</div><div id="nm">Waiting room</div><div id="ck"></div></div>
+<div id="wrap"><div id="L"><div class="h">NOW CALLING</div><div class="now" id="now"><div style="font-size:32px;color:#64748b">Please wait for your number</div></div><div id="olds" style="display:flex;flex-direction:column;gap:14px"></div><div class="h" style="font-size:24px;margin-top:6px">NEXT</div><div class="nx" id="nx"><span style="color:#94a3b8">-</span></div></div>
+<div id="R"><div id="ad"></div></div></div>
+<div id="off">No internet connection - list may be old</div>
+<div id="ctl"><button id="bs" onclick="tg('sound')">Sound on</button><button id="bv" onclick="tg('voice')">Voice off</button><button onclick="fs()">Full screen</button></div>
+<div id="go"><div style="font-size:34px;font-weight:700" id="gn">Waiting-room screen</div><button onclick="start()">Tap to start the screen</button><small>Tap once so the TV can play the call sound and show full screen. Keep this page open on the TV.</small></div>
+<div id="er"></div>
+<script>
+const SB_URL='%%SB_URL%%',SB_KEY='%%SB_KEY%%';
+const H=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search),code=(q.get('c')||'').trim(),key=(q.get('k')||'').trim();
+let D=null,ADS=[],ai=0,last=null,sound=1,voice=0,ac=null,wl=null,tries=0,stop=0,fails=0;
+const call=async b=>{const r=await fetch(SB_URL+'/functions/v1/queue-tv',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify(b)});let j={};try{j=await r.json()}catch(e){}return {ok:r.ok&&j.ok,j}};
+function beep(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();[880,660].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.3,ac.currentTime+i*.28);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+i*.28+.25);o.start(ac.currentTime+i*.28);o.stop(ac.currentTime+i*.28+.26)})}catch(e){}}
+function say(t){try{if(!voice||!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance('Number '+t.no+', please go to '+String(t.chair||'').replace(/0(\d)/,'$1'));u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function tg(w){if(w=='sound')sound=!sound;else{voice=!voice;if(voice)say({no:0,chair:'test'})}$('bs').textContent=sound?'Sound on':'Sound off';$('bv').textContent=voice?'Voice on':'Voice off'}
+async function fs(){try{if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}}
+async function lock(){try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}}
+async function start(){$('go').style.display='none';try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume&&ac.resume()}catch(e){}fs();lock();if(sound)beep()}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)lock()});
+function clock(){const d=new Date();$('ck').textContent=d.toLocaleDateString([],{weekday:'short',day:'numeric',month:'short'})+'  '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function paintAd(){const a=ADS.length?ADS[ai%ADS.length]:null,c=D?D.color:'#0284c7';
+ $('ad').innerHTML=a?((/^data:image\//.test(a.image||'')?'<img src="'+H(a.image)+'" alt="">':'<div style="flex:1"></div>')+'<div class="cap"><b>'+H(a.title)+'</b>'+(a.body?'<div>'+H(a.body)+'</div>':'')+'</div>'):'<div class="wel"><b>Welcome to '+H(D?D.clinic:'')+'</b><span>Please wait for your number to be called.</span></div>'}
+function paint(){if(!D)return;const c=D.color||'#0284c7',Ca=D.called||[];
+ $('top').style.background=c;$('nm').textContent=D.clinic;document.title=D.clinic+' - screen';
+ $('lg').innerHTML=/^data:image\//.test(D.logo||'')?'<img src="'+H(D.logo)+'" alt="">':'&#129463;';
+ const k=Ca[0]?Ca[0].id+'|'+Ca[0].called_at+'|'+Ca[0].chair:'';
+ $('now').innerHTML=Ca[0]?'<div class="big" style="color:'+H(c)+'">'+H(Ca[0].no)+'</div><div class="ch">&rarr; '+H(Ca[0].chair||'')+'</div>':'<div style="font-size:32px;color:#64748b">Please wait for your number</div>';
+ if(last!==null&&k&&k!==last){if(sound)beep();say(Ca[0]);$('now').classList.add('flash');setTimeout(()=>$('now').classList.remove('flash'),6000)}
+ last=k||last||'';
+ $('olds').innerHTML=Ca.slice(1).map(t=>'<div class="old"><span>'+H(t.no)+'</span><span>&rarr; '+H(t.chair||'')+'</span></div>').join('');
+ $('nx').innerHTML=(D.waiting||[]).slice(0,6).map(t=>'<span>'+(t.priority?'<b class="st">&#9733;</b> ':'')+H(t.no)+'</span>').join('')||'<span style="color:#94a3b8">-</span>'}
+function showErr(m){const e=$('er');e.style.display='flex';e.textContent=m}
+async function pull(withAds){if(stop)return;try{const r=await call({code,key,ads:!!withAds});
+  if(!r.ok){if(r.j&&r.j.error&&/not valid|incomplete/.test(r.j.error)){stop=1;showErr(r.j.error);return}throw 0}
+  fails=0;$('off').style.display='none';D=r.j;if(r.j.ads){ADS=r.j.ads;paintAd()}paint();$('gn').textContent=D.clinic}
+ catch(e){if(++fails>=2)$('off').style.display='block'}}
+if(!code||!key){showErr('This TV link is incomplete. Open the TV link again from the clinic app.')}
+else{pull(1).then(()=>{if(!ADS.length)paintAd();});setInterval(()=>{tries++;pull(tries%12==0)},5000);setInterval(()=>{ai++;paintAd()},12000);clock();setInterval(clock,15000)}
+// A TV that stays on all night: reload once a day to pick up app fixes.
+setTimeout(()=>location.reload(),6*3600e3);
+</script></body></html>

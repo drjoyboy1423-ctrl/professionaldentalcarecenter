@@ -2,7 +2,7 @@
    Opening it fills in the clinic code on the sign-in page, so the clinic's logo and colour show and staff only type username and password.
    The server sends /<code> to the app (vercel.json / netlify.toml); real files such as /apply, /inspect and /privacy are served as usual.
    A different clinic address never signs anybody in or changes who they are: it only chooses which clinic the sign-in page starts with. */
-const CLU_RES=['admin','administrator','apply','inspect','privacy','index','api','sw','manifest','favicon','robots','icon'];
+const CLU_RES=['admin','administrator','apply','inspect','tv','privacy','index','api','sw','manifest','favicon','robots','icon'];
 /* on GitHub Pages the app lives under /<repository name>/ ; on Vercel, Netlify or a own domain it is at the root */
 const siteBase=()=>location.origin+(/\.github\.io$/i.test(location.hostname)?'/'+(location.pathname.split('/')[1]||''):'');
 const clAddr=code=>siteBase()+'/'+encodeURIComponent(String(code||'').toLowerCase());
