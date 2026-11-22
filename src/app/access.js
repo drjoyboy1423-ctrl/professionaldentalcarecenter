@@ -14,13 +14,16 @@ function wrapW(n,kf){const o=window[n];if(typeof o!='function')return;window[n]=
 ['addI','editI','delI'].forEach(n=>wrapW(n,k=>k));
 {const _dI=delI;delI=function(k){if(U&&U.role=='nurse'){alert('Nurses can add and edit, but only a doctor, manager or administrator can delete.');return}return _dI.apply(this,arguments)}}
 ['recNew','recEdit','recDel','fin','toothAdd','toothDel'].forEach(n=>wrapW(n,()=>'rec'));
-wrapW('toInv',()=>'inv');wrapW('sp',()=>'presc');wrapW('svC',()=>'consent');
+wrapW('toInv',()=>'inv');wrapW('sp',()=>'presc');wrapW('rxEditP',()=>'presc');wrapW('svC',()=>'consent');
 const _mkI=mkItem;mkItem=function(k,v,p){if(p&&!ptW(p,k)){alert(ptMsg(p));return null}return _mkI.apply(this,arguments)};
 const _ptv=patient;patient=function(){const p=gp(),h=_ptv.apply(this,arguments);if(!p||ptW(p,SK))return h;
- const o=h.replace(/<button onclick="fin\(\)"[^>]*>[^<]*<\/button>/,'<b class="ml-2">'+(p.fin?'Yes':'No')+'</b>').replace(/<i [^>]*onclick="(editI|delI|recEdit|recDel|toInv)\([^"]*"[^>]*><\/i>/g,'').replace(/<button[^>]*onclick="(addI|recNew|ordNew|sp|svC)\([^"]*"[^>]*>[\s\S]*?<\/button>/g,'');
- const tk=U&&U.role=='doctor'&&U.stype!='specialist'&&!p.doc?` <button type="button" onclick="ptTake('${p.id}')" class="ml-1 px-3 py-1 rounded bg-red-600 text-white">Take this patient</button>`:'',who=p.doc&&U&&U.role=='doctor'?' (assigned to '+H(p.doc)+')':'';
+ const o=h.replace(/<button onclick="fin\(\)"[^>]*>[^<]*<\/button>/,'<b class="ml-2">'+(p.fin?'Yes':'No')+'</b>').replace(/<i [^>]*onclick="(editI|delI|recEdit|recDel|toInv|rxEditP)\([^"]*"[^>]*><\/i>/g,'').replace(/<button[^>]*onclick="(addI|recNew|ordNew|sp|svC)\([^"]*"[^>]*>[\s\S]*?<\/button>/g,'');
+ const tk=U&&U.role=='doctor'&&U.stype!='specialist'&&!p.doc?` <button type="button" onclick="ptTake('${p.id}')" class="ml-1 px-3 py-1 rounded bg-red-600 text-white">Take this patient</button>`:U&&U.role=='doctor'&&p.doc?` <button type="button" onclick="ptJoin('${p.id}')" class="ml-1 px-3 py-1 rounded bg-red-600 text-white"><i class="fa fa-pen mr-1"></i>Edit this record</button>`:'',who=p.doc&&U&&U.role=='doctor'?' (assigned to '+H(p.doc)+')':'';
  return `<div class="bg-sky-50 border border-sky-300 rounded-lg p-2 text-sm mb-3 w-full"><i class="fa fa-eye mr-1"></i>Read-only${who}. ${H(ptMsg(p))}${tk}</div>`+o};
 /* a doctor can take a patient nobody has been assigned to yet, so prescriptions and records can be added */
+/* A doctor who needs to change another doctor's patient (record, prescription, drugs) joins the patient as an extra doctor. The assigned doctor stays the same; the join is written on the file. */
+function ptJoin(id){const p=S.patients.find(x=>String(x.id)==String(id));if(!p||!U||U.role!='doctor')return;if(!confirm('This patient is assigned to '+(p.doc||'another doctor')+'.\n\nAdd yourself to this patient so you can change the record and the prescriptions? '+(p.doc||'The doctor')+' stays the assigned doctor and the change is written on the file.'))return;
+ p.spec=p.spec||[];if(!p.spec.includes(U.name))p.spec.push(U.name);(p.joined=p.joined||[]).push({name:U.name,at:Date.now()});sv();toast('You can now edit this patient.',1);go('patient',p.id)}
 function ptTake(id){const p=S.patients.find(x=>String(x.id)==String(id));if(!p||!U||U.role!='doctor'||p.doc)return;p.doc=U.name;p.doctor=U.name;sv();toast('Patient assigned to you.',1);go('patient',p.id)}
 
 /* ---------- Reception sees a summary of the patient (not the clinical record) ---------- */
