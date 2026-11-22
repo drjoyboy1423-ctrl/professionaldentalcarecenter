@@ -4,7 +4,7 @@
    Two levels: "Avoid" (risk of serious harm - a reason is required to continue) and "Caution" (monitor, change dose or choose another medicine).
    It is a help for the doctor, not a replacement for clinical judgement. It only knows what is written in the patient file.
    An alert that was overridden is stored on the prescription (x.ovr). */
-const RXT={pen:'Penicillin allergy',nsaid:'NSAID / aspirin allergy',sulfa:'Sulfa allergy',preg:'Pregnant',lact:'Breastfeeding',renal:'Kidney disease',liver:'Liver disease',alc:'Alcohol use',ulcer:'Stomach ulcer',gerd:'Reflux / GERD',ibd:'Bowel disease (IBD)',htn:'High blood pressure',hf:'Heart failure',cvs:'Heart disease',warf:'Takes warfarin',doac:'Takes a DOAC blood thinner',apl:'Takes aspirin / clopidogrel',bleed:'Bleeding disorder',asthma:'Asthma / COPD',diab:'Diabetes',epil:'Epilepsy / seizures',immuno:'Weak immunity',ssri:'Takes an antidepressant',acei:'Takes ACE inhibitor / ARB',lith:'Takes lithium / methotrexate',child:'Child under 12',young:'Child under 8',elderly:'Age 65 or more',anemia:'Anemia'};
+const RXT={pen:'Penicillin allergy',nsaid:'NSAID / aspirin allergy',sulfa:'Sulfa allergy',preg:'Pregnant',lact:'Breastfeeding',renal:'Kidney disease',liver:'Liver disease',alc:'Alcohol use',ulcer:'Stomach ulcer',gerd:'Reflux / GERD',ibd:'Bowel disease (IBD)',htn:'High blood pressure',hf:'Heart failure',cvs:'Heart disease',warf:'Takes warfarin',doac:'Takes a DOAC blood thinner',apl:'Takes aspirin / clopidogrel',bleed:'Bleeding disorder',asthma:'Asthma / COPD',diab:'Diabetes',epil:'Epilepsy / seizures',immuno:'Weak immunity',ssri:'Takes an antidepressant',acei:'Takes ACE inhibitor / ARB',lith:'Takes lithium / methotrexate',latex:'Latex allergy',la:'Local anesthetic allergy',dial:'On dialysis',antires:'Bisphosphonate / denosumab',cancer:'Cancer / radiotherapy',pace:'Pacemaker / ICD',prophy:'Heart valve / endocarditis risk',mi:'Heart attack, angina or stroke history',inf:'Hepatitis B / C or HIV',tb:'Active TB',child:'Child under 12',young:'Child under 8',elderly:'Age 65 or more',anemia:'Anemia'};
 const RXT_AGE=['child','young','elderly'];
 
 /* All tags that apply to the patient, from every place the file keeps medical history. */
@@ -42,6 +42,16 @@ function rxProf(p){const T=new Set();if(!p)return T;
  add('acei',/enalapril|captopril|lisinopril|ramipril|losartan|valsartan|telmisartan|ace inhib/.test(txt));
  add('lith',/lithium|methotrexate/.test(txt));
  const a=+p.age;if(a>0){add('child',a<12);add('young',a<8);add('elderly',a>=65)}
+ add('latex',al.includes('Latex')||/latex/.test(alTxt));
+ add('la',al.includes('Local anesthetic')||/lidocaine|lignocaine|articaine|local an(a)?esth/.test(alTxt));
+ add('dial',any(f=>o(f,'renal','Dialysis')));
+ add('antires',any(f=>f.antires));
+ add('cancer',any(f=>f.cancer));
+ add('pace',any(f=>o(f,'cvs','Pacemaker/ICD')));
+ add('prophy',any(f=>['Valve disease','Previous infective endocarditis','Congenital heart disease'].some(v=>o(f,'cvs',v))));
+ add('mi',any(f=>['MI','Angina','Stroke'].some(v=>o(f,'cvs',v))));
+ add('inf',any(f=>f.hbv||f.hcv||f.hiv||o(f,'immuno','HIV')));
+ add('tb',any(f=>o(f,'tb','Active')));
  add('anyac',T.has('warf')||T.has('doac')||T.has('apl'));
  return T}
 const rxHasHx=p=>!!p&&((p.d.rec||[]).some(r=>r.f&&Object.keys(r.f).length)||(p.d.health||[]).length>0||!!(p.d.consent&&((p.d.consent.ck||[]).length||p.d.consent.o)));

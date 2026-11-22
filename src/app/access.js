@@ -14,7 +14,7 @@ function wrapW(n,kf){const o=window[n];if(typeof o!='function')return;window[n]=
 ['addI','editI','delI'].forEach(n=>wrapW(n,k=>k));
 {const _dI=delI;delI=function(k){if(U&&U.role=='nurse'){alert('Nurses can add and edit, but only a doctor, manager or administrator can delete.');return}return _dI.apply(this,arguments)}}
 ['recNew','recEdit','recDel','fin','toothAdd','toothDel'].forEach(n=>wrapW(n,()=>'rec'));
-wrapW('toInv',()=>'inv');wrapW('sp',()=>'presc');wrapW('rxEditP',()=>'presc');wrapW('svC',()=>'consent');
+wrapW('toInv',()=>'inv');wrapW('sp',()=>'presc');wrapW('rxEditP',()=>'presc');wrapW('txmSave',()=>'rec');wrapW('svC',()=>'consent');
 const _mkI=mkItem;mkItem=function(k,v,p){if(p&&!ptW(p,k)){alert(ptMsg(p));return null}return _mkI.apply(this,arguments)};
 const _ptv=patient;patient=function(){const p=gp(),h=_ptv.apply(this,arguments);if(!p||ptW(p,SK))return h;
  const o=h.replace(/<button onclick="fin\(\)"[^>]*>[^<]*<\/button>/,'<b class="ml-2">'+(p.fin?'Yes':'No')+'</b>').replace(/<i [^>]*onclick="(editI|delI|recEdit|recDel|toInv|rxEditP)\([^"]*"[^>]*><\/i>/g,'').replace(/<button[^>]*onclick="(addI|recNew|ordNew|sp|svC)\([^"]*"[^>]*>[\s\S]*?<\/button>/g,'');
