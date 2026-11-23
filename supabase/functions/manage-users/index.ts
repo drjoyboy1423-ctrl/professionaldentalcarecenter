@@ -15,8 +15,8 @@ const winOf = (v: unknown, end: boolean) => { const d = String(v ?? "").trim(); 
 // Usernames are unique PER CLINIC: clinic staff sign in as <username>@<clinic>.dental.app, admins as <username>@dental.app.
 const emailOf = (u: string, clinic: string) => (!clinic || clinic === "all") ? `${u.toLowerCase()}@dental.app` : `${u.toLowerCase()}@${clinic.toLowerCase()}.dental.app`;
 const USERNAME = /^[a-zA-Z0-9_.-]{3,30}$/;
-// Staff type: BDS / visiting specialist are doctors, dental therapist is a nurse.
-const stypeOf = (role: string, s: unknown) => { const v = String(s ?? ""); return (role === "doctor" && (v === "bds" || v === "specialist")) || (role === "nurse" && v === "therapist") || (role === "support" && v === "biomed") || (role === "lab" && (v === "prostho" || v === "endo" || v === "ortho")) ? v : null; };
+// Staff type: BDS / visiting specialist / in-house specialists (endodontist, prosthodontist, orthodontist, periodontist, maxillofacial surgeon, implantologist) are doctors, dental therapist is a nurse.
+const stypeOf = (role: string, s: unknown) => { const v = String(s ?? ""); return (role === "doctor" && ["bds", "specialist", "endodontist", "prosthodontist", "orthodontist", "periodontist", "omfs", "implantologist"].includes(v)) || (role === "nurse" && v === "therapist") || (role === "support" && v === "biomed") || (role === "lab" && (v === "prostho" || v === "endo" || v === "ortho")) ? v : null; };
 const EDITABLE = ["name", "phone", "email", "title", "exp", "idcode", "blood", "expiry"];
 
 function tempPassword() {

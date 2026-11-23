@@ -8,7 +8,7 @@ function ptW(p,k){p=p||(typeof gp=='function'?gp():null);if(!p||!U)return false;
  const open=AS.v('acc.assignedOnly')===false;
  if(U.role=='doctor'){const mine=(!!p.doc&&p.doc==U.name)||(p.spec||[]).includes(U.name);return mine||(open&&U.stype!='specialist')}
  if(U.role=='nurse'){if((p.nurses||[]).includes(U.name))return k=='inv'||k=='presc'||!['consent','plan'].includes(k);return open&&(k=='inv'||!['presc','consent','plan'].includes(k))}
- if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred';return false}
+ if(U.role=='reception'||U.role=='manager')return k=='appt'||k=='cred'||k=='fu';return false}
 const ptMsg=p=>U&&(U.role=='doctor'||U.role=='nurse')?'This patient is not assigned to you yet, so you can read the file but not change it. Ask reception'+(U.role=='nurse'?' or the doctor':'')+' to assign the patient to you.':'You do not have permission to change this for this patient.';
 function wrapW(n,kf){const o=window[n];if(typeof o!='function')return;window[n]=function(){const p=gp();if(p&&!ptW(p,kf?kf.apply(null,arguments):SK)){alert(ptMsg(p));return}return o.apply(this,arguments)}}
 ['addI','editI','delI'].forEach(n=>wrapW(n,k=>k));
@@ -27,7 +27,7 @@ function ptJoin(id){const p=S.patients.find(x=>String(x.id)==String(id));if(!p||
 function ptTake(id){const p=S.patients.find(x=>String(x.id)==String(id));if(!p||!U||U.role!='doctor'||p.doc)return;p.doc=U.name;p.doctor=U.name;sv();toast('Patient assigned to you.',1);go('patient',p.id)}
 
 /* ---------- Reception sees a summary of the patient (not the clinical record) ---------- */
-RA.length=0;RA.push('sum','appt','inv','cred');
+RA.length=0;RA.push('sum','appt','inv','cred','fu');
 function recSumV(p){const inv=allInv([p]),due=sum(inv,r=>r.bal),paid=sum(inv,r=>r.paid),ap=(p.d.appt||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)),nx=ap.find(x=>(x.ts||0)>=NOW()-864e5),ords=p.d.ord||[],pend=ords.filter(o=>o.st=='pending').length,dn=ords.length-pend,vis=(p.d.rec||[]).length;
  const r=(k,v)=>`<div class="flex justify-between border-b py-2 text-sm"><span class="text-gray-600">${k}</span><b>${v}</b></div>`;
  return `<h3 class="text-lg font-bold mb-1">Patient summary</h3><p class="text-xs text-gray-500 mb-3">Reception sees a summary only. The clinical record is kept for the doctor and nurse.</p>`+
