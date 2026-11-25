@@ -86,7 +86,7 @@ function rxCheck(p,text){const T=rxProf(p),t=String(text||''),out=[],seen={},alT
  function push(drug,sev,why){const k=drug+'|'+why;if(seen[k])return;seen[k]=1;out.push({drug,sev,why})}
  return out.sort((a,b)=>(a.sev=='avoid'?0:1)-(b.sev=='avoid'?0:1))}
 const rxText=()=>RXM.join(' ; ')+' ; '+(($('rx_txt')||{}).value||'')+' ; '+(($('rx_dx')||{}).value||'')+' ; '+(($('rx_ms')||{}).value||'');
-const rxAlHtml=L=>L.map(a=>`<div class="rounded-lg border p-2 mb-2 text-sm ${a.sev=='avoid'?'bg-red-50 border-red-400 text-red-900':'bg-amber-50 border-amber-400 text-amber-900'}"><b><i class="fa fa-triangle-exclamation mr-1"></i>${a.sev=='avoid'?'AVOID':'Caution'}: ${H(a.drug)}</b><div>${H(a.why)}</div></div>`).join('');
+const rxAlHtml=L=>L.map(a=>`<div class="rounded-lg border p-2 mb-2 text-sm ${a.sev=='avoid'?'bg-red-50 border-red-400 text-red-900':'bg-amber-50 border-amber-400 text-amber-900'}"><b><i class="fa fa-triangle-exclamation mr-1"></i>${a.sev=='avoid'?'AVOID':'Caution'}: ${H(a.drug)}</b>${a.fld?` <span class="rounded-full bg-white border px-2 py-0.5 text-xs font-normal">${H(a.fld)}</span>`:''}<div>${H(a.why)}</div></div>`).join('');
 
 /* Patient risk box (top of the prescription page) and the live alert list (under the medicines) */
 function rxSafeBox(p){const T=rxProf(p),tags=[...T].filter(k=>RXT[k]);
@@ -110,7 +110,7 @@ function rxWarnGo(av){const r=(($('rxo_r')||{}).value||'').trim();if(av&&r.lengt
  if(ok!==1){const L=rxCheck(p,rxText());if(L.length){rxWarnOpen(L);return}}
  const e=RXE,n0=(p.d.presc||[]).length,ov=ok===1?{by:U.name,at:Date.now(),why:RXO.why,alerts:RXO.list.map(a=>(a.sev=='avoid'?'AVOID ':'Caution ')+a.drug+': '+a.why)}:null;
  _sp();const a=p.d.presc||[];if(a.length<=n0)return; /* validation message shown, nothing saved */
- let x=a[a.length-1];if(ov)x.ovr=ov;
+ let x=a[a.length-1];if(ov)x.ovr=ov;if(typeof rxField=='function'){const fk=rxField(p);if(fk&&fk!='gen')x.fld=fk}
  if(e>=0&&a[e]&&e<a.length-1){const old=a[e];a.pop();a[e]={...x,date:old.date,by:old.by,...(old.lic?{lic:old.lic}:{}),edited:{by:U.name,at:Date.now()}};toast('Prescription changed.',1)}
  RXO={list:[],why:''};sv();go('patient')}}
 
