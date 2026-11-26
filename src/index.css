@@ -207,3 +207,6 @@ html.dark .nvb{background:#1f2d4a;color:#a5b4cc}html.dark .nv.on .nvb{background
 #q{border-radius:14px!important}
 header button.rounded-full{border-radius:14px!important}
 .grid>.bg-white.rounded-xl.shadow.border-l-4 .text-2xl{font-size:1.9rem;font-weight:800;line-height:1.2}
+
+.pgsub{font-size:13px;color:#64748b;margin-top:2px;font-weight:500}html.dark .pgsub{color:#8ea0c0}
+#bcbtn{color:var(--c)!important}

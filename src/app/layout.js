@@ -5,7 +5,7 @@ function go(v,id){if(v!='patient'&&!(RN[U.role]||RN.reception).includes(v))v='da
  if(innerWidth<1024){$('sb').classList.add('-translate-x-full');$('ov').classList.add('hidden')}
  const f={dash,appt,recent,dir:dirPage,drd:drdPage,done:donePage,plans:planPage,ortho:orthoPage,fu:fuPage,ord:ordersPage,mat:matPage,rep:repPage,earn:earnPage,bkd:bkdPage,sys:sysPage,mydata:myDataPage,devnote:devNotePage,bc:bcPage,chat:chatPage,chairs:chairsPage,comply:cpPage,labmsg:labmsgPage,cv:cvPage,jobs:jobsPage,queue:queuePage,ads:adsPage,labq:labQPage,prules:prulesPage,ptrack:ptrackPage,mypay:mypayPage,perm:permPage,pay:payPage,ster:sterPage,tra:ordTracker,card:cardv,ran:analytics,rinv:invMgr,rpr:printCenter,fin:finance,lab,proc,users,clinics,cash:cashClose,activity:activityPage,crep:clinicsReport,dis,profile,settings:settingsPage,patient}[v];$('v').innerHTML=f();}
 const card=(h,b)=>`<div class="bg-white rounded-xl shadow p-4 md:p-6 mb-4">${h}${b}</div>`;
-const hd=(t,btn)=>`<div class="flex justify-between items-center mb-4 gap-2"><h2 class="text-2xl font-bold">${t}</h2>${btn||''}</div>`;
+const hd=(t,btn)=>`<div class="flex justify-between items-center mb-4 gap-2"><div><h2 class="text-2xl font-bold">${t}</h2>${typeof PSUB_S=='function'?PSUB_S(t):''}</div>${btn||''}</div>`;
 const gb=(l,a)=>`<button onclick="${a}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm">${l}</button>`;
 const bb=(l,a)=>`<button onclick="${a}" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">${l}</button>`;
 const cap=s=>s?s[0].toUpperCase()+s.slice(1):'';

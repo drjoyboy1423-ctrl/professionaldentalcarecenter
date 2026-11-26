@@ -61,6 +61,7 @@ Add +|ጨምር +|Dabaali +|Ku dar +
 Print|አትም|Maxxansi|Daabac
 Search|ፈልግ|Barbaadi|Raadi
 Search patients|ታካሚዎችን ፈልግ|Dhukkubsatoota barbaadi|Raadi bukaanka
+Search name, card # or phone|በስም፣ በካርድ ቁጥር ወይም በስልክ ፈልግ|Maqaa, lakkoofsa kaardii ykn bilbila barbaadi|Raadi magac, lambarka kaarka ama taleefan
 Refresh|አድስ|Haaromsi|Cusboonaysii
 Loading...|በመጫን ላይ...|Fe'aa jira...|Waa la rarayaa...
 Yes|አዎ|Eeyyee|Haa
