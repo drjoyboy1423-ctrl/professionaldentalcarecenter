@@ -1,7 +1,7 @@
 /* ---------- Colours (Settings): accent colour per device + colourful mode; works with light and dark ---------- */
 const ACC=[['clinic','Clinic colour',''],['sky','Sky','#0284c7'],['teal','Teal','#0d9488'],['green','Green','#16a34a'],['violet','Violet','#7c3aed'],['indigo','Indigo','#4f46e5'],['fuchsia','Fuchsia','#c026d3'],['rose','Rose','#e11d48'],['orange','Orange','#ea580c'],['amber','Amber','#b45309'],['slate','Slate','#475569']];
 const acGet=()=>{try{return localStorage.getItem('dental_accent')||'clinic'}catch(e){return 'clinic'}};
-const cfOn=()=>{try{return localStorage.getItem('dental_cf')!='0'}catch(e){return true}};
+const cfOn=()=>{try{return localStorage.getItem('dental_cf')=='1'}catch(e){return false}};
 let ACLR=null;
 function acApply(){const k=acGet(),a=ACC.find(x=>x[0]==k),col=(a&&a[2])||ACLR;document.documentElement.classList.toggle('cf',cfOn());if(!col)return;const r=document.documentElement.style,dk=document.documentElement.classList.contains('dark');
  r.setProperty('--c',col);r.setProperty('--cd',dk?`color-mix(in srgb,${col} 55%,white)`:`color-mix(in srgb,${col} 60%,black)`);r.setProperty('--cl',dk?`color-mix(in srgb,${col} 24%,#0f172a)`:`color-mix(in srgb,${col} 10%,white)`)}
