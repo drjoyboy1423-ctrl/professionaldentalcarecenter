@@ -199,3 +199,11 @@ html.dark .seg.on{background-color:var(--c)!important;color:#fff!important;borde
 th{font-weight:700}
 #bnav{border-radius:22px 22px 0 0}
 html:not(.dark) #bnav{border-top-color:#e2e8f0}
+
+/* menu count badges, top bar, stat tiles */
+.nvb{min-width:22px;text-align:center;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--cd)}
+.nv.on .nvb{background:#ffffff33;color:#fff}
+html.dark .nvb{background:#1f2d4a;color:#a5b4cc}html.dark .nv.on .nvb{background:color-mix(in srgb,var(--c) 35%,transparent);color:#fff}
+#q{border-radius:14px!important}
+header button.rounded-full{border-radius:14px!important}
+.grid>.bg-white.rounded-xl.shadow.border-l-4 .text-2xl{font-size:1.9rem;font-weight:800;line-height:1.2}

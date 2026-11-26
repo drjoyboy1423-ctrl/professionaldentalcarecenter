@@ -51,7 +51,7 @@
   <header class="flex items-center gap-3 p-3">
    <button class="lg:hidden text-gray-600 px-2" onclick="tgl()"><i class="fa fa-bars"></i></button>
    <div class="relative w-full max-w-xs"><i class="fa fa-search absolute left-3 top-3 text-gray-500"></i><input id="q" type="search" enterkeyhint="search" autocomplete="off" oninput="Q=this.value;go('recent')" placeholder="Search patients" class="w-full bg-white rounded-md shadow pl-9 pr-3 py-2"></div>
-   <div class="ml-auto flex items-center gap-3"><div id="av" class="w-9 h-9 rounded-full bg-white overflow-hidden"></div><button id="calbtn" onclick="go('settings')" class="border rounded-full w-9 h-9 bg-white text-gray-700" title="Settings" aria-label="Settings"><i class="fa fa-gear"></i></button><span id="un" class="text-red-500 text-sm"></span></div>
+   <div class="ml-auto flex items-center gap-3"><div id="av" class="w-9 h-9 rounded-full bg-white overflow-hidden"></div><button id="thbtn" onclick="thQuick()" class="border rounded-full w-9 h-9 bg-white text-gray-700" title="Light or dark" aria-label="Light or dark mode"><i class="fa fa-moon"></i></button><button id="calbtn" onclick="go('settings')" class="border rounded-full w-9 h-9 bg-white text-gray-700" title="Settings" aria-label="Settings"><i class="fa fa-gear"></i></button><span id="un" class="text-red-500 text-sm"></span></div>
   </header>
   <main id="v" class="flex-1 overflow-auto p-3 md:p-6"></main>
  </div></div>
@@ -79,6 +79,7 @@
 <script src="src/features/admin/activity.js"></script>
 <script src="src/app/settings.js"></script>
 <script src="src/app/colours.js"></script>
+<script src="src/app/topbar.js"></script>
 <script src="src/app/notify.js"></script>
 <script src="src/lib/barcode.js"></script>
 <script src="src/app/funcSearch.js"></script>
