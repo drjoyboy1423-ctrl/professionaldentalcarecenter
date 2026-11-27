@@ -221,3 +221,9 @@ button.bg-green-500{background-color:var(--c)!important}button.bg-green-500:hove
 button.bg-green-600{background-color:var(--c)!important}
 html.dark button.bg-green-500,html.dark button.bg-green-600{color:#fff!important}
 html.dark #bnav button.on i,html.dark #bnav button.on{color:color-mix(in srgb,var(--c) 55%,white)}
+
+/* group tabs at the top of a page (the other pages of the same side-menu group) */
+.gtabs{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px;padding:2px 0 6px;scrollbar-width:none}.gtabs::-webkit-scrollbar{display:none}
+.gtab{flex:0 0 auto;display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#475569}
+.gtab.on{background:var(--c);border-color:var(--c);color:#fff}
+html.dark .gtab{background:#14214a;border-color:#28396a;color:#cbd5e1}html.dark .gtab.on{background:var(--c);border-color:var(--c);color:#fff}
