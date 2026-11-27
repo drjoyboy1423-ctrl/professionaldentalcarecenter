@@ -227,3 +227,9 @@ html.dark #bnav button.on i,html.dark #bnav button.on{color:color-mix(in srgb,va
 .gtab{flex:0 0 auto;display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#475569}
 .gtab.on{background:var(--c);border-color:var(--c);color:#fff}
 html.dark .gtab{background:#14214a;border-color:#28396a;color:#cbd5e1}html.dark .gtab.on{background:var(--c);border-color:var(--c);color:#fff}
+
+/* clinic list in the app colours */
+.clpi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 14px;margin-bottom:8px;border-radius:14px;border:1px solid #e2e8f0;background:#fff;font-weight:600}
+.clpi.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,#fff)}.clpn{flex:1}.cldot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+html.dark .clpi{background:#101c3c;border-color:#28396a;color:#e2e8f0}html.dark .clpi.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,#101c3c)}
+html.dark #clbtn{background:#101c3c!important;border-color:#28396a!important;color:#e2e8f0}
