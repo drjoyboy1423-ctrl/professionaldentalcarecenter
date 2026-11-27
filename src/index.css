@@ -233,3 +233,9 @@ html.dark .gtab{background:#14214a;border-color:#28396a;color:#cbd5e1}html.dark 
 .clpi.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,#fff)}.clpn{flex:1}.cldot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:0 0 auto}
 html.dark .clpi{background:#101c3c;border-color:#28396a;color:#e2e8f0}html.dark .clpi.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,#101c3c)}
 html.dark #clbtn{background:#101c3c!important;border-color:#28396a!important;color:#e2e8f0}
+
+/* amber notice boxes readable in dark mode (AI helper privacy note and similar) */
+html.dark .bg-amber-50,html.dark .bg-orange-50{background-color:#33290f!important;color:#fde68a!important}
+html.dark .bg-amber-100,html.dark .bg-orange-100{background-color:#3d3010!important;color:#fde68a!important}
+html.dark .border-amber-300,html.dark .border-amber-200,html.dark .border-orange-300{border-color:#8a6d1f!important}
+html.dark .text-amber-800,html.dark .text-amber-700,html.dark .text-amber-900,html.dark .text-orange-700,html.dark .text-orange-800{color:#fcd34d!important}

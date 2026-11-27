@@ -56,6 +56,7 @@ async function firstFlash() {
   return m.length ? m[m.length - 1].name.replace(/^models\//, '') : '';
 }
 
+const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 async function ask(prompt) {
   let model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
   let { r, j } = await generate(model, prompt);
@@ -63,6 +64,18 @@ async function ask(prompt) {
     const alt = await firstFlash();
     if (alt && alt !== model) { model = alt; ({ r, j } = await generate(model, prompt)); }
   }
+  /* Google says 503 / 500 when the model is overloaded for a moment: try once more, then other models */
+  if (r.status === 503 || r.status === 500) {
+    await sleep(1200);
+    ({ r, j } = await generate(model, prompt));
+    for (const alt of ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-flash-latest']) {
+      if (r.status !== 503 && r.status !== 500 && r.status !== 404) break;
+      if (alt === model) continue;
+      const g = await generate(alt, prompt);
+      if (g.r.ok || (g.r.status !== 503 && g.r.status !== 500 && g.r.status !== 404)) { model = alt; r = g.r; j = g.j; }
+    }
+  }
+  if (r.status === 503 || r.status === 500) throw fail(503, 'Google\'s AI service is busy right now. Wait a minute and press Run again.');
   if (r.status === 400 && /api key/i.test((j.error && j.error.message) || '')) throw fail(500, 'The Gemini key on the server is not valid. Check GEMINI_API_KEY in Vercel.');
   if (r.status === 403 || r.status === 401) throw fail(500, 'Gemini refused the key on the server. Check GEMINI_API_KEY in Vercel.');
   if (r.status === 429) throw fail(429, 'Gemini is busy or the free limit is used up. Try again in a minute.');
